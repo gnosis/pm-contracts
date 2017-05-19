@@ -1,0 +1,6 @@
+requests==2.5.3
+click==5.1
+
+# ethereum
+git+https://github.com/Georgi87/pyethereum.git@develop
+git+https://github.com/Georgi87/ethjsonrpc.git@master

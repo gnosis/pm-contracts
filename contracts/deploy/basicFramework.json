@@ -1,0 +1,40 @@
+[
+  {
+    "type": "deployment",
+    "file": "Utils/Math.sol",
+    "label": "Math"
+  },
+  {
+    "type": "deployment",
+    "file": "Events/EventFactory.sol",
+    "libraries": {
+      "Math": "Math"
+    }
+  },
+  {
+    "type": "deployment",
+    "file": "Tokens/EtherToken.sol",
+    "libraries": {
+      "Math": "Math"
+    }
+  },
+  {
+    "type": "deployment",
+    "file": "Oracles/CentralizedOracleFactory.sol"
+  },
+  {
+    "type": "deployment",
+    "file": "Oracles/UltimateOracleFactory.sol"
+  },
+  {
+    "type": "deployment",
+    "file": "MarketMakers/LMSRMarketMaker.sol",
+    "libraries": {
+      "Math": "Math"
+    }
+  },
+  {
+    "type": "deployment",
+    "file": "Markets/DefaultMarketFactory.sol"
+  }
+]
