@@ -1,3 +1,4 @@
+from codecs import encode, decode
 from ethjsonrpc import EthJsonRpc
 from ethereum.abi import ContractTranslator
 from ethereum.transactions import Transaction
@@ -35,7 +36,7 @@ class EthDeploy:
         elif private_key_path:
             with open(private_key_path, 'r') as private_key_file:
                 self.private_key = private_key_file.read().strip()
-            self._from = self.add_0x(privtoaddr(self.private_key.decode('hex')).encode('hex'))
+            self._from = self.add_0x(encode(privtoaddr(decode(self.private_key, 'hex')),'hex'))
         else:
             accounts = self.json_rpc.eth_accounts()['result']
             if len(accounts) == 0:
@@ -114,9 +115,9 @@ class EthDeploy:
 
     def get_raw_transaction(self, to='', value=0, data=''):
         nonce = self.get_nonce()
-        tx = Transaction(nonce, self.gas_price, self.gas, to, value, data.decode('hex'))
-        tx.sign(self.private_key.decode('hex'))
-        return self.add_0x(rlp.encode(tx).encode('hex'))
+        tx = Transaction(nonce, self.gas_price, self.gas, to, value, decode(data, 'hex'))
+        tx.sign(decode(self.private_key, 'hex'))
+        return self.add_0x(encode(rlp.encode(tx), 'hex'))
 
     def compile_code(self, code=None, path=None):
         # create list of valid paths
@@ -133,7 +134,7 @@ class EthDeploy:
     def deploy(self, _from, file_path, bytecode, sourcecode, libraries, value, params, label, abi):
         # replace library placeholders
         if libraries:
-            for library_name, library_address in libraries.iteritems():
+            for library_name, library_address in libraries.items():
                 self.references[library_name] = self.replace_references(self.strip_0x(library_address))
         if file_path:
             if self.contract_dir:
@@ -148,7 +149,7 @@ class EthDeploy:
             translator = ContractTranslator(abi)
             # replace constructor placeholders
             params = [self.replace_references(p) for p in params]
-            bytecode += translator.encode_constructor_arguments(params).encode('hex')
+            bytecode += encode(translator.encode_constructor_arguments(params), 'hex')
         # deploy contract
         self.log('Deployment transaction for {} sent'.format(label if label else 'unknown'))
         tx_response = None
@@ -186,7 +187,7 @@ class EthDeploy:
                 name = abi['name']
             abi = self.abis[to] if to in self.abis else [abi]
             translator = ContractTranslator(abi)
-            data = translator.encode(name, self.replace_references(params)).encode("hex")
+            data = encode(translator.encode(name, self.replace_references(params)), "hex")
         self.log('Transaction to {}{} sent'.format(self.format_reference(reference),
                                                    ' calling {} function'.format(name) if name else ''))
         tx_response = None
@@ -221,7 +222,7 @@ class EthDeploy:
             name = abi['name']
         abi = self.abis[to] if to in self.abis else [abi]
         translator = ContractTranslator(abi)
-        data = translator.encode(name, self.replace_references(params)).encode('hex')
+        data = encode(translator.encode(name, self.replace_references(params)), 'hex')
         response = self.json_rpc.eth_call(
             self.add_0x(to),
             from_address=self.add_0x(_from if _from else self._from),
@@ -230,7 +231,7 @@ class EthDeploy:
             gas=self.gas,
             gas_price=self.gas_price
         )
-        result = translator.decode(name, self.strip_0x(response['result']).decode('hex'))
+        result = translator.decode(name, decode(self.strip_0x(response['result']), 'hex'))
         result = result if len(result) > 1 else result[0]
         if label:
             self.references[label] = result
@@ -288,7 +289,7 @@ class EthDeploy:
         self.log('Summary: {} gas used, {} Ether / {} Wei spent on gas'.format(self.total_gas,
                                                                                self.total_gas*self.gas_price/10.0**18,
                                                                                self.total_gas*self.gas_price))
-        for reference, value in self.references.iteritems():
+        for reference, value in self.references.items():
             self.log('{} references {}'.format(reference, self.add_0x(value) if isinstance(value, unicode) else value))
         self.log('-' * 96)
 

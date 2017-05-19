@@ -1,3 +1,4 @@
+from codecs import decode
 from ..abstract_test import AbstractTestContract, keys
 
 
@@ -15,7 +16,7 @@ class TestContract(AbstractTestContract):
 
     def test(self):
         # Create oracles
-        description_hash = "d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449".decode('hex')
+        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
         owner_1 = 0
         owner_2 = 1
         owner_3 = 1

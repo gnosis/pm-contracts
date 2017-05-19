@@ -6,6 +6,7 @@ from ethereum.tester import keys, accounts, TransactionFailed, ABIContract
 from ethereum import _solidity
 from ethereum.abi import ContractTranslator
 # standard libraries
+from codecs import encode, decode
 from unittest import TestCase
 from os import walk
 import string
@@ -43,14 +44,14 @@ class AbstractTestContract(TestCase):
     def create_abi(self, path, libraries=None):
         path, extra_args = self.get_dirs(path)
         if libraries:
-            for name, address in libraries.iteritems():
+            for name, address in libraries.items():
                 if type(address) == str:
                     if self.is_hex(address):
                         libraries[name] = address
                     else:
-                        libraries[name] = address.encode('hex')
+                        libraries[name] = encode(address, 'hex')
                 elif isinstance(address, t.ABIContract):
-                    libraries[name] = address.address.encode('hex')
+                    libraries[name] = encode(address.address, 'hex')
                 else:
                     raise ValueError
         return ContractTranslator(self.solidity.mk_full_signature(None, path=path, libraries=libraries, extra_args=extra_args))
@@ -60,14 +61,14 @@ class AbstractTestContract(TestCase):
         if params:
             params = [x.address if isinstance(x, t.ABIContract) else x for x in params]
         if libraries:
-            for name, address in libraries.iteritems():
+            for name, address in libraries.items():
                 if type(address) == str:
                     if self.is_hex(address):
                         libraries[name] = address
                     else:
-                        libraries[name] = address.encode('hex')
+                        libraries[name] = encode(address, 'hex')
                 elif isinstance(address, t.ABIContract):
-                    libraries[name] = address.address.encode('hex')
+                    libraries[name] = encode(address.address, 'hex')
                 else:
                     raise ValueError
         return self.s.abi_contract(None,

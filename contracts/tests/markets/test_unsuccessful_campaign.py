@@ -1,3 +1,4 @@
+from codecs import decode
 from ..abstract_test import AbstractTestContract, keys
 
 
@@ -22,7 +23,7 @@ class TestContract(AbstractTestContract):
 
     def test(self):
         # Create event
-        description_hash = "d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449".decode('hex')
+        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
         oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(description_hash), self.oracle_abi)
         event = self.contract_at(self.event_factory.createCategoricalEvent(self.ether_token.address, oracle.address, 2), self.event_abi)
         # Create campaign
@@ -35,7 +36,7 @@ class TestContract(AbstractTestContract):
         self.assertEqual(campaign.stage(), 0)
         # Fund campaign
         backer_1 = 0
-        amount = 10**18 / 4 * 3
+        amount = 10**18 // 4 * 3
         self.ether_token.deposit(value=amount, sender=keys[backer_1])
         self.ether_token.approve(campaign.address, amount, sender=keys[backer_1])
         campaign.fund(amount, sender=keys[backer_1])

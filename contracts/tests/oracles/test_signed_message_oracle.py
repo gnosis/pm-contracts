@@ -1,3 +1,4 @@
+from codecs import encode, decode
 from ..abstract_test import AbstractTestContract, accounts, keys, TransactionFailed
 # signing
 from bitcoin import ecdsa_raw_sign
@@ -16,7 +17,7 @@ class TestContract(AbstractTestContract):
 
     @staticmethod
     def i2b(_integer, zfill=64):
-        return format(_integer, 'x').zfill(zfill).decode('hex')
+        return decode(format(_integer, 'x').zfill(zfill), 'hex')
 
     def sign_data(self, data, private_key):
         v, r, s = ecdsa_raw_sign(data, private_key)
@@ -24,16 +25,16 @@ class TestContract(AbstractTestContract):
 
     def test(self):
         # Create oracles
-        description_hash = "d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449".decode('hex')
+        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
         signer_1 = 0
         signer_2 = 1
         v, r, s = self.sign_data(description_hash, keys[signer_1])
         oracle = self.contract_at(self.signed_message_oracle_factory.createSignedMessageOracle(description_hash, v, r, s),
                                   self.oracle_abi)
-        self.assertEqual(oracle.signer(), accounts[signer_1].encode('hex'))
+        self.assertEqual(oracle.signer(), encode(accounts[signer_1], 'hex'))
         # Replace signer
         oracle.replaceSigner(accounts[signer_2], sender=keys[signer_1])
-        self.assertEqual(oracle.signer(), accounts[signer_2].encode('hex'))
+        self.assertEqual(oracle.signer(), encode(accounts[signer_2], 'hex'))
         # Set outcome
         outcome = 1
         result_hash = sha3(

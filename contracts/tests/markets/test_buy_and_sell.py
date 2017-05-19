@@ -1,3 +1,4 @@
+from codecs import decode
 from ..abstract_test import AbstractTestContract, accounts, keys
 
 
@@ -20,7 +21,7 @@ class TestContract(AbstractTestContract):
 
     def test(self):
         # Create event
-        description_hash = "d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449".decode('hex')
+        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
         oracle_address = self.centralized_oracle_factory.createCentralizedOracle(description_hash)
         event = self.contract_at(self.event_factory.createCategoricalEvent(self.ether_token.address, oracle_address, 2), self.event_abi)
         # Create market
@@ -40,7 +41,7 @@ class TestContract(AbstractTestContract):
         token_count = 10**15
         outcome_token_costs = self.lmsr.calcCosts(market.address, outcome, token_count)
         fee = market.calcMarketFee(outcome_token_costs)
-        self.assertEqual(fee, outcome_token_costs * 105 / 100 - outcome_token_costs)
+        self.assertEqual(fee, outcome_token_costs * 105 // 100 - outcome_token_costs)
         costs = outcome_token_costs + fee
         self.ether_token.deposit(value=costs, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), costs)
