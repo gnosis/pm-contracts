@@ -10,7 +10,7 @@ contract EventFactory {
     /*
      *  Events
      */
-    event CategoricalEventCreation(address indexed creator, CategoricalEvent categoricalEvent, Token collateralToken, Oracle oracle, uint outcomeCount);
+    event CategoricalEventCreation(address indexed creator, CategoricalEvent categoricalEvent, Token collateralToken, Oracle oracle, uint8 outcomeCount);
     event ScalarEventCreation(address indexed creator, ScalarEvent scalarEvent, Token collateralToken, Oracle oracle, int lowerBound, int upperBound);
 
     /*
@@ -30,7 +30,7 @@ contract EventFactory {
     function createCategoricalEvent(
         Token collateralToken,
         Oracle oracle,
-        uint outcomeCount
+        uint8 outcomeCount
     )
         public
         returns (CategoricalEvent eventContract)

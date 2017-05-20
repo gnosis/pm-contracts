@@ -24,10 +24,10 @@ contract Event {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function Event(Token _collateralToken, Oracle _oracle, uint outcomeCount)
+    function Event(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
         public
     {
-        if (address(_collateralToken) == 0 || address(_oracle) == 0 || outcomeCount < 2 || outcomeCount > 256)
+        if (address(_collateralToken) == 0 || address(_oracle) == 0 || outcomeCount < 2)
             // Values are null or outcome count is too low
             revert();
         collateralToken = _collateralToken;

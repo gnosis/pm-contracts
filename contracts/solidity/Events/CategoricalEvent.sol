@@ -16,7 +16,7 @@ contract CategoricalEvent is Event {
     function CategoricalEvent(
         Token _collateralToken,
         Oracle _oracle,
-        uint outcomeCount
+        uint8 outcomeCount
     )
         public
         Event(_collateralToken, _oracle, outcomeCount)
