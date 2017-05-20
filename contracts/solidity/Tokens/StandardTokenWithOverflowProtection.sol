@@ -56,38 +56,38 @@ contract StandardTokenWithOverflowProtection is Token {
     }
 
     /// @dev Sets approved amount of tokens for spender. Returns success
-    /// @param _spender Address of allowed account
+    /// @param spender Address of allowed account
     /// @param value Number of approved tokens
     /// @return Returns success of function call
-    function approve(address _spender, uint value)
+    function approve(address spender, uint value)
         public
         returns (bool)
     {
-        allowances[msg.sender][_spender] = value;
-        Approval(msg.sender, _spender, value);
+        allowances[msg.sender][spender] = value;
+        Approval(msg.sender, spender, value);
         return true;
     }
 
     /// @dev Returns number of allowed tokens for given address
-    /// @param _owner Address of token owner
-    /// @param _spender Address of token spender
+    /// @param owner Address of token owner
+    /// @param spender Address of token spender
     /// @return Returns remaining allowance for spender
-    function allowance(address _owner, address _spender)
+    function allowance(address owner, address spender)
         public
         constant
         returns (uint)
     {
-        return allowances[_owner][_spender];
+        return allowances[owner][spender];
     }
 
     /// @dev Returns number of tokens owned by given address
-    /// @param _owner Address of token owner
+    /// @param owner Address of token owner
     /// @return Returns balance of owner
-    function balanceOf(address _owner)
+    function balanceOf(address owner)
         public
         constant
         returns (uint)
     {
-        return balances[_owner];
+        return balances[owner];
     }
 }

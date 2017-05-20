@@ -1,16 +1,16 @@
 pragma solidity 0.4.11;
-import "Tokens/StandardTokenWithOverflowProtection.sol";
+import "Tokens/StandardToken.sol";
 
 
 /// @title Token contract - Token exchanging Ether 1:1
 /// @author Stefan George - <stefan@gnosis.pm>
-contract EtherToken is StandardTokenWithOverflowProtection {
+contract EtherToken is StandardToken {
 
     /*
      *  Events
      */
-    event Deposit(address indexed sender, uint amount);
-    event Withdrawal(address indexed receiver, uint amount);
+    event Deposit(address indexed sender, uint value);
+    event Withdrawal(address indexed receiver, uint value);
 
     /*
      *  Constants
@@ -33,16 +33,16 @@ contract EtherToken is StandardTokenWithOverflowProtection {
     }
 
     /// @dev Sells tokens in exchange for Ether, exchanging them 1:1
-    /// @param amount Number of tokens to sell
-    function withdraw(uint amount)
+    /// @param value Number of tokens to sell
+    function withdraw(uint value)
         public
     {
-        if (!Math.safeToSubtract(balances[msg.sender], amount))
+        if (balances[msg.sender] < value)
             // Overflow operation
             revert();
-        balances[msg.sender] -= amount;
-        totalSupply -= amount;
-        msg.sender.transfer(amount);
-        Withdrawal(msg.sender, amount);
+        balances[msg.sender] -= value;
+        totalSupply -= value;
+        msg.sender.transfer(value);
+        Withdrawal(msg.sender, value);
     }
 }
