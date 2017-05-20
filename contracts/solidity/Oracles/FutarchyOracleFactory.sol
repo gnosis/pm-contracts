@@ -11,6 +11,7 @@ contract FutarchyOracleFactory {
      */
     event FutarchyOracleCreation(
         address indexed creator,
+        uint creationDate,
         FutarchyOracle futarchyOracle,
         Token collateralToken,
         Oracle oracle,
@@ -82,6 +83,7 @@ contract FutarchyOracleFactory {
         );
         FutarchyOracleCreation(
             msg.sender,
+            now,
             futarchyOracle,
             collateralToken,
             oracle,

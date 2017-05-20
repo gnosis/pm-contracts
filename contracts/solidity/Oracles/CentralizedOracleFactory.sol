@@ -9,7 +9,7 @@ contract CentralizedOracleFactory {
     /*
      *  Events
      */
-    event CentralizedOracleCreation(address indexed creator, CentralizedOracle centralizedOracle, bytes32 descriptionHash);
+    event CentralizedOracleCreation(address indexed creator, uint creationDate, CentralizedOracle centralizedOracle, bytes32 descriptionHash);
 
     /*
      *  Public functions
@@ -22,6 +22,6 @@ contract CentralizedOracleFactory {
         returns (CentralizedOracle centralizedOracle)
     {
         centralizedOracle = new CentralizedOracle(msg.sender, descriptionHash);
-        CentralizedOracleCreation(msg.sender, centralizedOracle, descriptionHash);
+        CentralizedOracleCreation(msg.sender, now, centralizedOracle, descriptionHash);
     }
 }

@@ -9,7 +9,7 @@ contract CampaignFactory {
     /*
      *  Events
      */
-    event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, MarketFactory marketFactory, MarketMaker marketMaker, uint fee, uint funding, uint deadline);
+    event CampaignCreation(address indexed creator, uint creationDate, Campaign campaign, Event eventContract, MarketFactory marketFactory, MarketMaker marketMaker, uint fee, uint funding, uint deadline);
 
     /*
      *  Public functions
@@ -34,6 +34,6 @@ contract CampaignFactory {
         returns (Campaign campaign)
     {
         campaign = new Campaign(eventContract, marketFactory, marketMaker, fee, funding, deadline);
-        CampaignCreation(msg.sender, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
+        CampaignCreation(msg.sender, now, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
     }
 }

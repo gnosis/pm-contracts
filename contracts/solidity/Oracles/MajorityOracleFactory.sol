@@ -9,7 +9,7 @@ contract MajorityOracleFactory {
     /*
      *  Events
      */
-    event MajorityOracleCreation(address indexed creator, MajorityOracle majorityOracle, Oracle[] oracles);
+    event MajorityOracleCreation(address indexed creator, uint creationDate, MajorityOracle majorityOracle, Oracle[] oracles);
 
     /*
      *  Public functions
@@ -22,6 +22,6 @@ contract MajorityOracleFactory {
         returns (MajorityOracle majorityOracle)
     {
         majorityOracle = new MajorityOracle(oracles);
-        MajorityOracleCreation(msg.sender, majorityOracle, oracles);
+        MajorityOracleCreation(msg.sender, now, majorityOracle, oracles);
     }
 }

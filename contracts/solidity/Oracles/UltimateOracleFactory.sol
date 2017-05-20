@@ -11,6 +11,7 @@ contract UltimateOracleFactory {
      */
     event UltimateOracleCreation(
         address indexed creator,
+        uint creationDate,
         UltimateOracle ultimateOracle,
         Oracle oracle,
         Token collateralToken,
@@ -52,6 +53,7 @@ contract UltimateOracleFactory {
         );
         UltimateOracleCreation(
             msg.sender,
+            now,
             ultimateOracle,
             oracle,
             collateralToken,
