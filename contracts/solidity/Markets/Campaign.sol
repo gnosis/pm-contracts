@@ -98,6 +98,7 @@ contract Campaign {
         if (maxAmount < amount)
             amount = maxAmount;
         if (!eventContract.collateralToken().transferFrom(msg.sender, this, amount))
+            // Transfer failed
             revert();
         contributions[msg.sender] += amount;
         if (amount == maxAmount)
@@ -141,6 +142,7 @@ contract Campaign {
         atStage(Stages.MarketCreated)
     {
         if (!eventContract.isWinningOutcomeSet())
+            // Winning outcome is not set yet
             revert();
         market.close();
         market.withdrawFees();

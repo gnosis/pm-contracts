@@ -86,12 +86,14 @@ contract FutarchyOracle is Oracle {
         // Buy all outcomes
         if (   !categoricalEvent.collateralToken().transferFrom(creator, this, funding)
             || !categoricalEvent.collateralToken().approve(categoricalEvent, funding))
+            // Transfer failed or approval failed
             revert();
         categoricalEvent.buyAllOutcomes(funding);
         // Fund each market with outcome tokens from categorical event
         for (uint8 i=0; i<markets.length; i++) {
             Market market = markets[i];
             if (!market.eventContract().collateralToken().approve(market, funding))
+                // Tokens could not be approved
                 revert();
             market.fund(funding);
         }
@@ -103,10 +105,12 @@ contract FutarchyOracle is Oracle {
         isCreator
     {
         if (!categoricalEvent.isWinningOutcomeSet())
+            // Winning outcome is not set yet
             revert();
         // Close market and transfer all outcome tokens from winning outcome to this contract
         Market market = markets[uint(getOutcome())];
         if (!market.eventContract().isWinningOutcomeSet())
+            // Winning outcome is not set yet
             revert();
         market.close();
         market.eventContract().redeemWinnings();
@@ -114,6 +118,7 @@ contract FutarchyOracle is Oracle {
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
         if (!categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)))
+            // Transfer failed
             revert();
     }
 

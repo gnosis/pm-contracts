@@ -24,6 +24,7 @@ contract MajorityOracle is Oracle {
             revert();
         for (uint i=0; i<_oracles.length; i++)
             if (address(_oracles[i]) == 0)
+                // Oracle address cannot be null
                 revert();
         oracles = _oracles;
     }

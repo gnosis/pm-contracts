@@ -29,6 +29,7 @@ contract DefaultMarket is Market {
      */
     modifier isCreator () {
         if (msg.sender != creator)
+            // Only creator is allowed to proceed
             revert();
         _;
     }
@@ -36,7 +37,7 @@ contract DefaultMarket is Market {
     /*
      *  Public functions
      */
-    /// @dev Constructor validates and sets market properties and invests initial funding
+    /// @dev Constructor validates and sets market properties
     /// @param _creator Market creator
     /// @param _eventContract Event contract
     /// @param _marketMaker Market maker contract
@@ -45,7 +46,7 @@ contract DefaultMarket is Market {
         public
     {
         if (address(_eventContract) == 0 || address(_marketMaker) == 0 || _fee >= FEE_RANGE)
-            // Values are null
+            // Values are null or fee is above 100%
             revert();
         creator = _creator;
         createdAtBlock = block.number;
@@ -87,6 +88,7 @@ contract DefaultMarket is Market {
     {
         fees = eventContract.collateralToken().balanceOf(this);
         if (!eventContract.collateralToken().transfer(creator, fees))
+            // Transfer failed
             revert();
     }
 
@@ -111,6 +113,7 @@ contract DefaultMarket is Market {
         // Transfer tokens to markets contract and buy all outcomes
         if (   !eventContract.collateralToken().transferFrom(msg.sender, this, costs)
             || !eventContract.collateralToken().approve(eventContract, outcomeTokenCosts))
+            // Tokens could not be transferred or approval failed
             revert();
         // Buy all outcomes
         eventContract.buyAllOutcomes(outcomeTokenCosts);
@@ -142,6 +145,7 @@ contract DefaultMarket is Market {
         eventContract.sellAllOutcomes(outcomeTokenProfits);
         // Transfer profits to seller
         if (!eventContract.collateralToken().transfer(msg.sender, profits))
+            // Transfer failed
             revert();
     }
 
@@ -157,7 +161,7 @@ contract DefaultMarket is Market {
         // Buy all outcomes
         if (   !eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
             || !eventContract.collateralToken().approve(eventContract, outcomeTokenCount))
-            // Sender did not approve enough tokens
+            // Transfer failed or approval failed
             revert();
         eventContract.buyAllOutcomes(outcomeTokenCount);
         // Short sell selected outcome

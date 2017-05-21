@@ -39,6 +39,7 @@ contract GnosisToken is StandardToken {
             assignedTokens += tokens[i];
         }
         if (assignedTokens != totalSupply)
+            // Assgined tokens don't match the total supply
             revert();
     }
 }

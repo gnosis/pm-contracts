@@ -52,7 +52,7 @@ contract UltimateOracle is Oracle {
             || _challengePeriod == 0
             || _challengeAmount == 0
             || _frontRunnerPeriod == 0)
-            // Values are null
+            // Values should not be null
             revert();
         oracle = _oracle;
         collateralToken = _collateralToken;
@@ -125,6 +125,7 @@ contract UltimateOracle is Oracle {
         returns (uint amount)
     {
         if (!isChallenged() || !isFrontRunnerPeriodOver())
+            // Outcome was not challenged or front runner period is not over yet
             revert();
         amount = totalAmount * outcomeAmounts[msg.sender][frontRunner] / totalOutcomeAmounts[frontRunner];
         outcomeAmounts[msg.sender][frontRunner] = 0;

@@ -38,8 +38,8 @@ class AbstractTestContract(TestCase):
         path = '{}/{}'.format(abs_contract_path, path)
         return path, extra_args
 
-    def contract_at(self, abi, address):
-        return ABIContract(self.s, address, abi)
+    def contract_at(self, address, abi):
+        return ABIContract(self.s, abi, address)
 
     def create_abi(self, path, libraries=None):
         path, extra_args = self.get_dirs(path)
