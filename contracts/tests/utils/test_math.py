@@ -42,7 +42,7 @@ class TestContract(AbstractTestContract):
             (random.randrange(1, ONE) for _ in range(100)),
             (random.randrange(ONE, 2**256) for _ in range(100)),
         ):
-            X, actual, expected = x / ONE, self.math.ln(x) / ONE, mp.log(x / ONE)
+            X, actual, expected = float(x) / ONE, float(self.math.ln(x)) / ONE, mp.log(float(x) / ONE)
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # EXP
@@ -50,7 +50,7 @@ class TestContract(AbstractTestContract):
             (0, MAX_POWER),
             (random.randrange(MAX_POWER) for _ in range(10)),
         ):
-            X, actual, expected = x / ONE, self.math.exp(x) / ONE, mp.exp(x / ONE)
+            X, actual, expected = float(x) / ONE, float(self.math.exp(x)) / ONE, mp.exp(float(x) / ONE)
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # Safe to add
