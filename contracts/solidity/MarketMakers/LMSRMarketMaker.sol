@@ -28,8 +28,9 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint costs)
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
+        require(outcomeTokenDistribution.length > 0);
         uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
-        uint invB = Math.ln(outcomeTokenDistribution.length * ONE) / 10000;
+        uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
         uint costsBefore = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
         outcomeTokenDistribution[outcomeTokenIndex] -= outcomeTokenCount;
@@ -52,8 +53,9 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint profits)
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
+        require(outcomeTokenDistribution.length > 0);
         uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
-        uint invB = Math.ln(outcomeTokenDistribution.length * ONE) / 10000;
+        uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
         outcomeTokenRange[1] += outcomeTokenCount;
         uint costsBefore = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
@@ -80,7 +82,8 @@ contract LMSRMarketMaker is MarketMaker {
         uint fundingDivisor = funding / 10000;
         for (uint8 i=0; i<outcomeTokenDistribution.length; i++)
             innerSum += Math.exp((outcomeTokenRange[1] - outcomeTokenRange[0] - (outcomeTokenDistribution[i] - outcomeTokenRange[0])) / fundingDivisor * invB);
-        costs = Math.ln(innerSum) * ONE / invB;
+        require(innerSum >= ONE);
+        costs = uint(Math.ln(innerSum)) * ONE / invB;
     }
 
     /// @dev Returns outcome tokens owned by market
