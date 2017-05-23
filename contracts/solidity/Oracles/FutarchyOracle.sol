@@ -113,10 +113,10 @@ contract FutarchyOracle is Oracle {
             // Winning outcome is not set yet
             revert();
         market.close();
-        market.eventContract().redeemWinnings();
+        market.eventContract().redeemWinnings(0);
         market.withdrawFees();
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
-        categoricalEvent.redeemWinnings();
+        categoricalEvent.redeemWinnings(0);
         if (!categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)))
             // Transfer failed
             revert();
