@@ -100,7 +100,7 @@ library Math {
 
         int z;
         if(ilog2 < 0)
-            z = int(x << uint(ilog2));
+            z = int(x << uint(-ilog2));
         else
             z = int(x >> uint(ilog2));
 
@@ -149,8 +149,8 @@ library Math {
         constant
         returns (int lo)
     {
-        lo = -133;
-        int hi = 133;
+        lo = -64;
+        int hi = 193;
         int mid = (hi + lo) / 2;
         while ((lo + 1) != hi) {
             if (mid < 0 && x << uint(-mid) < ONE || mid >= 0 && x >> uint(mid) < ONE )

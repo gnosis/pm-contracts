@@ -27,26 +27,28 @@ class TestContract(AbstractTestContract):
 
     def test(self):
         ONE = 0x10000000000000000
-        RELATIVE_TOLERANCE = 2.0**-1
-        MAX_POWER = math.floor(math.log((2**256 - 1) / ONE) * ONE)
+        RELATIVE_TOLERANCE = 1e-9
+
+        # int(mp.floor(mp.log((2**256 - 1) / ONE) * ONE))
+        MAX_POWER = 2454971259878909886679
 
         # LN
         self.assertRaises(TransactionFailed, partial(self.math.ln, 0))
         for x in chain(
-            (1, 2**254-1),
-            (random.randrange(1, ONE) for _ in range(10)),
-            (random.randrange(ONE, 2**256) for _ in range(10)),
+            (1, ONE, 2**256-1),
+            (random.randrange(1, ONE) for _ in range(100)),
+            (random.randrange(ONE, 2**256) for _ in range(100)),
         ):
-            actual, expected = self.math.ln(x) / ONE, math.log(x / ONE)
-            assert isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
+            X, actual, expected = x / ONE, self.math.ln(x) / ONE, math.log(x / ONE)
+            assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # EXP
         for x in chain(
             (0, MAX_POWER),
             (random.randrange(MAX_POWER) for _ in range(10)),
         ):
-            actual, expected = self.math.exp(x) / ONE, math.exp(x / ONE)
-            assert isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
+            X, actual, expected = x / ONE, self.math.exp(x) / ONE, math.exp(x / ONE)
+            assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # Safe to add
         self.assertFalse(self.math.safeToAdd(2**256 - 1, 1))
