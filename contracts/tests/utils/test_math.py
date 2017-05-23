@@ -4,6 +4,9 @@ from functools import partial
 import math
 import random
 
+from mpmath import mp
+mp.dps = 100
+
 from ethereum.tester import TransactionFailed
 
 from ..abstract_test import AbstractTestContract
@@ -39,7 +42,7 @@ class TestContract(AbstractTestContract):
             (random.randrange(1, ONE) for _ in range(100)),
             (random.randrange(ONE, 2**256) for _ in range(100)),
         ):
-            X, actual, expected = x / ONE, self.math.ln(x) / ONE, math.log(x / ONE)
+            X, actual, expected = x / ONE, self.math.ln(x) / ONE, mp.log(x / ONE)
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # EXP
@@ -47,7 +50,7 @@ class TestContract(AbstractTestContract):
             (0, MAX_POWER),
             (random.randrange(MAX_POWER) for _ in range(10)),
         ):
-            X, actual, expected = x / ONE, self.math.exp(x) / ONE, math.exp(x / ONE)
+            X, actual, expected = x / ONE, self.math.exp(x) / ONE, mp.exp(x / ONE)
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # Safe to add

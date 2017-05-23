@@ -104,41 +104,38 @@ library Math {
         else
             z = int(x >> uint(ilog2));
 
-        int zpow = int(ONE);
-        int const = int(ONE) * 10;
-        int result = const;
-        result -= 0x443b9c5adb08cc45f * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0xf0a52590f17c71a3f * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x2478f22e787502b023 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x48c6de1480526b8d4c * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x70c18cae824656408c * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x883c81ec0ce7abebb2 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x81814da94fe52ca9f5 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x616361924625d1acf5 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x39f9a16fb9292a608d * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x1b3049a5740b21d65f * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x9ee1408bd5ad96f3e * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x2c465c91703b7a7f4 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x918d2d5f045a4d63 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x14ca095145f44f78 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result -= 0x1d806fc412c1b99 * zpow / int(ONE);
-        zpow = zpow * z / int(ONE);
-        result += 0x13950b4e1e89cc * zpow / int(ONE);
-        return (ilog2 * int(ONE) + result - const) * int(ONE) / int(LOG2_E);
+        // z = x * 2^-⌊log₂x⌋
+        // so 1 <= z < 2
+        // and ln z = ln x - ⌊log₂x⌋/log₂e
+        // so just compute ln z using artanh series
+        // and calculate ln x from that
+        int term = (z - int(ONE)) * int(ONE) / (z + int(ONE));
+        int halflnz = term;
+        int termpow = term * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 3;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 5;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 7;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 9;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 11;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 13;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 15;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 17;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 19;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 21;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 23;
+        termpow = termpow * term / int(ONE) * term / int(ONE);
+        halflnz += termpow / 25;
+        return (ilog2 * int(ONE)) * int(ONE) / int(LOG2_E) + 2 * halflnz;
     }
 
     /// @dev Returns base 2 logarithm value of given x
@@ -151,13 +148,14 @@ library Math {
     {
         lo = -64;
         int hi = 193;
-        int mid = (hi + lo) / 2;
-        while ((lo + 1) != hi) {
-            if (mid < 0 && x << uint(-mid) < ONE || mid >= 0 && x >> uint(mid) < ONE )
+        // I use a shift here instead of / 2 because it floors instead of rounding towards 0
+        int mid = (hi + lo) >> 1;
+        while((lo + 1) < hi) {
+            if (mid < 0 && x << uint(-mid) < ONE || mid >= 0 && x >> uint(mid) < ONE)
                 hi = mid;
             else
                 lo = mid;
-            mid = (hi + lo) / 2;
+            mid = (hi + lo) >> 1;
         }
     }
 
