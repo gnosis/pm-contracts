@@ -44,11 +44,15 @@ contract ScalarEvent is Event {
     }
 
     /// @dev Exchanges user's winning outcome tokens for collateral tokens
+    /// @param receiver Redeem winnings for receiver address
     /// @return Returns user's winnings
-    function redeemWinnings()
+    function redeemWinnings(address receiver)
         public
         returns (uint winnings)
     {
+        // Set receiver to sender if receiver is not set
+        if (receiver == 0)
+            receiver = msg.sender;
         if (!isWinningOutcomeSet)
             // Winning outcome is not set yet
             revert();
@@ -65,14 +69,14 @@ contract ScalarEvent is Event {
             convertedWinningOutcome = uint16(OUTCOME_RANGE * (winningOutcome - lowerBound) / (upperBound - lowerBound));
         uint factorShort = OUTCOME_RANGE - convertedWinningOutcome;
         uint factorLong = OUTCOME_RANGE - factorShort;
-        uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);
-        uint longOutcomeTokenCount = outcomeTokens[LONG].balanceOf(msg.sender);
+        uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(receiver);
+        uint longOutcomeTokenCount = outcomeTokens[LONG].balanceOf(receiver);
         winnings = (shortOutcomeTokenCount * factorShort + longOutcomeTokenCount * factorLong) / OUTCOME_RANGE;
         // Revoke all tokens of all outcomes
-        outcomeTokens[SHORT].revoke(msg.sender, shortOutcomeTokenCount);
-        outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);
+        outcomeTokens[SHORT].revoke(receiver, shortOutcomeTokenCount);
+        outcomeTokens[LONG].revoke(receiver, longOutcomeTokenCount);
         // Payout winnings
-        if (!collateralToken.transfer(msg.sender, winnings))
+        if (!collateralToken.transfer(receiver, winnings))
             // Transfer failed
             revert();
     }

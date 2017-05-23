@@ -46,8 +46,8 @@ class TestContract(AbstractTestContract):
         event.setWinningOutcome()
         self.assertEqual(event.winningOutcome(), 1)
         self.assertTrue(event.isWinningOutcomeSet())
-        # Redeem winnings
-        self.assertEqual(event.redeemWinnings(sender=keys[buyer]), collateral_token_count)
+        # Redeem winnings for buyer account
+        self.assertEqual(event.redeemWinnings(accounts[buyer], sender=keys[9]), collateral_token_count)
         self.assertEqual(outcome_token_1.balanceOf(accounts[buyer]), collateral_token_count)
         self.assertEqual(outcome_token_2.balanceOf(accounts[buyer]), 0)
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), collateral_token_count)
