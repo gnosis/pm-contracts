@@ -11,6 +11,7 @@ contract SignedMessageOracle is Oracle {
      */
     address public signer;
     bytes32 public descriptionHash;
+    uint nonce;
     bool public isSet;
     int public outcome;
 
@@ -41,13 +42,20 @@ contract SignedMessageOracle is Oracle {
 
     /// @dev Replaces signer
     /// @param _signer New signer
-    function replaceSigner(address _signer)
+    /// @param _nonce Unique nonce to prevent replay attacks
+    /// @param v Signature parameter
+    /// @param r Signature parameter
+    /// @param s Signature parameter
+    function replaceSigner(address _signer, uint _nonce, uint8 v, bytes32 r, bytes32 s)
         public
         isSigner
     {
-        if (isSet)
-            // Result was set already
+        if (   isSet
+            || nonce >= _nonce
+            || signer != ecrecover(keccak256(descriptionHash, _signer, _nonce), v, r, s))
+            // Result was set already or nonce is invalid or singer is invalid
             revert();
+        nonce = _nonce;
         signer = _signer;
     }
 

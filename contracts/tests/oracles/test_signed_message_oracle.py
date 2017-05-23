@@ -33,7 +33,15 @@ class TestContract(AbstractTestContract):
                                   self.oracle_abi)
         self.assertEqual(oracle.signer(), encode(accounts[signer_1], 'hex'))
         # Replace signer
-        oracle.replaceSigner(accounts[signer_2], sender=keys[signer_1])
+        nonce = 1
+        replace_hash = sha3(
+            description_hash +
+            accounts[signer_2] +
+            self.i2b(nonce)
+        )
+        # Signing by registered signer works
+        v, r, s = self.sign_data(replace_hash, keys[signer_1])
+        oracle.replaceSigner(accounts[signer_2], nonce,  v, r, s, sender=keys[signer_1])
         self.assertEqual(oracle.signer(), encode(accounts[signer_2], 'hex'))
         # Set outcome
         outcome = 1
