@@ -25,24 +25,20 @@ contract CategoricalEvent is Event {
     }
 
     /// @dev Exchanges user's winning outcome tokens for collateral tokens
-    /// @param receiver Redeem winnings for receiver address
     /// @return Returns user's winnings
-    function redeemWinnings(address receiver)
+    function redeemWinnings()
         public
         returns (uint winnings)
     {
-        // Set receiver to sender if receiver is not set
-        if (receiver == 0)
-            receiver = msg.sender;
         if (!isWinningOutcomeSet)
             // Winning outcome is not set yet
             revert();
         // Calculate winnings
-        winnings = outcomeTokens[uint(winningOutcome)].balanceOf(receiver);
+        winnings = outcomeTokens[uint(winningOutcome)].balanceOf(msg.sender);
         // Revoke tokens from winning outcome
-        outcomeTokens[uint(winningOutcome)].revoke(receiver, winnings);
+        outcomeTokens[uint(winningOutcome)].revoke(msg.sender, winnings);
         // Payout winnings
-        if (!collateralToken.transfer(receiver, winnings))
+        if (!collateralToken.transfer(msg.sender, winnings))
             // Transfer failed
             revert();
     }

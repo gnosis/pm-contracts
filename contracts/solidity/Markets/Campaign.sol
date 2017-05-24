@@ -146,7 +146,7 @@ contract Campaign {
             revert();
         market.close();
         market.withdrawFees();
-        eventContract.redeemWinnings(0);
+        eventContract.redeemWinnings();
         finalBalance = eventContract.collateralToken().balanceOf(this);
         stage = Stages.MarketClosed;
     }

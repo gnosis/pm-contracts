@@ -114,7 +114,6 @@ contract Event {
     function getEventHash() public constant returns (bytes32);
 
     /// @dev Exchanges user's winning outcome tokens for collateral tokens
-    /// @param receiver Redeem winnings for receiver address
     /// @return Returns user's winnings
-    function redeemWinnings(address receiver) public returns (uint);
+    function redeemWinnings() public returns (uint);
 }
