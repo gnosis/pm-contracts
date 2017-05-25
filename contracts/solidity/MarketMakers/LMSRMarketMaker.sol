@@ -28,7 +28,7 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint costs)
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
-        require(outcomeTokenDistribution.length > 0);
+        require(outcomeTokenDistribution.length > 1);
         uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
         uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
@@ -53,7 +53,7 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint profits)
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
-        require(outcomeTokenDistribution.length > 0);
+        require(outcomeTokenDistribution.length > 1);
         uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
         uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
@@ -65,9 +65,6 @@ contract LMSRMarketMaker is MarketMaker {
         profits = (costsBefore - costsAfter) * (funding / 10000) * (100000 - 2) / 100000 / ONE;
     }
 
-    /*
-     *  Private functions
-     */
     /// @dev Returns current price for given outcome token
     /// @param invB Cost indicator
     /// @param outcomeTokenRange Lowest and highest number of outcome tokens owned by market
