@@ -23,9 +23,8 @@ contract StandardToken is Token {
         public
         returns (bool)
     {
-        if (balances[msg.sender] < value)
-            // Balance too low
-            revert();
+        // Balance covers value
+        require(balances[msg.sender] >= value);
         balances[msg.sender] -= value;
         balances[to] += value;
         Transfer(msg.sender, to, value);
@@ -41,9 +40,8 @@ contract StandardToken is Token {
         public
         returns (bool)
     {
-        if (balances[from] < value || allowances[from][msg.sender] < value)
-            // Balance or allowance too low
-            revert();
+        // Balance and allowance covers value
+        require(balances[from] >= value && allowances[from][msg.sender] >= value);
         balances[to] += value;
         balances[from] -= value;
         allowances[from][msg.sender] -= value;
