@@ -20,9 +20,8 @@ contract DifficultyOracle is Oracle {
     function DifficultyOracle(uint _blockNumber)
         public
     {
-        if (_blockNumber < block.number)
-            // Block is in the past
-            revert();
+        // Block has to be in the future
+        require(_blockNumber > block.number);
         blockNumber = _blockNumber;
     }
 
@@ -30,9 +29,8 @@ contract DifficultyOracle is Oracle {
     function setOutcome()
         public
     {
-        if (block.number < blockNumber || outcome != 0)
-            // Block number was not reached yet or it was set already
-            revert();
+        // Block number was reached and outcome was not set yet
+        require(block.number >= blockNumber && outcome == 0);
         outcome = int(block.difficulty);
     }
 

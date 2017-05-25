@@ -18,9 +18,8 @@ contract CentralizedOracle is Oracle {
      *  Modifiers
      */
     modifier isOwner () {
-        if (msg.sender != owner)
-            // Only owner is allowed to proceed
-            revert();
+        // Only owner is allowed to proceed
+        require(msg.sender == owner);
         _;
     }
 
@@ -32,9 +31,8 @@ contract CentralizedOracle is Oracle {
     function CentralizedOracle(address _owner, bytes32 _descriptionHash)
         public
     {
-        if (_descriptionHash == 0)
-            // Description hash is null
-            revert();
+        // Description hash cannot be null
+        require(_descriptionHash != 0);
         owner = _owner;
         descriptionHash = _descriptionHash;
     }
@@ -45,9 +43,8 @@ contract CentralizedOracle is Oracle {
         public
         isOwner
     {
-        if (isSet)
-            // Result was set already
-            revert();
+        // Result is not set yet
+        require(!isSet);
         owner = _owner;
     }
 
@@ -57,9 +54,8 @@ contract CentralizedOracle is Oracle {
         public
         isOwner
     {
-        if (isSet)
-            // Result was set already
-            revert();
+        // Result is not set yet
+        require(!isSet);
         isSet = true;
         outcome = _outcome;
     }
