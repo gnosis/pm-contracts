@@ -30,17 +30,14 @@ contract CategoricalEvent is Event {
         public
         returns (uint winnings)
     {
-        if (!isWinningOutcomeSet)
-            // Winning outcome is not set yet
-            revert();
+        // Winning outcome has to be set
+        require(isWinningOutcomeSet);
         // Calculate winnings
         winnings = outcomeTokens[uint(winningOutcome)].balanceOf(msg.sender);
         // Revoke tokens from winning outcome
         outcomeTokens[uint(winningOutcome)].revoke(msg.sender, winnings);
         // Payout winnings
-        if (!collateralToken.transfer(msg.sender, winnings))
-            // Transfer failed
-            revert();
+        require(collateralToken.transfer(msg.sender, winnings));
     }
 
     /// @dev Calculates and returns event hash
