@@ -20,7 +20,6 @@ class AbstractTestContracts(TestCase):
     def __init__(self, *args, **kwargs):
         super(AbstractTestContracts, self).__init__(*args, **kwargs)
         self.s = t.state()
-        self.solidity = _solidity.solc_wrapper()
         self.s.block.number = self.HOMESTEAD_BLOCK
         t.gas_limit = 4712388
 
@@ -51,7 +50,8 @@ class AbstractTestContracts(TestCase):
                     libraries[name] = encode(address.address, 'hex')
                 else:
                     raise ValueError
-        return ContractTranslator(self.solidity.mk_full_signature(None, path=path, libraries=libraries, extra_args=extra_args))
+        abi = _solidity.compile_last_contract(path, libraries=libraries, combined='abi', extra_args=extra_args)['abi']
+        return ContractTranslator(abi)
 
     def create_contract(self, path, params=None, libraries=None, sender=None):
         path, extra_args = self.get_dirs(path)
