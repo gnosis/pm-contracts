@@ -19,7 +19,6 @@ logger.addHandler(ch)
 class EthABI:
 
     def __init__(self, f, contract_dir, abi_dir):
-        self.solidity = _solidity.solc_wrapper()
         self.f = f
         self.contract_dir = contract_dir
         self.abi_dir = abi_dir
@@ -39,7 +38,7 @@ class EthABI:
         sub_dirs = [x[0] for x in os.walk(absolute_path)]
         extra_args = ' '.join(['{}={}'.format(d.split('/')[-1], d) for d in sub_dirs])
         try:
-            return self.solidity.mk_full_signature(None, path=file_path, libraries=None, extra_args=extra_args)
+            return _solidity.compile_last_contract(file_path, combined='abi', extra_args=extra_args)['abi']
         except CalledProcessError:
             file_name = self.get_file_name(file_path)
             logger.error('Error: {} ABI not generated.'.format(file_name))
