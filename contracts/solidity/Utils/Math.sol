@@ -26,9 +26,10 @@ library Math {
         constant
         returns (uint)
     {
-        // Transform so that e^x = 2^x
+        // Transform so that e^x -> 2^x
         x = x * ONE / LN2;
         uint shift = x / ONE;
+        if(shift >= 192) return (2**256-1);
 
         // 2^x = 2^whole(x) * 2^frac(x)
         //       ^^^^^^^^^^ is a bit shift
@@ -82,6 +83,10 @@ library Math {
         result += 0xe1b7 * zpow / ONE;
         zpow = zpow * z / ONE;
         result += 0x9c7 * zpow / ONE;
+
+        if(result >> (256-shift) > 0)
+            return (2**256-1);
+
         return result << shift;
     }
 
@@ -159,7 +164,7 @@ library Math {
         }
     }
 
-    /// @dev Returns if an add operation causes an overflow
+    /// @dev Returns whether an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
     /// @return Did an overflow occur?
@@ -170,14 +175,26 @@ library Math {
         return (a + b >= a);
     }
 
-    /// @dev Returns if an subtraction operation causes an overflow
+    /// @dev Returns whether a subtraction operation causes an underflow
     /// @param a Minuend
     /// @param b Subtrahend
-    /// @return Did an overflow occur?
+    /// @return Did an underflow occur?
     function safeToSubtract(uint a, uint b)
         public
         returns (bool)
     {
         return (b <= a);
+    }
+
+    /// @dev Returns whether a multiply operation causes an overflow
+    /// @param a First factor
+    /// @param b Second factor
+    /// @return Did an overflow occur?
+    function safeToMultiply(uint a, uint b)
+        public
+        returns (bool)
+    {
+        if(a == 0 || b == 0) return true;
+        return a * b / b == a;
     }
 }

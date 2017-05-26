@@ -4,8 +4,9 @@ from functools import partial
 import math
 import random
 
-from mpmath import mp
+from mpmath import mp, mpf
 mp.dps = 100
+mp.pretty=True
 
 from ethereum.tester import TransactionFailed
 
@@ -32,26 +33,45 @@ class TestContract(AbstractTestContract):
         ONE = 0x10000000000000000
         RELATIVE_TOLERANCE = 1e-9
 
-        # int(mp.floor(mp.log((2**256 - 1) / ONE) * ONE))
-        MAX_POWER = 2454971259878909886679
+        MAX_POWER = int(mp.floor(mp.log((2**256 - 1) / ONE) * ONE))
 
         # LN
         self.assertRaises(TransactionFailed, partial(self.math.ln, 0))
         for x in chain(
             (1, ONE, 2**256-1),
-            (random.randrange(1, ONE) for _ in range(100)),
-            (random.randrange(ONE, 2**256) for _ in range(100)),
+            (random.randrange(1, ONE) for _ in range(10)),
+            (random.randrange(ONE+1, 2**256) for _ in range(10)),
         ):
-            X, actual, expected = float(x) / ONE, float(self.math.ln(x)) / ONE, mp.log(float(x) / ONE)
+            X, actual, expected = (
+                mpf(x) / ONE,
+                mpf(self.math.ln(x)) / ONE,
+                mp.log(mpf(x) / ONE),
+            )
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
 
         # EXP
         for x in chain(
-            (0, MAX_POWER),
+            (0, 2448597794190215440622, MAX_POWER),
             (random.randrange(MAX_POWER) for _ in range(10)),
         ):
-            X, actual, expected = float(x) / ONE, float(self.math.exp(x)) / ONE, mp.exp(float(x) / ONE)
+            X, actual, expected = (
+                mpf(x) / ONE,
+                mpf(self.math.exp(x)) / ONE,
+                mp.exp(mpf(x) / ONE),
+            )
             assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
+
+        for x in chain(
+            (MAX_POWER + 1,),
+            (random.randrange(MAX_POWER+1, 2**256) for _ in range(10)),
+        ):
+            X, actual, expected = (
+                mpf(x) / ONE,
+                mpf(self.math.exp(x)) / ONE,
+                mpf(2**256 - 1) / ONE,
+            )
+            assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
+
 
         # Safe to add
         self.assertFalse(self.math.safeToAdd(2**256 - 1, 1))
@@ -60,3 +80,7 @@ class TestContract(AbstractTestContract):
         # Safe to subtract
         self.assertFalse(self.math.safeToSubtract(1, 2))
         self.assertTrue(self.math.safeToSubtract(1, 1))
+
+        # Safe to multiply
+        self.assertFalse(self.math.safeToMultiply(2**128, 2**128))
+        self.assertTrue(self.math.safeToMultiply(2**128 - 1, 2**128 - 1))
