@@ -29,12 +29,12 @@ contract LMSRMarketMaker is MarketMaker {
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
         require(outcomeTokenDistribution.length > 0);
-        uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
+        uint outcomeTokenMax = max(outcomeTokenDistribution);
         uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
-        uint costsBefore = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
+        uint costsBefore = calcCurrentCosts(invB, outcomeTokenMax, outcomeTokenDistribution, funding);
         outcomeTokenDistribution[outcomeTokenIndex] -= outcomeTokenCount;
-        uint costsAfter = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
+        uint costsAfter = calcCurrentCosts(invB, outcomeTokenMax, outcomeTokenDistribution, funding);
         // Calculate costs
         costs = (costsAfter - costsBefore) * (funding / 10000) * (100000 + 2) / 100000 / ONE;
         if (costs > outcomeTokenCount)
@@ -54,13 +54,13 @@ contract LMSRMarketMaker is MarketMaker {
     {
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(market);
         require(outcomeTokenDistribution.length > 0);
-        uint[2] memory outcomeTokenRange = getOutcomeTokenRange(outcomeTokenDistribution);
+        uint outcomeTokenMax = max(outcomeTokenDistribution);
         uint invB = uint(Math.ln(outcomeTokenDistribution.length * ONE)) / 10000;
         uint funding = market.funding();
-        outcomeTokenRange[1] += outcomeTokenCount;
-        uint costsBefore = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
+        outcomeTokenMax += outcomeTokenCount;
+        uint costsBefore = calcCurrentCosts(invB, outcomeTokenMax, outcomeTokenDistribution, funding);
         outcomeTokenDistribution[outcomeTokenIndex] += outcomeTokenCount;
-        uint costsAfter = calcCurrentCosts(invB, outcomeTokenRange, outcomeTokenDistribution, funding);
+        uint costsAfter = calcCurrentCosts(invB, outcomeTokenMax, outcomeTokenDistribution, funding);
         // Calculate earnings
         profits = (costsBefore - costsAfter) * (funding / 10000) * (100000 - 2) / 100000 / ONE;
     }
@@ -70,18 +70,18 @@ contract LMSRMarketMaker is MarketMaker {
      */
     /// @dev Returns current price for given outcome token
     /// @param invB Cost indicator
-    /// @param outcomeTokenRange Lowest and highest number of outcome tokens owned by market
+    /// @param outcomeTokenMax Highest number of outcome tokens owned by market
     /// @param outcomeTokenDistribution Outcome tokens owned by market
     /// @param funding Initial funding for market
     /// @return Returns costs
-    function calcCurrentCosts(uint invB, uint[2] outcomeTokenRange, uint[] outcomeTokenDistribution, uint funding)
+    function calcCurrentCosts(uint invB, uint outcomeTokenMax, uint[] outcomeTokenDistribution, uint funding)
         public
         returns(uint costs)
     {
         uint innerSum = 0;
         uint fundingDivisor = funding / 10000;
         for (uint8 i=0; i<outcomeTokenDistribution.length; i++)
-            innerSum += Math.exp((outcomeTokenRange[1] - outcomeTokenRange[0] - (outcomeTokenDistribution[i] - outcomeTokenRange[0])) / fundingDivisor * invB);
+            innerSum += Math.exp((outcomeTokenMax - outcomeTokenDistribution[i]) / fundingDivisor * invB);
         require(innerSum >= ONE);
         costs = uint(Math.ln(innerSum)) * ONE / invB;
     }
@@ -98,20 +98,20 @@ contract LMSRMarketMaker is MarketMaker {
             outcomeTokenDistribution[i] = market.eventContract().outcomeTokens(i).balanceOf(market);
     }
 
-    /// @dev Returns lowest and highest number of outcome tokens owned by market
-    /// @return Returns lowest and highest number of outcome tokens
-    function getOutcomeTokenRange(uint[] outcomeTokenDistribution)
-        public
-        returns (uint[2] outcomeTokenRange)
+    /// @dev Gets maximum of numbers
+    /// @param nums Numbers to search
+    /// @return Maximum number
+    function max(uint[] nums)
+        private
+        constant
+        returns (uint)
     {
-        // Lowest shares
-        outcomeTokenRange[0] = outcomeTokenDistribution[0];
-        // Highest shares
-        outcomeTokenRange[1] = outcomeTokenDistribution[0];
-        for (uint8 i=0; i<outcomeTokenDistribution.length; i++)
-            if (outcomeTokenDistribution[i] < outcomeTokenRange[0])
-                outcomeTokenRange[0] = outcomeTokenDistribution[i];
-            else if (outcomeTokenDistribution[i] > outcomeTokenRange[1])
-                outcomeTokenRange[1] = outcomeTokenDistribution[i];
+        uint max = 0;
+        for(uint i = 0; i < nums.length; i++) {
+            if(max < nums[i]) {
+                max = nums[i];
+            }
+        }
+        return max;
     }
 }
