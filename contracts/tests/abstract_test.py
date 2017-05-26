@@ -12,16 +12,13 @@ from os import walk
 import string
 
 
-class AbstractTestContract(TestCase):
-    """
-    run all tests with python -m unittest discover contracts.tests
-    """
+class AbstractTestContracts(TestCase):
 
     HOMESTEAD_BLOCK = 1150000
     CONTRACT_DIR = 'solidity'
 
     def __init__(self, *args, **kwargs):
-        super(AbstractTestContract, self).__init__(*args, **kwargs)
+        super(AbstractTestContracts, self).__init__(*args, **kwargs)
         self.s = t.state()
         self.solidity = _solidity.solc_wrapper()
         self.s.block.number = self.HOMESTEAD_BLOCK

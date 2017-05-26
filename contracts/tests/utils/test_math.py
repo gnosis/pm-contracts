@@ -9,7 +9,7 @@ mp.dps = 100
 
 from ethereum.tester import TransactionFailed
 
-from ..abstract_test import AbstractTestContract
+from ..abstract_test import AbstractTestContracts
 
 if hasattr(math, 'isclose'):
     isclose = math.isclose
@@ -19,13 +19,10 @@ else:
         return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.utils.test_math
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
 
     def test(self):

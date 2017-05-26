@@ -1,16 +1,12 @@
 from codecs import decode
-from ..abstract_test import AbstractTestContract, accounts, keys
-from codecs import decode
+from ..abstract_test import AbstractTestContracts, accounts, keys
 import math
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.market_makers.test_calc_token_count
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
         self.event_factory = self.create_contract('Events/EventFactory.sol', libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')

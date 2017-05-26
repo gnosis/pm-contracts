@@ -28,14 +28,14 @@ Test
 -------------
 ### Run all tests:
 ```
-cd gnosis-contracts
-python -m unittest discover contracts.tests
+cd gnosis-contracts/contracts/tests/
+pytest
 ```
 
 ### Run one test:
 ```
-cd gnosis-contracts
-python -m unittest contracts.tests.test_name
+cd gnosis-contracts/contracts/tests/
+pytest utils/test_math.py
 ```
 
 Deploy

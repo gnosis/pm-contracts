@@ -1,14 +1,11 @@
 from codecs import decode
-from ..abstract_test import AbstractTestContract, accounts
+from ..abstract_test import AbstractTestContracts, accounts
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.events.test_buy_and_sell_all_outcomes
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
         self.event_factory = self.create_contract('Events/EventFactory.sol', libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
