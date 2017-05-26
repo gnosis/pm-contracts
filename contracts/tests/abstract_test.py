@@ -37,20 +37,9 @@ class AbstractTestContracts(TestCase):
     def contract_at(self, address, abi):
         return ABIContract(self.s, abi, address)
 
-    def create_abi(self, path, libraries=None):
+    def create_abi(self, path):
         path, extra_args = self.get_dirs(path)
-        if libraries:
-            for name, address in libraries.items():
-                if type(address) == str:
-                    if self.is_hex(address):
-                        libraries[name] = address
-                    else:
-                        libraries[name] = encode(address, 'hex')
-                elif isinstance(address, t.ABIContract):
-                    libraries[name] = encode(address.address, 'hex')
-                else:
-                    raise ValueError
-        abi = _solidity.compile_last_contract(path, libraries=libraries, combined='abi', extra_args=extra_args)['abi']
+        abi = _solidity.compile_last_contract(path, combined='abi', extra_args=extra_args)['abi']
         return ContractTranslator(abi)
 
     def create_contract(self, path, params=None, libraries=None, sender=None):
