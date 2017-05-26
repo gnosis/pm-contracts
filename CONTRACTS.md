@@ -81,8 +81,11 @@ Markets
 #### shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfits) returns (uint)
 #### calcMarketFee(uint outcomeTokenCosts) returns (uint)
 
+### Default market
+#### DefaultMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint _fee)
+
 ### Abstract market maker
-#### calcCosts(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) returns (uint)
-#### calcProfits(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) returns (uint)
+#### calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) returns (uint)
+#### calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) returns (uint)
 
 ### LMSR market maker
