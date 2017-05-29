@@ -10,7 +10,6 @@ library Math {
      *  Constants
      */
     // This is equal to 1 in our calculations
-    uint public constant ONE_SHIFT = 64;
     uint public constant ONE =  0x10000000000000000;
     uint public constant LN2 = 0xb17217f7d1cf79ac;
     uint public constant LOG2_E = 0x171547652b82fe177;
@@ -21,20 +20,36 @@ library Math {
     /// @dev Returns natural exponential function value of given x
     /// @param x x
     /// @return Returns e**x
-    function exp(uint x)
+    function exp(int x)
         public
         constant
         returns (uint)
     {
+        // revert if x is > MAX_POWER, where
+        // MAX_POWER = int(mp.floor(mp.log(mpf(2**256 - 1) / ONE) * ONE))
+        require(x <= 2454971259878909886679);
+
+        // return 0 if exp(x) is tiny, using
+        // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE) * ONE))
+        if(x < -818323753292969962227) return 0;
+
         // Transform so that e^x -> 2^x
-        x = x * ONE / LN2;
-        uint shift = x / ONE;
-        if(shift >= 192) return (2**256-1);
+        x = x * int(ONE) / int(LN2);
 
         // 2^x = 2^whole(x) * 2^frac(x)
         //       ^^^^^^^^^^ is a bit shift
         // so Taylor expand on z = frac(x)
-        uint z = x % ONE;
+        int shift;
+        uint z;
+        if(x >= 0) {
+            shift = x / int(ONE);
+            z = uint(x % int(ONE));
+        }
+        else {
+            shift = x / int(ONE) - 1;
+            z = ONE - uint(-x % int(ONE));
+        }
+
 
         // 2^x = 1 + (ln 2) x + (ln 2)^2/2! x^2 + ...
         //
@@ -84,10 +99,15 @@ library Math {
         zpow = zpow * z / ONE;
         result += 0x9c7 * zpow / ONE;
 
-        if(result >> (256-shift) > 0)
-            return (2**256-1);
+        if(shift >= 0) {
+            if(result >> (256-shift) > 0)
+                return (2**256-1);
 
-        return result << shift;
+            return result << shift;
+        }
+        else {
+            return result >> (-shift);
+        }
     }
 
     /// @dev Returns natural logarithm value of given x
