@@ -28,17 +28,21 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint cost)
     {
         require(market.eventContract().getOutcomeCount() > 0);
-        uint[] memory netQuantitiesSold = getNetQuantitiesSold(market);
+        int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
 
-        uint logN = uint(Math.ln(netQuantitiesSold.length * ONE)) / 10000;
+        uint logN = uint(Math.ln(netOutcomeTokensSold.length * ONE)) / 10000;
         uint funding = market.funding();
-        uint costLevelBefore = calcCostFunction(logN, netQuantitiesSold, funding);
-        netQuantitiesSold[outcomeTokenIndex] += outcomeTokenCount;
-        uint costLevelAfter = calcCostFunction(logN, netQuantitiesSold, funding);
+        uint costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
+
+        // require(Math.safeToAdd(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount));
+        netOutcomeTokensSold[outcomeTokenIndex] += int(outcomeTokenCount);
+        
+        uint costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
+
         // Calculate cost
         cost = (costLevelAfter - costLevelBefore) * (100000 + 2) / 100000 / ONE;
         if (cost > outcomeTokenCount)
-            // Make sure cost are not bigger than 1 per share
+            // Make sure cost is not bigger than 1 per share
             cost = outcomeTokenCount;
     }
 
@@ -53,13 +57,18 @@ contract LMSRMarketMaker is MarketMaker {
         returns (uint profits)
     {
         require(market.eventContract().getOutcomeCount() > 0);
-        uint[] memory netQuantitiesSold = getNetQuantitiesSold(market);
+        int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
 
-        uint logN = uint(Math.ln(netQuantitiesSold.length * ONE)) / 10000;
+        uint logN = uint(Math.ln(netOutcomeTokensSold.length * ONE)) / 10000;
         uint funding = market.funding();
-        uint costLevelBefore = calcCostFunction(logN, netQuantitiesSold, funding);
-        netQuantitiesSold[outcomeTokenIndex] -= outcomeTokenCount;
-        uint costLevelAfter = calcCostFunction(logN, netQuantitiesSold, funding);
+
+        uint costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
+
+        // require(Math.safeToSubtract(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount));
+        netOutcomeTokensSold[outcomeTokenIndex] -= int(outcomeTokenCount);
+
+        uint costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
+
         // Calculate earnings
         profits = (costLevelBefore - costLevelAfter) * (100000 - 2) / 100000 / ONE;
     }
@@ -69,18 +78,19 @@ contract LMSRMarketMaker is MarketMaker {
      */
     /// @dev Returns current price for given outcome token
     /// @param logN Logarithm of the number of outcomes
-    /// @param netQuantitiesSold Net outcome tokens sold by market
+    /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
     /// @return Returns costLevel
-    function calcCostFunction(uint logN, uint[] netQuantitiesSold, uint funding)
+    function calcCostFunction(uint logN, int[] netOutcomeTokensSold, uint funding)
         private
         constant
         returns(uint costLevel)
     {
         uint innerSum = 0;
         uint fundingDivisor = funding / 10000;
-        for (uint8 i=0; i<netQuantitiesSold.length; i++)
-            innerSum += Math.exp(netQuantitiesSold[i] / fundingDivisor * logN);
+        for (uint8 i=0; i<netOutcomeTokensSold.length; i++) {
+            innerSum += Math.exp(netOutcomeTokensSold[i] / int(fundingDivisor) * int(logN));
+        }
         require(innerSum >= ONE);
         costLevel = uint(Math.ln(innerSum)) * ONE / logN * fundingDivisor;
     }
@@ -91,30 +101,13 @@ contract LMSRMarketMaker is MarketMaker {
     ///      market created) subtracted by the quantity of that token held by the market.
     /// @param market Market contract
     /// @return Net outcome tokens sold by market
-    function getNetQuantitiesSold(Market market)
+    function getNetOutcomeTokensSold(Market market)
         private
         constant
-        returns (uint[] quantities)
+        returns (int[] quantities)
     {
-
-        quantities = new uint[](market.eventContract().getOutcomeCount());
-
-        // This loop just gets the holdings of the market
-        // Also get the max quantity held to avoid checking every quantity against totalCreated
-        uint maxQuantityHeld = 0;
-        for(uint i = 0; i < quantities.length; i++) {
-            quantities[i] = market.eventContract().outcomeTokens(i).balanceOf(market);
-            if(quantities[i] > maxQuantityHeld) maxQuantityHeld = quantities[i];
-        }
-
-        uint totalCreated = market.eventContract().collateralToken().balanceOf(market.eventContract());
-        require(totalCreated >= maxQuantityHeld);
-
-        // The net outcome tokens minus the holdings of the market gives you the net sold
-        for(i = 0; i < quantities.length; i++) {
-            quantities[i] = totalCreated - quantities[i];
-        }
-
-        return quantities;
+        quantities = new int[](market.eventContract().getOutcomeCount());
+        for(uint8 i = 0; i < quantities.length; i++)
+            quantities[i] = market.netOutcomeTokensSold(i);
     }
 }

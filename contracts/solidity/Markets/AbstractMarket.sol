@@ -12,6 +12,7 @@ contract Market {
     MarketMaker public marketMaker;
     uint public fee;
     uint public funding;
+    int[] public netOutcomeTokensSold;
     function fund(uint _funding) public;
     function close() public;
     function withdrawFees() public returns (uint);
