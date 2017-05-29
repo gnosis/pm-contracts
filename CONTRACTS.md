@@ -123,29 +123,45 @@ Assuming we want to predict, how the potential change of the Microsoft CEO affec
 
 The first event can use Ether as collateral token but for the second market, we use the No outcome token representing the outcome "Steve Ballmer is not CEO of Microsoft end of 2014". Any market using the second event is predicting the stock price of Microsoft end 2014 under the assumption that Steve Ballmer is no longer CEO end 2017.
 
-
-
 Oracles
 -------
-While all other parts of a prediction market can be automatically executed by smart contracts on the blockchain, the blockchain somehow needs to get the information about what happened in the real world to decide which outcome tokens have to be paid out. The Gnosis platform is oracle agnostic. Any contract can serve as an oracle so any oracle solution that will be developed on Ethereum might be used by Gnosis.
+The Gnosis platform is agnostic towards oracle solutions. Any smart contract implementing the oracle interface can be used as an oracle to resolve events. Our smart contracts already include many different oracle solutions for different use cases. We differentiate between regular oracles and proxy oracles. Proxy oracles cannot function as standalone oracles but have to define other oracle, which they utilize for resolution. One example is the majority oracle, which requires other oracles to come to a majority decision to resolve an event.
 
 <img src="assets/oracles.png" />
 
 ### Abstract oracle
-#### isOutcomeSet() returns (bool)
-#### getOutcome() returns (int)
+The abstract oracle contract contains all functions, which have to be implemented by all oracles.
 
+#### isOutcomeSet() returns (bool)
+Returns if the outcome was resolved yet.
+
+#### getOutcome() returns (int)
+Returns the outcome as a signed integer. In case of categorical event, the outcome is the index of the winning outcome token. If the first outcome won, the winning outcome is 0. In case of a scalar event, the result will be the resulting number.
 
 ### Centralized oracle
+The centralized oracle is the simplest oracle. The owner creates a new centralized oracle contract and can set the outcome afterwards by sending a transaction.
+
 #### CentralizedOracle(address _owner, bytes32 _descriptionHash)
+The owner address is set to the sender address by the factory contract. The description hash is provided by the sender creating the oracle referencing a hashed event description.
+
 #### replaceOwner(address _owner)
+The replace owner function allows the oracle owner to exchange the owner address, allowing another ethereum account to define the outcome. This is only possible before an outcome was set. The reason for this function is the option to replace an account with a more protected account in case the relevance of an oracle is increasing because the markets depending on the oracle increase in volume.
+
 #### setOutcome(int _outcome)
+Allows the contract owner ot set the outcome. The outcome can only be set once.
 
 ### Difficulty oracle
+The difficulty oracle allows to resolve an event based on the difficulty after a specified block.
+
 #### DifficultyOracle(uint _blockNumber)
+The oracle creator creates an difficulty oracle by defining the block number after which the difficulty should be set as the outcome.
+
 #### setOutcome()
+Allows to set the outcome if the defined block number was reached.
 
 ### Majority oracle
+
+
 #### MajorityOracle(Oracle[] _oracles)
 #### getStatusAndOutcome() returns (bool outcomeSet, int outcome)
 
