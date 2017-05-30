@@ -20,7 +20,7 @@ contract MajorityOracle is Oracle {
         public
     {
         // At least 2 oracles should be defined
-        require(_oracles.length >= 2);
+        require(_oracles.length > 2);
         for (uint i=0; i<_oracles.length; i++)
             // Oracle address cannot be null
             require(address(_oracles[i]) != 0);
