@@ -78,9 +78,8 @@ contract UltimateOracle is Oracle {
     function challengeOutcome(int _outcome)
         public
     {
-        // Challenged outcome is different from voted outcome and there was no challenge yet or the challenge period expired
-        require(   _outcome != outcome
-                && !isChallenged()
+        // There was no challenge yet or the challenge period expired
+        require(   !isChallenged()
                 && !isChallengePeriodOver()
                 && collateralToken.transferFrom(msg.sender, this, challengeAmount));
         outcomeAmounts[msg.sender][_outcome] = challengeAmount;
