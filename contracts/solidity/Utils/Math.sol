@@ -162,7 +162,7 @@ library Math {
     /// @dev Returns if an add operation causes an overflow
     /// @param a First addend
     /// @param b Second addend
-    /// @return Did an overflow occur?
+    /// @return Did no overflow occur?
     function safeToAdd(uint a, uint b)
         public
         returns (bool)
@@ -173,7 +173,7 @@ library Math {
     /// @dev Returns if an subtraction operation causes an overflow
     /// @param a Minuend
     /// @param b Subtrahend
-    /// @return Did an overflow occur?
+    /// @return Did no overflow occur?
     function safeToSub(uint a, uint b)
         public
         returns (bool)
@@ -184,7 +184,7 @@ library Math {
     /// @dev Returns whether a multiply operation causes an overflow
     /// @param a First factor
     /// @param b Second factor
-    /// @return Did an overflow occur?
+    /// @return Did no overflow occur?
     function safeToMul(uint a, uint b)
         public
         returns (bool)
