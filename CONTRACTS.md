@@ -125,7 +125,7 @@ The first event can use Ether as collateral token but for the second market, we 
 
 Oracles
 -------
-The Gnosis platform is agnostic towards oracle solutions. Any smart contract implementing the oracle interface can be used as an oracle to resolve events. Our smart contracts already include many different oracle solutions for different use cases. We differentiate between regular oracles and proxy oracles. Proxy oracles cannot function as standalone oracles but have to define other oracle, which they utilize for resolution. One example is the majority oracle, which requires other oracles to come to a majority decision to resolve an event.
+The Gnosis platform is agnostic towards oracle solutions. Any smart contract implementing the oracle interface can be used as an oracle to resolve events. Our smart contracts already include many different oracle solutions for different use cases. We differentiate between regular oracles and proxy oracles. Proxy oracles cannot function as standalone oracles but have to define other oracles, which they utilize for resolution. One example is the majority oracle, which requires other oracles to come to a majority decision to resolve an event. All oracles have in common that the outcome can only be set once.
 
 <img src="assets/oracles.png" />
 
@@ -136,7 +136,7 @@ The abstract oracle contract contains all functions, which have to be implemente
 Returns if the outcome was resolved yet.
 
 #### getOutcome() returns (int)
-Returns the outcome as a signed integer. In case of categorical event, the outcome is the index of the winning outcome token. If the first outcome won, the winning outcome is 0. In case of a scalar event, the result will be the resulting number.
+Returns the outcome as a signed integer. In case of categorical event, the outcome is the index of the winning outcome token. If the first outcome won, the winning outcome is 0. In case of a scalar event, the result will be the winning number.
 
 ### Centralized oracle
 The centralized oracle is the simplest oracle. The owner creates a new centralized oracle contract and can set the outcome afterwards by sending a transaction.
@@ -160,27 +160,62 @@ The oracle creator creates an difficulty oracle by defining the block number aft
 Allows to set the outcome if the defined block number was reached.
 
 ### Majority oracle
-
+The majority oracle is a proxy oracle resolving to the outcome defined by an absolute majority of defined oracles. Assuming there are 5 defined oracles, 3 of them have to set the same outcome to resolve the majority oracle. The majority oracle cannot be resolved in standoff situations. This is why this oracle should always be used with a backstop oracle like the ultimate oracle.
 
 #### MajorityOracle(Oracle[] _oracles)
+When a majority oracle is created, at least 3 oracles have to be defined. The oracle addresses are saved in the majority oracle contract.
+
 #### getStatusAndOutcome() returns (bool outcomeSet, int outcome)
+This function returns if the majority oracle was resolved and the resolved outcome. In case the oracle was not resolved yet, the outcome value is 0.
 
 ### Signed message oracle
+Signed message oracles allow to set an oracle based on a signed message. The Ethereum account accepted as signer is defined at oracle creation. The advantage over the centralized oracle is, that the oracle contract creator and the outcome signer don't have ot be the same entity but a third party like Reality Keys can be used to sign outcomes.
+
 #### SignedMessageOracle(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+When a signed message oracle is created an event description hash and the signer's signature of the description hash are sent. The allowed outcome signer is derived from the description hash and the given signature and saved in the oracle contract.
+
 #### replaceSigner(address _signer, uint _nonce, uint8 v, bytes32 r, bytes32 s)
+Similarly to the centralized oracle, the account allowed to set the outcome can be replaced by the currently allowed account. This is useful if the private key allowed to sign the outcome should be replaced with another one with higher protection in case markets resolved by this event become very popular. The new signer address, a nonce and the current singer's signature are provided. A nonce is required to prevent replay attacks in case multiple substitutions of signers are necessary.
+
 #### setOutcome(int _outcome, uint8 v, bytes32 r, bytes32 s)
+Validates that the outcome was signed by the allowed signer and sets the outcome. Once the outcome was set, it cannot be changed anymore.
 
 ### Ultimate oracle
+The ultimate oracle is a proxy oracle forwarding the result of a predefined oracle. This result can be overwritten by the ultimate oracle in case someone is challenging the outcome. In that sense the ultimate oracle is a backstop oracle used in case the forwarded oracle is acting maliciously. The ultimate oracle is a decentralized oracle, meaning that not a single entity can define the outcome but there has to be consensus within a group of entities about the outcome to resolve the oracle.
+
 <img src="assets/ultimate_oracle.png" />
 
+To challenge an outcome and start the ultimate oracle a user has to put a challenge amount of collateral tokens on the outcome that he believes to be the correct outcome. After the outcome was challenged anyone can put collateral tokens on their preferred outcome. If the outcome with the biggest betting amount (front runner) doesn't change within a defined period, the oracle is resolved and the current front runner is set as the final outcome. To make sure that the spread between the total amount bet and the front runner is not too high so others can catch up, a spread multiplier is defined limiting the spread. After an outcome is decided, the total betting amount is distributed among everyone who put money on the front runner proportionally to their contribution to the front runner.
+
 #### UltimateOracle(Oracle _oracle, Token _collateralToken, uint8 _spreadMultiplier, uint _challengePeriod, uint _challengeAmount, uint _frontRunnerPeriod)
+To create an ultimate oracle contract a few settings have to be defined:
+1. The forwarded oracle, whose outcome is used in case there is no challenge.
+2. The used collateral token to contribute to the ultimate oracle outcome.
+3. The spread multiplier to define the max. spread between total betting amounts and front runner.
+4. The challenge period in seconds to define how long users have the option to challenge a forwarded outcome before it is set as final.
+5. The challenge amount required to challenge an outcome.
+6. The front runner period in seconds to define how long a front runner must be leading before the front runner is set as final outcome.
+
 #### setOutcome()
+Allows to set the outcome based on the forwarded outcome. It can only be set in case it was set in the forwarded oracle and no challenge was started yet.
+
 #### challengeOutcome(int _outcome)
+Allows to challenge the outcome set by the forwarded outcome. The challenge can be started even if no outcome was set yet. The sender has to pay the defined challenge amount in collateral tokens to start the challenge. The amount is bet on the outcome defined by the sender.
+
 #### voteForOutcome(int _outcome, uint amount)
+After
+
 #### withdraw() returns (uint amount)
+The function allows the sender to withdraw his share in collateral tokens after the final outcome was set.
+
 #### isChallengePeriodOver()
+Returns if forwarded outcome was set and the challenge period is over.
+
 #### isFrontRunnerPeriodOver()
+Returns if the outcome was challenged and the front runner period is over.
+
 #### isChallenged()
+Returns if the outcome was challenged.
 
 Markets
 -------
