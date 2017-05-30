@@ -11,16 +11,14 @@ For every prediction market two main objects have to be created:
 1. An event object referencing an oracle to resolve the event and a collateral token to exchange outcome tokens for collateral tokens.
 2. A market object, which connects a market maker with the event.
 
-Once the event occurred, the event can be resolved and winnings can be redeemed.
-
 
 Events
 ------
 ### Abstract event
-The abstract event contract contains all contract functionality shared between scalar and categorical events.
+The abstract event contract contains all contract functionalities shared between scalar and categorical events.
 
 #### Event(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
-On a event creation a collateral token, an oracle and an outcome count have to be defined. The collateral token is used to deposit a collateral in return for outcome tokens. A common collateral token is Ether itself. The oracle is used to define which outcome was resolved as the winning outcome. The outcome count defines the number of outcome tokens. One outcome token is created for each outcome when the event is created.
+To create an event a collateral token, an oracle and an outcome count have to be defined. The collateral token is used to deposit a collateral in return for outcome tokens. A common collateral token is Ether itself. The oracle is used to define which outcome was resolved as the winning outcome to define the value of outcome tokens. The outcome count defines the number of outcome tokens. One outcome token is created for each outcome when the event is created.
 
 #### buyAllOutcomes(uint collateralTokenCount)
 `buyAllOutcomes` allows to buy multiple sets of outcome tokens in exchange for multiple (`collateralTokenCount`) collateral tokens. Assuming an event has two outcomes and the buyer invests 10 collateral tokens, he will receive 10 outcome tokens for each outcome.
@@ -29,7 +27,7 @@ On a event creation a collateral token, an oracle and an outcome count have to b
 `sellAllOutcomes` allows to sell multiple (`outcomeTokenCount`) sets of outcome tokens in exchange for multiple collateral tokens. Assuming an event has two outcomes and the buyer sells 2 sets of outcome tokens (2 outcome tokens for each outcome), he will receive 2 collateral tokens.
 
 #### setWinningOutcome()
-`setWinningOutcome` sets the winning outcome in the event contract if the defined oracle contract set a winning outcome.
+`setWinningOutcome` sets the winning outcome in the event contract if the defined oracle contract has decided on an outcome.
 
 #### redeemWinnings() returns (uint)
 Abstract function implemented in the inheriting event contract.
@@ -47,7 +45,7 @@ Returns an array of outcome tokens balances for an `owner`.
 Abstract function implemented in the inheriting event contract.
 
 ### Categorical event
-Categorical events define a set of outcomes and resolve to one outcome out of this set of outcomes. An example for such an event is an election where the set of outcomes is defined as the set of candidates participating in the election:
+Categorical events define a set of outcomes and resolve to one of the defined outcomes. An example for such an event is an election where the set of outcomes is defined as the set of candidates participating in the election:
 
 Event: Who becomes the next president of the United States?
 
@@ -66,7 +64,7 @@ Using the `sellAllOutcomes` function a seller can sell a set of outcome tokens f
 After the oracle decided the winning outcome, one winning outcome token can be redeemed for one collateral token. All other outcome tokens are worthless.
 
 #### CategoricalEvent(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
-An categorical event has the same properties as the abstract event contract. Only one event for each combination of properties (collateral token, oracle, outcome count) can be created. This allows to combine liquidity for each currency and outcome in only one event. Several markets can use the same event to share this liquidity pool.
+A categorical event has the same properties as the abstract event contract. Only one event for each combination of properties (collateral token, oracle, outcome count) can be created. This allows to combine liquidity for each currency and oracle in only one event contract. Several markets can use the same event to share this liquidity pool.
 
 #### redeemWinnings() returns (uint)
 Redeem winnings allows the sender to redeem winning outcome tokens for collateral tokens. The function revokes all sender's outcome tokens of the winning outcome and sends the same amount in collateral tokens back to the sender. The function returns this amount.
@@ -87,12 +85,12 @@ Using the `buyAllOutcomes` function a buyer can invest collateral tokens in retu
 
 <img src="assets/scalar_event_buy.png" />
 
-Using the `sellAllOutcomes` function a seller can sell sets of long and one short outcome tokens for collateral tokens:
+Using the `sellAllOutcomes` function a seller can sell sets of long and short outcome tokens for collateral tokens:
 
 <img src="assets/scalar_event_sell.png" />
 
 #### ScalarEvent(Token _collateralToken, Oracle _oracle, int _lowerBound, int _upperBound)
-A scalar event has the same properties as the abstract event contract and extends the model with a lower and an upper bound. Scalar events have always only 2 outcome tokens for long and short positions. Only one event for each combination of properties (collateral token, oracle, lower bound, upper bound) can be created. This allows to combine liquidity for each currency, oracle and range in only one event. Several markets can use the same event to share this liquidity pool.
+A scalar event has the same properties as the abstract event contract and adds a lower and an upper bound. Scalar events have always only 2 outcome tokens for long and short positions. Only one event for each combination of properties (collateral token, oracle, lower bound, upper bound) can be created. This allows to combine liquidity for each currency, oracle and range in only one event contract. Several markets can use the same event to share this liquidity pool.
 
 #### redeemWinnings() returns (uint)
 Redeem winnings allows the sender to redeem outcome tokens for collateral tokens. The function revokes all sender's outcome tokens and sends the winnings as collateral tokens back to the sender. The function returns the amount of collateral tokens.
@@ -101,31 +99,31 @@ The following graph shows how payouts are done in scalar events:
 
 <img src="assets/scalar_event_payout.png" />
 
-If the resolved outcome is below the lower bound, long outcome tokens have no value and short outcome tokens have the value of 1 unit of collateral tokens.
+If the resolved outcome is below the lower bound, long outcome tokens have no value and each short outcome token has the value of one collateral tokens.
 
-If the resolved outcome is within the lower and upper bound, the value of short outcome tokens decreases linearly and the value of long outcome tokens increases linearly the higher the outcome in the range is.
+If the resolved outcome is within the lower and upper bound, the value of short outcome tokens decreases linearly and the value of long outcome tokens increases linearly the higher the outcome in the range is. Assuming the outcome is the average value of the defined range, long and short outcome tokens have the same value.
 
-If the resolved outcome is higher than the upper bound, long outcome tokens have the value of 1 unit of collateral tokens and short outcome tokens have no value.
+If the resolved outcome is higher than the upper bound, each long outcome token has the value of one collateral token and short outcome tokens have no value.
 
-Regardless off the resolved value, the sum of payoff of any complete set is always 1 unit of collateral tokens.
+Regardless off the resolved value, the sum of payoff of any complete set is always one collateral token.
 
 #### getEventHash() returns (bytes32)
 This function generates a unique event hash based on the event properties: collateral token, oracle, outcome count, lower bound and upper bound.
 
 Outcome tokens
 --------------
-Outcome tokens are ERC20 compatible and can be used as collateral tokens for other events. The interesting feature of outcome tokens is, that they only have a value when the outcome they represent occurred. Trading an event using an outcome token as collateral implies that the event is only relevant under the assumption that the outcome occurred. This allows to create events with conditional probabilities.
+Outcome tokens are ERC20 compatible and can be used as collateral tokens for other events. Outcome tokens have the property that they only have a value when the outcome they represent occurred. Trading an event using an outcome token as collateral implies that the event is only relevant under the assumption that the outcome occurred. This allows to create events with conditional probabilities.
 
 Assuming we want to predict, how the potential change of the Microsoft CEO affects the Microsoft stock price, we create two events:
 
 1. Will Steve Ballmer be CEO of Microsoft end of 2014? Outcomes: Yes, No
 2. What is Microsoft stock price end of 2014? Outcome: Any number
 
-The first event can use Ether as collateral token but for the second market, we use the No outcome token representing the outcome "Steve Ballmer is not CEO of Microsoft end of 2014". Any market using the second event is predicting the stock price of Microsoft end 2014 under the assumption that Steve Ballmer is no longer CEO end 2017.
+The first event can use Ether as collateral token but for the second event we use the No outcome token representing the outcome "Steve Ballmer is not CEO of Microsoft end of 2014". Any market using the second event is predicting the stock price of Microsoft end 2014 under the assumption that Steve Ballmer is no longer CEO end 2017.
 
 Oracles
 -------
-The Gnosis platform is agnostic towards oracle solutions. Any smart contract implementing the oracle interface can be used as an oracle to resolve events. Our smart contracts already include many different oracle solutions for different use cases. We differentiate between regular oracles and proxy oracles. Proxy oracles cannot function as standalone oracles but have to define other oracles, which they utilize for resolution. One example is the majority oracle, which requires other oracles to come to a majority decision to resolve an event. All oracles have in common that the outcome can only be set once.
+The Gnosis platform is oracle agnostic. Any smart contract implementing the oracle interface can be used as an oracle to resolve events. Our smart contracts already include many different oracle solutions for different use cases. There are two types of oracles: regular oracles and proxy oracles. Proxy oracles cannot function as standalone oracles but have to define other oracles, which they utilize for resolution. One example is the majority oracle, which requires other oracles to come to a majority decision to resolve an event.
 
 <img src="assets/oracles.png" />
 
@@ -154,13 +152,13 @@ Allows the contract owner ot set the outcome. The outcome can only be set once.
 The difficulty oracle allows to resolve an event based on the difficulty after a specified block.
 
 #### DifficultyOracle(uint _blockNumber)
-The oracle creator creates an difficulty oracle by defining the block number after which the difficulty should be set as the outcome.
+A difficulty oracle is created by defining the block number after which the difficulty should be set as the outcome.
 
 #### setOutcome()
-Allows to set the outcome if the defined block number was reached.
+Allows anyone to set the outcome if the defined block number was reached. The outcome can only be set once.
 
 ### Majority oracle
-The majority oracle is a proxy oracle resolving to the outcome defined by an absolute majority of defined oracles. Assuming there are 5 defined oracles, 3 of them have to set the same outcome to resolve the majority oracle. The majority oracle cannot be resolved in standoff situations. This is why this oracle should always be used with a backstop oracle like the ultimate oracle.
+The majority oracle is a proxy oracle resolving to the outcome defined by an absolute majority of oracles. Assuming there are 5 defined oracles, 3 of them have to set the same outcome to resolve the majority oracle. The majority oracle cannot be resolved in standoff situations. This is why this oracle should always be used with a backstop oracle like the ultimate oracle.
 
 #### MajorityOracle(Oracle[] _oracles)
 When a majority oracle is created, at least 3 oracles have to be defined. The oracle addresses are saved in the majority oracle contract.
@@ -169,41 +167,41 @@ When a majority oracle is created, at least 3 oracles have to be defined. The or
 This function returns if the majority oracle was resolved and the resolved outcome. In case the oracle was not resolved yet, the outcome value is 0.
 
 ### Signed message oracle
-Signed message oracles allow to set an oracle based on a signed message. The Ethereum account accepted as signer is defined at oracle creation. The advantage over the centralized oracle is, that the oracle contract creator and the outcome signer don't have ot be the same entity but a third party like Reality Keys can be used to sign outcomes.
+Signed message oracles allow to set an oracle based on a signed message. The Ethereum account accepted as signer is defined at oracle creation. The advantage over the centralized oracle is, that the oracle contract creator and the outcome signer don't have ot be the same entity but a third party like Reality Keys can be used to sign outcomes of supported events.
 
 #### SignedMessageOracle(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
 When a signed message oracle is created an event description hash and the signer's signature of the description hash are sent. The allowed outcome signer is derived from the description hash and the given signature and saved in the oracle contract.
 
 #### replaceSigner(address _signer, uint _nonce, uint8 v, bytes32 r, bytes32 s)
-Similarly to the centralized oracle, the account allowed to set the outcome can be replaced by the currently allowed account. This is useful if the private key allowed to sign the outcome should be replaced with another one with higher protection in case markets resolved by this event become very popular. The new signer address, a nonce and the current singer's signature are provided. A nonce is required to prevent replay attacks in case multiple substitutions of signers are necessary.
+Similarly to the centralized oracle, the account allowed to set the outcome can be replaced by the currently allowed account. This is useful if the private key allowed to sign the outcome should be replaced with a better protected account in case markets resolved by this oracle hold a lot of collateral. The new signer address, a nonce and the current singer's signature are provided. A nonce is required to prevent replay attacks in case multiple substitutions of signers are necessary.
 
 #### setOutcome(int _outcome, uint8 v, bytes32 r, bytes32 s)
 Validates that the outcome was signed by the allowed signer and sets the outcome. Once the outcome was set, it cannot be changed anymore.
 
 ### Ultimate oracle
-The ultimate oracle is a proxy oracle forwarding the result of a predefined oracle. This result can be overwritten by the ultimate oracle in case someone is challenging the outcome. In that sense the ultimate oracle is a backstop oracle used in case the forwarded oracle is acting maliciously. The ultimate oracle is a decentralized oracle, meaning that not a single entity can define the outcome but there has to be consensus within a group of entities about the outcome to resolve the oracle.
+The ultimate oracle is a proxy oracle forwarding the result of a predefined oracle. This result can be overwritten by the ultimate oracle in case someone is challenging the forwarded outcome. The ultimate oracle is a backstop oracle used in case the forwarded oracle is providing wrong information.
 
 <img src="assets/ultimate_oracle.png" />
 
-To challenge an outcome and start the ultimate oracle a user has to put a challenge amount of collateral tokens on the outcome that he believes to be the correct outcome. After the outcome was challenged anyone can put collateral tokens on their preferred outcome. If the outcome with the biggest betting amount (front runner) doesn't change within a defined period, the oracle is resolved and the current front runner is set as the final outcome. To make sure that the spread between the total amount bet and the front runner is not too high so others can catch up, a spread multiplier is defined limiting the spread. After an outcome is decided, the total betting amount is distributed among everyone who put money on the front runner proportionally to their contribution to the front runner.
+To challenge an outcome and start the ultimate oracle a user has to put a challenge amount of collateral tokens on the outcome that he believes to be the correct outcome. After the outcome was challenged anyone can put collateral tokens on their preferred outcome. If the outcome with the biggest betting amount (front runner) doesn't change within a defined period, the oracle is resolved and the current front runner is set as the final outcome. To make sure that the spread between the total amount bet and the front runner is not too high and others can catch up, a spread multiplier is defined limiting the spread. After an outcome is decided, the total betting amount is distributed among everyone who put money on the front runner proportionally to their contribution to the front runner.
 
 #### UltimateOracle(Oracle _oracle, Token _collateralToken, uint8 _spreadMultiplier, uint _challengePeriod, uint _challengeAmount, uint _frontRunnerPeriod)
 To create an ultimate oracle contract a few settings have to be defined:
-1. The forwarded oracle, whose outcome is used in case there is no challenge.
-2. The used collateral token to contribute to the ultimate oracle outcome.
-3. The spread multiplier to define the max. spread between total betting amounts and front runner.
-4. The challenge period in seconds to define how long users have the option to challenge a forwarded outcome before it is set as final.
-5. The challenge amount required to challenge an outcome.
-6. The front runner period in seconds to define how long a front runner must be leading before the front runner is set as final outcome.
+1. Forwarded oracle, whose outcome is used in case there is no challenge.
+2. Collateral token to contribute to the ultimate oracle outcome.
+3. Spread multiplier to define the max. spread between total betting amounts and front runner.
+4. Challenge period in seconds to define how long users have the option to challenge a forwarded outcome before it is set as final.
+5. Challenge amount required to challenge an outcome.
+6. Front runner period in seconds to define how long a front runner must be leading before the front runner is set as final outcome.
 
 #### setOutcome()
-Allows to set the outcome based on the forwarded outcome. It can only be set in case it was set in the forwarded oracle and no challenge was started yet.
+Allows to set the outcome based on the forwarded oracle. It can only be set in case it was set in the forwarded oracle and no challenge was started yet.
 
 #### challengeOutcome(int _outcome)
-Allows to challenge the outcome set by the forwarded outcome. The challenge can be started even if no outcome was set yet. The sender has to pay the defined challenge amount in collateral tokens to start the challenge. The amount is bet on the outcome defined by the sender.
+Allows to challenge the outcome set by the forwarded oracle. The challenge can be started even if no outcome was set yet. The sender has to pay the defined challenge amount in collateral tokens to start the challenge. The amount is bet on the outcome defined by the sender.
 
 #### voteForOutcome(int _outcome, uint amount)
-After
+After a challenge was started everyone can vote for outcomes by betting collateral tokens on their preferred outcome. The maximum amount is the total amount bet on all other outcomes multiplied with the spread multiplier.
 
 #### withdraw() returns (uint amount)
 The function allows the sender to withdraw his share in collateral tokens after the final outcome was set.
