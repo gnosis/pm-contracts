@@ -36,7 +36,7 @@ class TestContract(AbstractTestContract):
         profiling = self.futarchy_factory.createFutarchyOracle(self.ether_token.address, oracle.address, 2, lower, upper,
                                                                self.market_factory.address, self.lmsr.address, fee,
                                                                deadline, sender=keys[creator], profiling=True)
-        self.assertLess(profiling['gas'], 10000000)
+        self.assertLess(profiling['gas'], 20000000)
         futarchy = self.contract_at(profiling['output'], self.futarchy_abi)
         categorical_event = self.contract_at(futarchy.categoricalEvent(), self.event_abi)
         # Fund markets
