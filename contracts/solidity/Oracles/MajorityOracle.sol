@@ -19,13 +19,11 @@ contract MajorityOracle is Oracle {
     function MajorityOracle(Oracle[] _oracles)
         public
     {
-        if (_oracles.length < 2)
-            // At least 2 oracles should be defined
-            revert();
+        // At least 2 oracles should be defined
+        require(_oracles.length > 2);
         for (uint i=0; i<_oracles.length; i++)
-            if (address(_oracles[i]) == 0)
-                // Oracle address cannot be null
-                revert();
+            // Oracle address cannot be null
+            require(address(_oracles[i]) != 0);
         oracles = _oracles;
     }
 

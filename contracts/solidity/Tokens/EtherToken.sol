@@ -37,9 +37,8 @@ contract EtherToken is StandardToken {
     function withdraw(uint value)
         public
     {
-        if (balances[msg.sender] < value)
-            // Overflow operation
-            revert();
+        // Balance covers value
+        require(balances[msg.sender] >= value);
         balances[msg.sender] -= value;
         totalSupply -= value;
         msg.sender.transfer(value);

@@ -19,9 +19,8 @@ contract SignedMessageOracle is Oracle {
      *  Modifiers
      */
     modifier isSigner () {
-        if (msg.sender != signer)
-            // Only signer is allowed to proceed
-            revert();
+        // Only signer is allowed to proceed
+        require(msg.sender == signer);
         _;
     }
 
@@ -50,11 +49,10 @@ contract SignedMessageOracle is Oracle {
         public
         isSigner
     {
-        if (   isSet
-            || nonce >= _nonce
-            || signer != ecrecover(keccak256(descriptionHash, _signer, _nonce), v, r, s))
-            // Result was set already or nonce is invalid or singer is invalid
-            revert();
+        // Result is not set yet and nonce and signer are valid
+        require(   !isSet
+                && _nonce > nonce
+                && signer == ecrecover(keccak256(descriptionHash, _signer, _nonce), v, r, s));
         nonce = _nonce;
         signer = _signer;
     }
@@ -67,10 +65,9 @@ contract SignedMessageOracle is Oracle {
     function setOutcome(int _outcome, uint8 v, bytes32 r, bytes32 s)
         public
     {
-        address _signer = ecrecover(keccak256(descriptionHash, _outcome), v, r, s);
-        if (isSet || _signer != signer)
-            // Result was set already or result was not signed by registered signer
-            revert();
+        // Result is not set yet and signer is valid
+        require(   !isSet
+                && signer == ecrecover(keccak256(descriptionHash, _outcome), v, r, s));
         isSet = true;
         outcome = _outcome;
     }

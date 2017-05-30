@@ -1,6 +1,7 @@
 pragma solidity 0.4.11;
 import "Oracles/AbstractOracle.sol";
 import "Tokens/AbstractToken.sol";
+import "Utils/Math.sol";
 
 
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
@@ -46,14 +47,13 @@ contract UltimateOracle is Oracle {
     )
         public
     {
-        if (   address(_oracle) == 0
-            || address(_collateralToken) == 0
-            || _spreadMultiplier < 2
-            || _challengePeriod == 0
-            || _challengeAmount == 0
-            || _frontRunnerPeriod == 0)
-            // Values should not be null
-            revert();
+        // Validate inputs
+        require(   address(_oracle) != 0
+                && address(_collateralToken) != 0
+                && _spreadMultiplier >= 2
+                && _challengePeriod > 0
+                && _challengeAmount > 0
+                && _frontRunnerPeriod > 0);
         oracle = _oracle;
         collateralToken = _collateralToken;
         spreadMultiplier = _spreadMultiplier;
@@ -66,11 +66,10 @@ contract UltimateOracle is Oracle {
     function setOutcome()
         public
     {
-        if (   isChallenged()
-            || outcomeSetTimestamp != 0
-            || !oracle.isOutcomeSet())
-            // Outcome was set already or cannot be set yet
-            revert();
+        // There was no challenge and the outcome was not set yet in the ultimate oracle but in the forwarded oracle
+        require(   !isChallenged()
+                && outcomeSetTimestamp == 0
+                && oracle.isOutcomeSet());
         outcome = oracle.getOutcome();
         outcomeSetTimestamp = now;
     }
@@ -80,12 +79,10 @@ contract UltimateOracle is Oracle {
     function challengeOutcome(int _outcome)
         public
     {
-        if (   _outcome == outcome
-            || isChallenged()
-            || isChallengePeriodOver()
-            || !collateralToken.transferFrom(msg.sender, this, challengeAmount))
-            // Outcome challenged already or challenge period is over or deposit cannot be paid
-            revert();
+        // There was no challenge yet or the challenge period expired
+        require(   !isChallenged()
+                && !isChallengePeriodOver()
+                && collateralToken.transferFrom(msg.sender, this, challengeAmount));
         outcomeAmounts[msg.sender][_outcome] = challengeAmount;
         totalOutcomeAmounts[_outcome] = challengeAmount;
         totalAmount = challengeAmount;
@@ -99,18 +96,16 @@ contract UltimateOracle is Oracle {
     function voteForOutcome(int _outcome, uint amount)
         public
     {
-        uint maxAmount =   (totalAmount - totalOutcomeAmounts[_outcome]) * spreadMultiplier
-                         - totalOutcomeAmounts[_outcome];
+        uint maxAmount = Math.mul(totalAmount - totalOutcomeAmounts[_outcome], spreadMultiplier);
         if (amount > maxAmount)
             amount = maxAmount;
-        if (   !isChallenged()
-            || isFrontRunnerPeriodOver()
-            || !collateralToken.transferFrom(msg.sender, this, amount))
-            // Outcome is not challenged or front runner period is over or deposit cannot be paid
-            revert();
-        outcomeAmounts[msg.sender][_outcome] += amount;
-        totalOutcomeAmounts[_outcome] += amount;
-        totalAmount += amount;
+        // Outcome is challenged and front runner period is not over yet and tokens can be transferred
+        require(   isChallenged()
+                && !isFrontRunnerPeriodOver()
+                && collateralToken.transferFrom(msg.sender, this, amount));
+        outcomeAmounts[msg.sender][_outcome] = Math.add(outcomeAmounts[msg.sender][_outcome], amount);
+        totalOutcomeAmounts[_outcome] = Math.add(totalOutcomeAmounts[_outcome], amount);
+        totalAmount = Math.add(totalAmount, amount);
         if (_outcome != frontRunner && totalOutcomeAmounts[_outcome] > totalOutcomeAmounts[frontRunner])
         {
             frontRunner = _outcome;
@@ -124,14 +119,12 @@ contract UltimateOracle is Oracle {
         public
         returns (uint amount)
     {
-        if (!isChallenged() || !isFrontRunnerPeriodOver())
-            // Outcome was not challenged or front runner period is not over yet
-            revert();
-        amount = totalAmount * outcomeAmounts[msg.sender][frontRunner] / totalOutcomeAmounts[frontRunner];
+        // Outcome was challenged and ultimate outcome decided
+        require(isFrontRunnerPeriodOver());
+        amount = Math.mul(totalAmount, outcomeAmounts[msg.sender][frontRunner]) / totalOutcomeAmounts[frontRunner];
         outcomeAmounts[msg.sender][frontRunner] = 0;
-        if (!collateralToken.transfer(msg.sender, amount))
-            // Tokens could not be transferred
-            revert();
+        // Transfer earnings to contributor
+        require(collateralToken.transfer(msg.sender, amount));
     }
 
     /// @dev Checks if time to challenge the outcome is over
@@ -158,7 +151,7 @@ contract UltimateOracle is Oracle {
         public
         returns (bool)
     {
-        return frontRunnerSetTimestamp > 0;
+        return frontRunnerSetTimestamp != 0;
     }
 
     /// @dev Returns if winning outcome is set for given event

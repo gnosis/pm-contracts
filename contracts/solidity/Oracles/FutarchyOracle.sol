@@ -22,9 +22,8 @@ contract FutarchyOracle is Oracle {
      *  Modifiers
      */
     modifier isCreator () {
-        if (msg.sender != creator)
-            // Only creator is allowed to proceed
-            revert();
+        // Only creator is allowed to proceed
+        require(msg.sender == creator);
         _;
     }
 
@@ -58,9 +57,8 @@ contract FutarchyOracle is Oracle {
     )
         public
     {
-        if (_deadline < now)
-            // Deadline has passed already
-            revert();
+        // Deadline is in the future
+        require(_deadline > now);
         // Create decision event
         categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
         // Create outcome events
@@ -84,17 +82,14 @@ contract FutarchyOracle is Oracle {
         isCreator
     {
         // Buy all outcomes
-        if (   !categoricalEvent.collateralToken().transferFrom(creator, this, funding)
-            || !categoricalEvent.collateralToken().approve(categoricalEvent, funding))
-            // Transfer failed or approval failed
-            revert();
+        require(   categoricalEvent.collateralToken().transferFrom(creator, this, funding)
+                && categoricalEvent.collateralToken().approve(categoricalEvent, funding));
         categoricalEvent.buyAllOutcomes(funding);
         // Fund each market with outcome tokens from categorical event
         for (uint8 i=0; i<markets.length; i++) {
             Market market = markets[i];
-            if (!market.eventContract().collateralToken().approve(market, funding))
-                // Tokens could not be approved
-                revert();
+            // Approve funding for market
+            require(market.eventContract().collateralToken().approve(market, funding));
             market.fund(funding);
         }
     }
@@ -104,22 +99,16 @@ contract FutarchyOracle is Oracle {
         public
         isCreator
     {
-        if (!categoricalEvent.isWinningOutcomeSet())
-            // Winning outcome is not set yet
-            revert();
-        // Close market and transfer all outcome tokens from winning outcome to this contract
+        // Winning outcome has to be set
         Market market = markets[uint(getOutcome())];
-        if (!market.eventContract().isWinningOutcomeSet())
-            // Winning outcome is not set yet
-            revert();
+        require(categoricalEvent.isWinningOutcomeSet() && market.eventContract().isWinningOutcomeSet());
+        // Close market and transfer all outcome tokens from winning outcome to this contract
         market.close();
         market.eventContract().redeemWinnings();
         market.withdrawFees();
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
-        if (!categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)))
-            // Transfer failed
-            revert();
+        require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
     }
 
     /// @dev Returns the amount of outcome tokens held by market
@@ -137,9 +126,8 @@ contract FutarchyOracle is Oracle {
     function setOutcome()
         public
     {
-        if (isSet || deadline > now)
-            // Outcome was set already or deadline is not over yet
-            revert();
+        // Outcome is not set yet and deadline has passed
+        require(!isSet && deadline <= now);
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(markets[0]);
         uint highest = outcomeTokenDistribution[0] - outcomeTokenDistribution[1];
         int highestIndex = 0;

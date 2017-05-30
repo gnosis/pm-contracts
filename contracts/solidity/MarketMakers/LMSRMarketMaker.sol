@@ -78,7 +78,7 @@ contract LMSRMarketMaker is MarketMaker {
         int costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
 
         require(
-            // Math.safeToSubtract(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount) &&
+            // Math.safeToSub(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount) &&
             int(outcomeTokenCount) >= 0
         );
         netOutcomeTokensSold[outcomeTokenIndex] -= int(outcomeTokenCount);
@@ -91,9 +91,6 @@ contract LMSRMarketMaker is MarketMaker {
         profits = uint(costLevelBefore - costLevelAfter) / ONE;
     }
 
-    /*
-     *  Private functions
-     */
     /// @dev Returns current price for given outcome token
     /// @param logN Logarithm of the number of outcomes
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
@@ -133,25 +130,25 @@ contract LMSRMarketMaker is MarketMaker {
         // TODO: deal with large quantities better
         int maxQuantity = Math.max(netOutcomeTokensSold);
         require(
-            // Math.safeToMultiply(maxQuantity, int(logN)) &&
+            // Math.safeToMul(maxQuantity, int(logN)) &&
             int(logN) >= 0 && int(funding) >= 0
         );
         int offset = maxQuantity * int(logN) / int(funding);
-        // require(Math.safeToSubtract(offset, EXP_LIMIT));
+        // require(Math.safeToSub(offset, EXP_LIMIT));
         offset -= EXP_LIMIT;
 
         uint innerSum = 0;
         int exponent;
         for (uint8 i=0; i<netOutcomeTokensSold.length; i++) {
-            // require(Math.safeToMultiply(netOutcomeTokensSold[i], int(logN)));
+            // require(Math.safeToMul(netOutcomeTokensSold[i], int(logN)));
             exponent = netOutcomeTokensSold[i] * int(logN) / int(funding);
-            // require(Math.safeToSubtract(exponent, offset));
+            // require(Math.safeToSub(exponent, offset));
             innerSum += Math.exp(exponent - offset);
         }
         int logsum = Math.ln(innerSum);
         // require(Math.safeToAdd(offset, logsum));
         costLevel = offset + logsum;
-        // require(Math.safeToMultiply(costLevel, int(funding)));
+        // require(Math.safeToMul(costLevel, int(funding)));
         costLevel = costLevel * int(ONE) / int(logN) * int(funding);
     }
 

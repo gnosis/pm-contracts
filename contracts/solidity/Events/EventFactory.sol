@@ -36,9 +36,9 @@ contract EventFactory {
         returns (CategoricalEvent eventContract)
     {
         bytes32 eventHash = keccak256(collateralToken, oracle, outcomeCount);
-        if (address(categoricalEvents[eventHash]) != 0)
-            // Event does exist
-            revert();
+        // Event should not exist yet
+        require(address(categoricalEvents[eventHash]) == 0);
+        // Create event
         eventContract = new CategoricalEvent(
             collateralToken,
             oracle,
@@ -64,9 +64,9 @@ contract EventFactory {
         returns (ScalarEvent eventContract)
     {
         bytes32 eventHash = keccak256(collateralToken, oracle, lowerBound, upperBound);
-        if (address(scalarEvents[eventHash]) != 0)
-            // Event does exist already
-            revert();
+        // Event should not exist yet
+        require(address(scalarEvents[eventHash]) == 0);
+        // Create event
         eventContract = new ScalarEvent(
             collateralToken,
             oracle,

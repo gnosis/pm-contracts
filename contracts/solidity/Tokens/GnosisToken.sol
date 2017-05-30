@@ -23,23 +23,20 @@ contract GnosisToken is StandardToken {
     function GnosisToken(address dutchAuction, address[] owners, uint[] tokens)
         public
     {
-        if (dutchAuction == 0)
-            // Address should not be null
-            revert();
+        // Address should not be null
+        require(dutchAuction != 0);
         totalSupply = 10000000 * 10**18;
         balances[dutchAuction] = 9000000 * 10**18;
         Transfer(0, dutchAuction, balances[dutchAuction]);
         uint assignedTokens = balances[dutchAuction];
         for (uint i=0; i<owners.length; i++) {
-            if (owners[i] == 0)
-                // Address should not be null
-                revert();
+            // Address should not be null
+            require(owners[i] != 0);
             balances[owners[i]] += tokens[i];
             Transfer(0, owners[i], tokens[i]);
             assignedTokens += tokens[i];
         }
-        if (assignedTokens != totalSupply)
-            // Assgined tokens don't match the total supply
-            revert();
+        // Assigned tokens match the total supply
+        require(assignedTokens == totalSupply);
     }
 }

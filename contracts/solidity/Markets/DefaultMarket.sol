@@ -29,9 +29,8 @@ contract DefaultMarket is Market {
      *  Modifiers
      */
     modifier isCreator () {
-        if (msg.sender != creator)
-            // Only creator is allowed to proceed
-            revert();
+        // Only creator is allowed to proceed
+        require(msg.sender == creator);
         _;
     }
 
@@ -46,9 +45,8 @@ contract DefaultMarket is Market {
     function DefaultMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint _fee)
         public
     {
-        if (address(_eventContract) == 0 || address(_marketMaker) == 0 || _fee >= FEE_RANGE)
-            // Values are null or fee is above 100%
-            revert();
+        // Validate inputs
+        require(address(_eventContract) != 0 && address(_marketMaker) != 0 && _fee < FEE_RANGE);
         creator = _creator;
         createdAtBlock = block.number;
         eventContract = _eventContract;
@@ -63,10 +61,9 @@ contract DefaultMarket is Market {
         public
         isCreator
     {
-        if (   !eventContract.collateralToken().transferFrom(msg.sender, this, _funding)
-            || !eventContract.collateralToken().approve(eventContract, _funding))
-            // Sender doesn't have enough tokens to do the funding or token approval failed
-            revert();
+        // Request collateral tokens and allow event contract to transfer them to buy all outcomes
+        require(   eventContract.collateralToken().transferFrom(msg.sender, this, _funding)
+                && eventContract.collateralToken().approve(eventContract, _funding));
         eventContract.buyAllOutcomes(_funding);
         funding += _funding;
     }
@@ -89,9 +86,8 @@ contract DefaultMarket is Market {
         returns (uint fees)
     {
         fees = eventContract.collateralToken().balanceOf(this);
-        if (!eventContract.collateralToken().transfer(creator, fees))
-            // Transfer failed
-            revert();
+        // Transfer fees
+        require(eventContract.collateralToken().transfer(creator, fees));
     }
 
     /// @dev Allows to buy outcome tokens from market maker
@@ -109,18 +105,14 @@ contract DefaultMarket is Market {
         uint fee = calcMarketFee(outcomeTokenCosts);
         costs = outcomeTokenCosts + fee;
         // Check costs don't exceed max costs
-        if (costs == 0 || costs > maxCosts)
-            // Amount of token is too small or tokens are more expensive
-            revert();
+        require(costs > 0 && costs <= maxCosts);
         // Transfer tokens to markets contract and buy all outcomes
-        if (   !eventContract.collateralToken().transferFrom(msg.sender, this, costs)
-            || !eventContract.collateralToken().approve(eventContract, outcomeTokenCosts))
-            // Tokens could not be transferred or approval failed
-            revert();
+        require(   eventContract.collateralToken().transferFrom(msg.sender, this, costs)
+                && eventContract.collateralToken().approve(eventContract, outcomeTokenCosts));
         // Buy all outcomes
         eventContract.buyAllOutcomes(outcomeTokenCosts);
         // Transfer outcome tokens to buyer
-        eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount);
+        require(eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount));
 
         require(
             int(outcomeTokenCount) >= 0 &&
@@ -144,17 +136,13 @@ contract DefaultMarket is Market {
         uint fee = calcMarketFee(outcomeTokenProfits);
         profits = outcomeTokenProfits - fee;
         // Check profits are not too low
-        if (profits == 0 || profits < minProfits)
-            // Amount of token is too small or profits are too low
-            revert();
+        require(profits > 0 && profits >= minProfits);
         // Transfer outcome tokens to markets contract to sell all outcomes
         eventContract.outcomeTokens(outcomeTokenIndex).transferFrom(msg.sender, this, outcomeTokenCount);
         // Sell all outcomes
         eventContract.sellAllOutcomes(outcomeTokenProfits);
         // Transfer profits to seller
-        if (!eventContract.collateralToken().transfer(msg.sender, profits))
-            // Transfer failed
-            revert();
+        require(eventContract.collateralToken().transfer(msg.sender, profits));
 
         require(
             int(outcomeTokenCount) >= 0 &&
@@ -174,10 +162,8 @@ contract DefaultMarket is Market {
         returns (uint costs)
     {
         // Buy all outcomes
-        if (   !eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
-            || !eventContract.collateralToken().approve(eventContract, outcomeTokenCount))
-            // Transfer failed or approval failed
-            revert();
+        require(   eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
+                && eventContract.collateralToken().approve(eventContract, outcomeTokenCount));
         eventContract.buyAllOutcomes(outcomeTokenCount);
         // Short sell selected outcome
         eventContract.outcomeTokens(outcomeTokenIndex).approve(this, outcomeTokenCount);
@@ -189,9 +175,7 @@ contract DefaultMarket is Market {
             if (i != outcomeTokenIndex)
                 eventContract.outcomeTokens(i).transfer(msg.sender, outcomeTokenCount);
         // Send change back to buyer
-        if (!eventContract.collateralToken().transfer(msg.sender, profits))
-            // Couldn't send user change back
-            revert();
+        require(eventContract.collateralToken().transfer(msg.sender, profits));
     }
 
     /// @dev Calculates fee to be paid to market maker

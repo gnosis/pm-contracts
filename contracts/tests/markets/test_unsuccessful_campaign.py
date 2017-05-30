@@ -1,19 +1,16 @@
 from codecs import decode
-from ..abstract_test import AbstractTestContract, keys
+from ..abstract_test import AbstractTestContracts, keys
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.markets.test_unsuccessful_campaign
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
         self.event_factory = self.create_contract('Events/EventFactory.sol', libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.market_factory = self.create_contract('Markets/DefaultMarketFactory.sol')
-        self.campaign_factory = self.create_contract('Markets/CampaignFactory.sol')
+        self.campaign_factory = self.create_contract('Markets/CampaignFactory.sol', libraries={'Math': self.math})
         self.lmsr = self.create_contract('MarketMakers/LMSRMarketMaker.sol', libraries={'Math': self.math})
         self.ether_token = self.create_contract('Tokens/EtherToken.sol')
         self.token_abi = self.create_abi('Tokens/AbstractToken.sol')

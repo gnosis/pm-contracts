@@ -1,17 +1,14 @@
 from codecs import encode, decode
-from ..abstract_test import AbstractTestContract, accounts, keys, TransactionFailed
+from ..abstract_test import AbstractTestContracts, accounts, keys, TransactionFailed
 # signing
 from bitcoin import ecdsa_raw_sign
 from ethereum.utils import sha3
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.oracles.test_signed_message_oracle
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.signed_message_oracle_factory = self.create_contract('Oracles/SignedMessageOracleFactory.sol')
         self.oracle_abi = self.create_abi('Oracles/SignedMessageOracle.sol')
 

@@ -1,13 +1,10 @@
-from ..abstract_test import AbstractTestContract, TransactionFailed
+from ..abstract_test import AbstractTestContracts, TransactionFailed
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.oracles.test_difficulty_oracle
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.difficulty_oracle_factory = self.create_contract('Oracles/DifficultyOracleFactory.sol')
         self.oracle_abi = self.create_abi('Oracles/DifficultyOracle.sol')
 

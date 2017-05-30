@@ -1,6 +1,7 @@
 pragma solidity 0.4.11;
 import "Events/AbstractEvent.sol";
 import "Markets/DefaultMarketFactory.sol";
+import "Utils/Math.sol";
 
 
 /// @title Campaign contract - Allows to crowdfund a market
@@ -38,9 +39,8 @@ contract Campaign {
      *  Modifiers
      */
     modifier atStage(Stages _stage) {
-        if (stage != _stage)
-            // Contract not in expected state
-            revert();
+        // Contract has to be in given stage
+        require(stage == _stage);
         _;
     }
 
@@ -70,14 +70,13 @@ contract Campaign {
     )
         public
     {
-        if (   address(_eventContract) == 0
-            || address(_marketFactory) == 0
-            || address(_marketMaker) == 0
-            || _fee >= FEE_RANGE
-            || _funding == 0
-            || _deadline < now)
-            // Invalid arguments
-            revert();
+        // Validate input
+        require(   address(_eventContract) != 0
+                && address(_marketFactory) != 0
+                && address(_marketMaker) != 0
+                && _fee < FEE_RANGE
+                && _funding > 0
+                && now < _deadline);
         eventContract = _eventContract;
         marketFactory = _marketFactory;
         marketMaker = _marketMaker;
@@ -97,10 +96,9 @@ contract Campaign {
         uint maxAmount = funding - raisedAmount;
         if (maxAmount < amount)
             amount = maxAmount;
-        if (!eventContract.collateralToken().transferFrom(msg.sender, this, amount))
-            // Transfer failed
-            revert();
-        contributions[msg.sender] += amount;
+        // Collect collateral tokens
+        require(eventContract.collateralToken().transferFrom(msg.sender, this, amount));
+        contributions[msg.sender] = Math.add(contributions[msg.sender], amount);
         if (amount == maxAmount)
             stage = Stages.AuctionSuccessful;
     }
@@ -115,9 +113,8 @@ contract Campaign {
     {
         refundAmount = contributions[msg.sender];
         contributions[msg.sender] = 0;
-        if (!eventContract.collateralToken().transfer(msg.sender, refundAmount))
-            // Refund failed
-            revert();
+        // Refund collateral tokens
+        require(eventContract.collateralToken().transfer(msg.sender, refundAmount));
     }
 
     /// @dev Allows to create market after successful funding
@@ -129,7 +126,7 @@ contract Campaign {
         returns (Market)
     {
         market = marketFactory.createMarket(eventContract, marketMaker, fee);
-        eventContract.collateralToken().approve(market, funding);
+        require(eventContract.collateralToken().approve(market, funding));
         market.fund(funding);
         stage = Stages.MarketCreated;
         return market;
@@ -141,9 +138,8 @@ contract Campaign {
         public
         atStage(Stages.MarketCreated)
     {
-        if (!eventContract.isWinningOutcomeSet())
-            // Winning outcome is not set yet
-            revert();
+        // Winning outcome should be set
+        require(eventContract.isWinningOutcomeSet());
         market.close();
         market.withdrawFees();
         eventContract.redeemWinnings();
@@ -158,10 +154,9 @@ contract Campaign {
         atStage(Stages.MarketClosed)
         returns (uint fees)
     {
-        fees = finalBalance * contributions[msg.sender] / funding;
+        fees = Math.mul(finalBalance, contributions[msg.sender]) / funding;
         contributions[msg.sender] = 0;
-        if (!eventContract.collateralToken().transfer(msg.sender, fees))
-            // Transfer failed
-            revert();
+        // Send fee share to contributor
+        require(eventContract.collateralToken().transfer(msg.sender, fees));
     }
 }

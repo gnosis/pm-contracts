@@ -37,9 +37,7 @@ contract FutarchyOracleFactory {
     function FutarchyOracleFactory(EventFactory _eventFactory)
         public
     {
-        if (address(_eventFactory) == 0)
-            // Address is null
-            revert();
+        require(address(_eventFactory) != 0);
         eventFactory = _eventFactory;
     }
 

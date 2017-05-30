@@ -24,12 +24,8 @@ contract StandardTokenWithOverflowProtection is Token {
         public
         returns (bool)
     {
-        if (   !Math.safeToSubtract(balances[msg.sender], value)
-            || !Math.safeToAdd(balances[to], value))
-            // Overflow operation
-            revert();
-        balances[msg.sender] -= value;
-        balances[to] += value;
+        balances[msg.sender] = Math.sub(balances[msg.sender], value);
+        balances[to] = Math.add(balances[to], value);
         Transfer(msg.sender, to, value);
         return true;
     }
@@ -43,14 +39,9 @@ contract StandardTokenWithOverflowProtection is Token {
         public
         returns (bool)
     {
-        if (   !Math.safeToSubtract(balances[from], value)
-            || !Math.safeToSubtract(allowances[from][msg.sender], value)
-            || !Math.safeToAdd(balances[to], value))
-            // Overflow operation
-            revert();
-        balances[from] -= value;
-        allowances[from][msg.sender] -= value;
-        balances[to] += value;
+        balances[from] = Math.sub(balances[from], value);
+        allowances[from][msg.sender] = Math.sub(allowances[from][msg.sender], value);
+        balances[to] = Math.add(balances[to], value);
         Transfer(from, to, value);
         return true;
     }

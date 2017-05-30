@@ -28,22 +28,28 @@ Test
 -------------
 ### Run all tests:
 ```
-cd gnosis-contracts
-python -m unittest discover contracts.tests
+cd gnosis-contracts/contracts/tests/
+pytest
 ```
 
 ### Run one test:
 ```
-cd gnosis-contracts
-python -m unittest contracts.tests.test_name
+cd gnosis-contracts/contracts/tests/
+pytest utils/test_math.py
 ```
 
-Deploy
--------------
+Deploy & ABI generation
+-----------------------
 ### Deploy all contracts required for the basic framework:
 ```
 cd gnosis-contracts/contracts/
 python ethdeploy.py --f deploy/basicFramework.json --optimize
+```
+
+### Generate ABIs for all contracts
+```
+cd gnosis-contracts/contracts/
+python ethabi.py
 ```
 
 Security and Liability

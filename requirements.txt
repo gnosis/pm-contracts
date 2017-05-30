@@ -1,6 +1,7 @@
 requests==2.5.3
 click==5.1
 mpmath==0.19
+pytest==3.1.0
 
 # ethereum
 git+https://github.com/Georgi87/pyethereum.git@develop

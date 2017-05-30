@@ -1,17 +1,15 @@
 from codecs import decode
-from ..abstract_test import AbstractTestContract, keys, TransactionFailed
+from ..abstract_test import AbstractTestContracts, keys, TransactionFailed
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.oracles.test_ultimate_oracle
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
         self.ether_token = self.create_contract('Tokens/EtherToken.sol')
-        self.ultimate_oracle_factory = self.create_contract('Oracles/UltimateOracleFactory.sol')
+        self.ultimate_oracle_factory = self.create_contract('Oracles/UltimateOracleFactory.sol',
+                                                            libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.ultimate_oracle_abi = self.create_abi('Oracles/UltimateOracle.sol')
         self.centralized_oracle_abi = self.create_abi('Oracles/CentralizedOracle.sol')

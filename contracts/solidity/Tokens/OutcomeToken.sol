@@ -21,9 +21,8 @@ contract OutcomeToken is StandardTokenWithOverflowProtection {
      *  Modifiers
      */
     modifier isEventContract () {
-        if (msg.sender != eventContract)
-            // Only event contract is allowed to proceed
-            revert();
+        // Only event contract is allowed to proceed
+        require(msg.sender == eventContract);
         _;
     }
 
@@ -44,12 +43,8 @@ contract OutcomeToken is StandardTokenWithOverflowProtection {
         public
         isEventContract
     {
-        if (   !Math.safeToAdd(balances[_for], outcomeTokenCount)
-            || !Math.safeToAdd(totalSupply, outcomeTokenCount))
-            // Overflow operation
-            revert();
-        balances[_for] += outcomeTokenCount;
-        totalSupply += outcomeTokenCount;
+        balances[_for] = Math.add(balances[_for], outcomeTokenCount);
+        totalSupply = Math.add(totalSupply, outcomeTokenCount);
         Issue(_for, outcomeTokenCount);
     }
 
@@ -60,12 +55,8 @@ contract OutcomeToken is StandardTokenWithOverflowProtection {
         public
         isEventContract
     {
-        if (   !Math.safeToSubtract(balances[_for], outcomeTokenCount)
-            || !Math.safeToSubtract(totalSupply, outcomeTokenCount))
-            // Overflow operation
-            revert();
-        balances[_for] -= outcomeTokenCount;
-        totalSupply -= outcomeTokenCount;
+        balances[_for] = Math.sub(balances[_for], outcomeTokenCount);
+        totalSupply = Math.sub(totalSupply, outcomeTokenCount);
         Revoke(_for, outcomeTokenCount);
     }
 }

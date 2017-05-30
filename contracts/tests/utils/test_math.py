@@ -7,16 +7,13 @@ import random
 from ethereum.tester import TransactionFailed
 
 from ..math_utils import isclose, mp, mpf
-from ..abstract_test import AbstractTestContract
+from ..abstract_test import AbstractTestContracts
 
 
-class TestContract(AbstractTestContract):
-    """
-    run test with python -m unittest contracts.tests.utils.test_math
-    """
+class TestContracts(AbstractTestContracts):
 
     def __init__(self, *args, **kwargs):
-        super(TestContract, self).__init__(*args, **kwargs)
+        super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
 
     def test(self):
@@ -75,9 +72,21 @@ class TestContract(AbstractTestContract):
         self.assertTrue(self.math.safeToAdd(1, 1))
 
         # Safe to subtract
-        self.assertFalse(self.math.safeToSubtract(1, 2))
-        self.assertTrue(self.math.safeToSubtract(1, 1))
+        self.assertFalse(self.math.safeToSub(1, 2))
+        self.assertTrue(self.math.safeToSub(1, 1))
 
         # Safe to multiply
-        self.assertFalse(self.math.safeToMultiply(2**128, 2**128))
-        self.assertTrue(self.math.safeToMultiply(2**128 - 1, 2**128 - 1))
+        self.assertFalse(self.math.safeToMul(2**128, 2**128))
+        self.assertTrue(self.math.safeToMul(2**256//2 - 1, 2))
+
+        # Add
+        self.assertRaises(TransactionFailed, self.math.add, 2**256 - 1, 1)
+        self.assertEqual(self.math.add(1, 1), 2)
+
+        # Sub
+        self.assertRaises(TransactionFailed, self.math.sub, 1, 2)
+        self.assertEqual(self.math.sub(1, 1), 0)
+
+        # Mul
+        self.assertRaises(TransactionFailed, self.math.mul, 2**128, 2**128)
+        self.assertEqual(self.math.mul(5, 5), 25)

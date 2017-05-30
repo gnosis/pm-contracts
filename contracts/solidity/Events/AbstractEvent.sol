@@ -27,9 +27,8 @@ contract Event {
     function Event(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
         public
     {
-        if (address(_collateralToken) == 0 || address(_oracle) == 0 || outcomeCount < 2)
-            // Values are null or outcome count is too low
-            revert();
+        // Validate input
+        require(address(_collateralToken) != 0 && address(_oracle) != 0 && outcomeCount >= 2);
         collateralToken = _collateralToken;
         oracle = _oracle;
         // Create outcome tokens for each outcome
@@ -43,9 +42,7 @@ contract Event {
         public
     {
         // Transfer tokens to events contract
-        if (!collateralToken.transferFrom(msg.sender, this, collateralTokenCount))
-            // Transfer failed
-            revert();
+        require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
         // Issue new event tokens to owner
         for (uint8 i=0; i<outcomeTokens.length; i++)
             outcomeTokens[i].issue(msg.sender, collateralTokenCount);
@@ -60,18 +57,15 @@ contract Event {
         for (uint8 i=0; i<outcomeTokens.length; i++)
             outcomeTokens[i].revoke(msg.sender, outcomeTokenCount);
         // Transfer redeemed tokens
-        if (!collateralToken.transfer(msg.sender, outcomeTokenCount))
-            // Transfer failed
-            revert();
+        require(collateralToken.transfer(msg.sender, outcomeTokenCount));
     }
 
     /// @dev Sets winning event outcome if resolved by oracle
     function setWinningOutcome()
         public
     {
-        if (isWinningOutcomeSet || !oracle.isOutcomeSet())
-            // Winning outcome is set already or outcome is not set yet
-            revert();
+        // Winning outcome is not set yet in event contract but in oracle contract
+        require(!isWinningOutcomeSet && oracle.isOutcomeSet());
         // Set winning outcome
         winningOutcome = oracle.getOutcome();
         isWinningOutcomeSet = true;

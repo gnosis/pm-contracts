@@ -27,7 +27,6 @@ class EthDeploy:
     def __init__(self, protocol, host, port, gas, gas_price, contract_dir, optimize, account, private_key_path):
         # establish rpc connection
         self.json_rpc = EthJsonRpc(protocol=protocol, host=host, port=port)
-        self.solidity = _solidity.solc_wrapper()
         self._from = None
         self.private_key = None
         # set sending account
@@ -119,32 +118,29 @@ class EthDeploy:
         tx.sign(decode(self.private_key, 'hex'))
         return self.add_0x(encode(rlp.encode(tx), 'hex'))
 
-    def compile_code(self, code=None, path=None):
+    def compile_code(self, path):
         # create list of valid paths
         absolute_path = self.contract_dir if self.contract_dir.startswith('/') else '{}/{}'.format(os.getcwd(),
                                                                                                    self.contract_dir)
         sub_dirs = [x[0] for x in os.walk(absolute_path)]
         extra_args = ' '.join(['{}={}'.format(d.split('/')[-1], d) for d in sub_dirs])
         # compile code
-        combined = self.solidity.combined(code, path=path, libraries=self.references, optimize=self.optimize, extra_args=extra_args)
-        bytecode = combined[-1][1]['bin_hex']
-        abi = combined[-1][1]['abi']
+        combined = _solidity.compile_last_contract(path, libraries=self.references, combined='bin,abi',
+                                                   optimize=self.optimize, extra_args=extra_args)
+        bytecode = combined['bin_hex']
+        abi = combined['abi']
         return bytecode, abi
 
-    def deploy(self, _from, file_path, bytecode, sourcecode, libraries, value, params, label, abi):
+    def deploy(self, _from, file_path, libraries, value, params, label):
         # replace library placeholders
         if libraries:
             for library_name, library_address in libraries.items():
                 self.references[library_name] = self.replace_references(self.strip_0x(library_address))
-        if file_path:
-            if self.contract_dir:
-                file_path = '{}/{}'.format(self.contract_dir, file_path)
-            bytecode, abi = self.compile_code(path=file_path)
-            if not label:
-                label = file_path.split("/")[-1].split(".")[0]
-        if sourcecode:
-            # compile code
-            bytecode, abi = self.compile_code(code=sourcecode)
+        if self.contract_dir:
+            file_path = '{}/{}'.format(self.contract_dir, file_path)
+        bytecode, abi = self.compile_code(file_path)
+        if not label:
+            label = file_path.split("/")[-1].split(".")[0]
         if params:
             translator = ContractTranslator(abi)
             # replace constructor placeholders
@@ -257,13 +253,10 @@ class EthDeploy:
                 self.deploy(
                     i['from'] if 'from' in i else None,
                     i['file'] if 'file' in i else None,
-                    i['bytecode'] if 'bytecode' in i else None,
-                    i['sourcecode'] if 'sourcecode' in i else None,
                     i['libraries'] if 'libraries' in i else None,
                     i['value'] if 'value' in i else 0,
                     i['params'] if 'params' in i else (),
-                    i['label'] if 'label' in i else None,
-                    i['abi'] if 'abi' in i else None
+                    i['label'] if 'label' in i else None
                 )
             elif i["type"] == "transaction":
                 self.send_transaction(

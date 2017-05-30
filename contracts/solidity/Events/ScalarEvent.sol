@@ -36,9 +36,8 @@ contract ScalarEvent is Event {
         public
         Event(_collateralToken, _oracle, 2)
     {
-        if (_upperBound <= _lowerBound)
-            // Bounds are invalid
-            revert();
+        // Validate bounds
+        require(_upperBound > _lowerBound);
         lowerBound = _lowerBound;
         upperBound = _upperBound;
     }
@@ -49,9 +48,8 @@ contract ScalarEvent is Event {
         public
         returns (uint winnings)
     {
-        if (!isWinningOutcomeSet)
-            // Winning outcome is not set yet
-            revert();
+        // Winning outcome should not be set yet
+        require(isWinningOutcomeSet);
         // Calculate winnings
         uint16 convertedWinningOutcome;
         // Outcome is lower than defined lower bound
@@ -67,14 +65,12 @@ contract ScalarEvent is Event {
         uint factorLong = OUTCOME_RANGE - factorShort;
         uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);
         uint longOutcomeTokenCount = outcomeTokens[LONG].balanceOf(msg.sender);
-        winnings = (shortOutcomeTokenCount * factorShort + longOutcomeTokenCount * factorLong) / OUTCOME_RANGE;
+        winnings = Math.add(Math.mul(shortOutcomeTokenCount, factorShort), Math.mul(longOutcomeTokenCount, factorLong)) / OUTCOME_RANGE;
         // Revoke all tokens of all outcomes
         outcomeTokens[SHORT].revoke(msg.sender, shortOutcomeTokenCount);
         outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);
         // Payout winnings
-        if (!collateralToken.transfer(msg.sender, winnings))
-            // Transfer failed
-            revert();
+        require(collateralToken.transfer(msg.sender, winnings));
     }
 
     /// @dev Calculates and returns event hash

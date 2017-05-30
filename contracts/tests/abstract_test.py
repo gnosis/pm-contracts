@@ -12,18 +12,14 @@ from os import walk
 import string
 
 
-class AbstractTestContract(TestCase):
-    """
-    run all tests with python -m unittest discover contracts.tests
-    """
+class AbstractTestContracts(TestCase):
 
     HOMESTEAD_BLOCK = 1150000
     CONTRACT_DIR = 'solidity'
 
     def __init__(self, *args, **kwargs):
-        super(AbstractTestContract, self).__init__(*args, **kwargs)
+        super(AbstractTestContracts, self).__init__(*args, **kwargs)
         self.s = t.state()
-        self.solidity = _solidity.solc_wrapper()
         self.s.block.number = self.HOMESTEAD_BLOCK
         t.gas_limit = 4712388
 
@@ -41,20 +37,10 @@ class AbstractTestContract(TestCase):
     def contract_at(self, address, abi):
         return ABIContract(self.s, abi, address)
 
-    def create_abi(self, path, libraries=None):
+    def create_abi(self, path):
         path, extra_args = self.get_dirs(path)
-        if libraries:
-            for name, address in libraries.items():
-                if type(address) == str:
-                    if self.is_hex(address):
-                        libraries[name] = address
-                    else:
-                        libraries[name] = encode(address, 'hex')
-                elif isinstance(address, t.ABIContract):
-                    libraries[name] = encode(address.address, 'hex')
-                else:
-                    raise ValueError
-        return ContractTranslator(self.solidity.mk_full_signature(None, path=path, libraries=libraries, extra_args=extra_args))
+        abi = _solidity.compile_last_contract(path, combined='abi', extra_args=extra_args)['abi']
+        return ContractTranslator(abi)
 
     def create_contract(self, path, params=None, libraries=None, sender=None):
         path, extra_args = self.get_dirs(path)
