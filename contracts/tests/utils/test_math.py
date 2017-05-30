@@ -55,5 +55,21 @@ class TestContracts(AbstractTestContracts):
         self.assertTrue(self.math.safeToAdd(1, 1))
 
         # Safe to subtract
-        self.assertFalse(self.math.safeToSubtract(1, 2))
-        self.assertTrue(self.math.safeToSubtract(1, 1))
+        self.assertFalse(self.math.safeToSub(1, 2))
+        self.assertTrue(self.math.safeToSub(1, 1))
+
+        # Safe to multiply
+        self.assertFalse(self.math.safeToMul(2**128, 2**128))
+        self.assertTrue(self.math.safeToMul(2**256/2 - 1, 2))
+
+        # Add
+        self.assertRaises(TransactionFailed, self.math.add, 2**256 - 1, 1)
+        self.assertEqual(self.math.add(1, 1), 2)
+
+        # Sub
+        self.assertRaises(TransactionFailed, self.math.sub, 1, 2)
+        self.assertEqual(self.math.sub(1, 1), 0)
+
+        # Mul
+        self.assertRaises(TransactionFailed, self.math.mul, 2**128, 2**128)
+        self.assertEqual(self.math.mul(5, 5), 25)

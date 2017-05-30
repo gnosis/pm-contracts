@@ -65,7 +65,7 @@ contract ScalarEvent is Event {
         uint factorLong = OUTCOME_RANGE - factorShort;
         uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);
         uint longOutcomeTokenCount = outcomeTokens[LONG].balanceOf(msg.sender);
-        winnings = (shortOutcomeTokenCount * factorShort + longOutcomeTokenCount * factorLong) / OUTCOME_RANGE;
+        winnings = Math.add(Math.mul(shortOutcomeTokenCount, factorShort), Math.mul(longOutcomeTokenCount, factorLong)) / OUTCOME_RANGE;
         // Revoke all tokens of all outcomes
         outcomeTokens[SHORT].revoke(msg.sender, shortOutcomeTokenCount);
         outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);

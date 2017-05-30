@@ -174,10 +174,59 @@ library Math {
     /// @param a Minuend
     /// @param b Subtrahend
     /// @return Did an overflow occur?
-    function safeToSubtract(uint a, uint b)
+    function safeToSub(uint a, uint b)
         public
         returns (bool)
     {
         return (b <= a);
+    }
+
+    /// @dev Returns whether a multiply operation causes an overflow
+    /// @param a First factor
+    /// @param b Second factor
+    /// @return Did an overflow occur?
+    function safeToMul(uint a, uint b)
+        public
+        returns (bool)
+    {
+        if (a == 0 || b == 0)
+            return true;
+        return a * b / b == a;
+    }
+
+    /// @dev Returns sum if no overflow occurred
+    /// @param a First addend
+    /// @param b Second addend
+    /// @return Sum
+    function add(uint a, uint b)
+        public
+        returns (uint)
+    {
+        require(safeToAdd(a, b));
+        return a + b;
+    }
+
+    /// @dev Returns difference if no overflow occurred
+    /// @param a Minuend
+    /// @param b Subtrahend
+    /// @return Difference
+    function sub(uint a, uint b)
+        public
+        returns (uint)
+    {
+        require(safeToSub(a, b));
+        return a - b;
+    }
+
+    /// @dev Returns product if no overflow occurred
+    /// @param a First factor
+    /// @param b Second factor
+    /// @return Product
+    function mul(uint a, uint b)
+        public
+        returns (uint)
+    {
+        require(safeToMul(a, b));
+        return a * b;
     }
 }

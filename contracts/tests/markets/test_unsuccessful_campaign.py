@@ -10,7 +10,7 @@ class TestContracts(AbstractTestContracts):
         self.event_factory = self.create_contract('Events/EventFactory.sol', libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.market_factory = self.create_contract('Markets/DefaultMarketFactory.sol')
-        self.campaign_factory = self.create_contract('Markets/CampaignFactory.sol')
+        self.campaign_factory = self.create_contract('Markets/CampaignFactory.sol', libraries={'Math': self.math})
         self.lmsr = self.create_contract('MarketMakers/LMSRMarketMaker.sol', libraries={'Math': self.math})
         self.ether_token = self.create_contract('Tokens/EtherToken.sol')
         self.token_abi = self.create_abi('Tokens/AbstractToken.sol')

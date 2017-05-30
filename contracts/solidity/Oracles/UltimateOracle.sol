@@ -1,6 +1,7 @@
 pragma solidity 0.4.11;
 import "Oracles/AbstractOracle.sol";
 import "Tokens/AbstractToken.sol";
+import "Utils/Math.sol";
 
 
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
@@ -96,7 +97,7 @@ contract UltimateOracle is Oracle {
     function voteForOutcome(int _outcome, uint amount)
         public
     {
-        uint maxAmount =   (totalAmount - totalOutcomeAmounts[_outcome]) * spreadMultiplier
+        uint maxAmount =   Math.mul((totalAmount - totalOutcomeAmounts[_outcome]), spreadMultiplier)
                          - totalOutcomeAmounts[_outcome];
         if (amount > maxAmount)
             amount = maxAmount;
@@ -104,9 +105,9 @@ contract UltimateOracle is Oracle {
         require(   isChallenged()
                 && !isFrontRunnerPeriodOver()
                 && collateralToken.transferFrom(msg.sender, this, amount));
-        outcomeAmounts[msg.sender][_outcome] += amount;
-        totalOutcomeAmounts[_outcome] += amount;
-        totalAmount += amount;
+        outcomeAmounts[msg.sender][_outcome] = Math.add(outcomeAmounts[msg.sender][_outcome], amount);
+        totalOutcomeAmounts[_outcome] = Math.add(totalOutcomeAmounts[_outcome], amount);
+        totalAmount = Math.add(totalAmount, amount);
         if (_outcome != frontRunner && totalOutcomeAmounts[_outcome] > totalOutcomeAmounts[frontRunner])
         {
             frontRunner = _outcome;
@@ -122,7 +123,7 @@ contract UltimateOracle is Oracle {
     {
         // Outcome was challenged and ultimate outcome decided
         require(isFrontRunnerPeriodOver());
-        amount = totalAmount * outcomeAmounts[msg.sender][frontRunner] / totalOutcomeAmounts[frontRunner];
+        amount = Math.mul(totalAmount, outcomeAmounts[msg.sender][frontRunner]) / totalOutcomeAmounts[frontRunner];
         outcomeAmounts[msg.sender][frontRunner] = 0;
         // Transfer earnings to contributor
         require(collateralToken.transfer(msg.sender, amount));

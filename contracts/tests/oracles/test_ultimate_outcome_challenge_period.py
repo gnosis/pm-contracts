@@ -8,7 +8,8 @@ class TestContracts(AbstractTestContracts):
         super(TestContracts, self).__init__(*args, **kwargs)
         self.math = self.create_contract('Utils/Math.sol')
         self.ether_token = self.create_contract('Tokens/EtherToken.sol')
-        self.ultimate_oracle_factory = self.create_contract('Oracles/UltimateOracleFactory.sol')
+        self.ultimate_oracle_factory = self.create_contract('Oracles/UltimateOracleFactory.sol',
+                                                            libraries={'Math': self.math})
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.ultimate_oracle_abi = self.create_abi('Oracles/UltimateOracle.sol')
         self.centralized_oracle_abi = self.create_abi('Oracles/CentralizedOracle.sol')
