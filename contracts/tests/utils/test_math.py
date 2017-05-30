@@ -4,20 +4,10 @@ from functools import partial
 import math
 import random
 
-from mpmath import mp, mpf
-mp.dps = 100
-mp.pretty=True
-
 from ethereum.tester import TransactionFailed
 
+from ..math_utils import isclose, mp, mpf
 from ..abstract_test import AbstractTestContract
-
-if hasattr(math, 'isclose'):
-    isclose = math.isclose
-else:
-    # PEP 485
-    def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
-        return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
 class TestContract(AbstractTestContract):

@@ -217,4 +217,20 @@ library Math {
         if(a == 0 || b == 0) return true;
         return a * b / b == a;
     }
+
+    /// @dev Returns maximum of an array
+    /// @param nums Numbers to look through
+    /// @return Maximum number
+    function max(int[] nums)
+        public
+        returns (int max)
+    {
+        require(nums.length > 0);
+        max = -2**255;
+        for(uint i = 0; i < nums.length; i++) {
+            if(nums[i] > max) {
+                max = nums[i];
+            }
+        }
+    }
 }
