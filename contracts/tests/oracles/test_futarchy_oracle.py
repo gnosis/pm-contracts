@@ -1,4 +1,3 @@
-from codecs import decode
 from ..abstract_test import AbstractTestContracts, accounts, keys, TransactionFailed
 from ethereum import tester as t
 
@@ -23,8 +22,8 @@ class TestContracts(AbstractTestContracts):
     def test(self):
         t.gas_limit = 4712388*4  # Creation gas costs are above gas limit!!!
         # Create futarchy oracle
-        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
-        oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(description_hash), self.oracle_abi)
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash), self.oracle_abi)
         fee = 50000  # 5%
         lower = -100
         upper = 100

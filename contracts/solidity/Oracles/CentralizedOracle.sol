@@ -10,7 +10,7 @@ contract CentralizedOracle is Oracle {
      *  Storage
      */
     address public owner;
-    bytes32 public descriptionHash;
+    bytes public ipfsHash;
     bool public isSet;
     int public outcome;
 
@@ -26,15 +26,15 @@ contract CentralizedOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets owner address and description hash
-    /// @param _descriptionHash Hash identifying off chain event description
-    function CentralizedOracle(address _owner, bytes32 _descriptionHash)
+    /// @dev Constructor sets owner address and IPFS hash
+    /// @param _ipfsHash Hash identifying off chain event description
+    function CentralizedOracle(address _owner, bytes _ipfsHash)
         public
     {
         // Description hash cannot be null
-        require(_descriptionHash != 0);
+        require(_ipfsHash.length == 46);
         owner = _owner;
-        descriptionHash = _descriptionHash;
+        ipfsHash = _ipfsHash;
     }
 
     /// @dev Replaces owner

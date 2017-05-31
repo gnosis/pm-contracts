@@ -1,4 +1,3 @@
-from codecs import decode
 from ..abstract_test import AbstractTestContracts, accounts, keys
 
 
@@ -24,8 +23,8 @@ class TestContracts(AbstractTestContracts):
         ]:
             ether_token = self.create_contract('Tokens/EtherToken.sol')
             # Create event
-            description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
-            oracle_address = self.centralized_oracle_factory.createCentralizedOracle(description_hash)
+            ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+            oracle_address = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
             event = self.contract_at(self.event_factory.createCategoricalEvent(ether_token.address, oracle_address, 2), self.event_abi)
             # Create market
             fee = 0  # 0%

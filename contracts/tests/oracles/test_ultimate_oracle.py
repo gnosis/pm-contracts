@@ -1,4 +1,3 @@
-from codecs import decode
 from ..abstract_test import AbstractTestContracts, keys, TransactionFailed
 
 
@@ -16,8 +15,8 @@ class TestContracts(AbstractTestContracts):
 
     def test(self):
         # Create oracles
-        description_hash = decode("d621d969951b20c5cf2008cbfc282a2d496ddfe75a76afe7b6b32f1470b8a449", 'hex')
-        centralized_oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(description_hash,),
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        centralized_oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash,),
                                               self.centralized_oracle_abi)
         spread_multiplier = 3
         challenge_period = 200  # 200s
