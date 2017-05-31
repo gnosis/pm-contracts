@@ -9,19 +9,19 @@ contract CentralizedOracleFactory {
     /*
      *  Events
      */
-    event CentralizedOracleCreation(address indexed creator, uint creationDate, CentralizedOracle centralizedOracle, bytes32 descriptionHash);
+    event CentralizedOracleCreation(address indexed creator, uint creationDate, CentralizedOracle centralizedOracle, bytes ipfsHash);
 
     /*
      *  Public functions
      */
     /// @dev Creates a new centralized oracle contract
-    /// @param descriptionHash Hash identifying off chain event description
+    /// @param ipfsHash Hash identifying off chain event description
     /// @return Returns oracle contract
-    function createCentralizedOracle(bytes32 descriptionHash)
+    function createCentralizedOracle(bytes ipfsHash)
         public
         returns (CentralizedOracle centralizedOracle)
     {
-        centralizedOracle = new CentralizedOracle(msg.sender, descriptionHash);
-        CentralizedOracleCreation(msg.sender, now, centralizedOracle, descriptionHash);
+        centralizedOracle = new CentralizedOracle(msg.sender, ipfsHash);
+        CentralizedOracleCreation(msg.sender, now, centralizedOracle, ipfsHash);
     }
 }
