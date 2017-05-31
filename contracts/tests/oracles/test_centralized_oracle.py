@@ -11,7 +11,7 @@ class TestContracts(AbstractTestContracts):
 
     def test(self):
         # Create oracles
-        ipfs_hash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         owner_1 = 0
         owner_2 = 1
         oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash, sender=keys[owner_1]),

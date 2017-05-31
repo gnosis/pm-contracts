@@ -17,7 +17,7 @@ class TestContracts(AbstractTestContracts):
 
     def test(self):
         # Create event
-        ipfs_hash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
         event = self.contract_at(self.event_factory.createCategoricalEvent(self.ether_token.address, oracle, 2), self.event_abi)
         # Create market

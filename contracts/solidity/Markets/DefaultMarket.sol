@@ -23,6 +23,7 @@ contract DefaultMarket is Market {
     MarketMaker public marketMaker;
     uint public fee;
     uint public funding;
+    int[] public netOutcomeTokensSold;
 
     /*
      *  Modifiers
@@ -49,6 +50,7 @@ contract DefaultMarket is Market {
         creator = _creator;
         createdAtBlock = block.number;
         eventContract = _eventContract;
+        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
         fee = _fee;
         marketMaker = _marketMaker;
     }
@@ -110,7 +112,13 @@ contract DefaultMarket is Market {
         // Buy all outcomes
         eventContract.buyAllOutcomes(outcomeTokenCosts);
         // Transfer outcome tokens to buyer
-        eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount);
+        require(eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount));
+
+        require(
+            int(outcomeTokenCount) >= 0 &&
+            netOutcomeTokensSold[outcomeTokenIndex] + int(outcomeTokenCount) >= netOutcomeTokensSold[outcomeTokenIndex]
+        );
+        netOutcomeTokensSold[outcomeTokenIndex] += int(outcomeTokenCount);
     }
 
     /// @dev Allows to sell outcome tokens to market maker
@@ -135,13 +143,20 @@ contract DefaultMarket is Market {
         eventContract.sellAllOutcomes(outcomeTokenProfits);
         // Transfer profits to seller
         require(eventContract.collateralToken().transfer(msg.sender, profits));
+
+        require(
+            int(outcomeTokenCount) >= 0 &&
+            netOutcomeTokensSold[outcomeTokenIndex] - int(outcomeTokenCount) <= netOutcomeTokensSold[outcomeTokenIndex]
+        );
+        netOutcomeTokensSold[outcomeTokenIndex] -= int(outcomeTokenCount);
     }
 
-    /// @dev Allows to short sell outcome tokens to market maker
+    /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
+    ///      shares of all other outcome tokens.
     /// @param outcomeTokenIndex Index of the outcome token to short sell
     /// @param outcomeTokenCount Amount of outcome tokens to short sell
     /// @param minProfits The minimum profits in collateral tokens to earn for short sold outcome tokens
-    /// @return Returns costs in collateral tokens
+    /// @return Returns cost to short sell outcome in collateral tokens
     function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfits)
         public
         returns (uint costs)

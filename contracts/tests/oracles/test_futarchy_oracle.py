@@ -22,7 +22,7 @@ class TestContracts(AbstractTestContracts):
     def test(self):
         t.gas_limit = 4712388*4  # Creation gas costs are above gas limit!!!
         # Create futarchy oracle
-        ipfs_hash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash), self.oracle_abi)
         fee = 50000  # 5%
         lower = -100
@@ -32,7 +32,7 @@ class TestContracts(AbstractTestContracts):
         profiling = self.futarchy_factory.createFutarchyOracle(self.ether_token.address, oracle.address, 2, lower, upper,
                                                                self.market_factory.address, self.lmsr.address, fee,
                                                                deadline, sender=keys[creator], profiling=True)
-        self.assertLess(profiling['gas'], 10000000)
+        self.assertLess(profiling['gas'], 20000000)
         futarchy = self.contract_at(profiling['output'], self.futarchy_abi)
         categorical_event = self.contract_at(futarchy.categoricalEvent(), self.event_abi)
         # Fund markets
