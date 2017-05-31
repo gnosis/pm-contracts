@@ -20,6 +20,6 @@ contract DefaultMarketFactory is MarketFactory {
         returns (Market market)
     {
         market = new DefaultMarket(msg.sender, eventContract, marketMaker, fee);
-        MarketCreation(msg.sender, now, market, eventContract, marketMaker, fee);
+        MarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

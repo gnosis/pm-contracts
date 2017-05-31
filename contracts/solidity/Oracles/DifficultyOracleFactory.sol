@@ -9,7 +9,7 @@ contract DifficultyOracleFactory {
     /*
      *  Events
      */
-    event DifficultyOracleCreation(address indexed creator, uint creationDate, DifficultyOracle difficultyOracle, uint blockNumber);
+    event DifficultyOracleCreation(address indexed creator, DifficultyOracle difficultyOracle, uint blockNumber);
 
     /*
      *  Public functions
@@ -22,6 +22,6 @@ contract DifficultyOracleFactory {
         returns (DifficultyOracle difficultyOracle)
     {
         difficultyOracle = new DifficultyOracle(blockNumber);
-        DifficultyOracleCreation(msg.sender, now, difficultyOracle, blockNumber);
+        DifficultyOracleCreation(msg.sender, difficultyOracle, blockNumber);
     }
 }

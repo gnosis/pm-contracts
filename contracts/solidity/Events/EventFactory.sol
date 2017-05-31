@@ -10,8 +10,8 @@ contract EventFactory {
     /*
      *  Events
      */
-    event CategoricalEventCreation(address indexed creator, uint creationDate, CategoricalEvent categoricalEvent, Token collateralToken, Oracle oracle, uint8 outcomeCount);
-    event ScalarEventCreation(address indexed creator, uint creationDate, ScalarEvent scalarEvent, Token collateralToken, Oracle oracle, int lowerBound, int upperBound);
+    event CategoricalEventCreation(address indexed creator, CategoricalEvent categoricalEvent, Token collateralToken, Oracle oracle, uint8 outcomeCount);
+    event ScalarEventCreation(address indexed creator, ScalarEvent scalarEvent, Token collateralToken, Oracle oracle, int lowerBound, int upperBound);
 
     /*
      *  Storage
@@ -45,7 +45,7 @@ contract EventFactory {
             outcomeCount
         );
         categoricalEvents[eventHash] = eventContract;
-        CategoricalEventCreation(msg.sender, now, eventContract, collateralToken, oracle, outcomeCount);
+        CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
     }
 
     /// @dev Creates a new scalar event and adds it to the event mapping
@@ -74,6 +74,6 @@ contract EventFactory {
             upperBound
         );
         scalarEvents[eventHash] = eventContract;
-        ScalarEventCreation(msg.sender, now, eventContract, collateralToken, oracle, lowerBound, upperBound);
+        ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
     }
 }

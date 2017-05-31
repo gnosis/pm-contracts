@@ -9,7 +9,7 @@ contract SignedMessageOracleFactory {
     /*
      *  Events
      */
-    event SignedMessageOracleCreation(address indexed creator, uint creationDate, SignedMessageOracle signedMessageOracle, address oracle);
+    event SignedMessageOracleCreation(address indexed creator, SignedMessageOracle signedMessageOracle, address oracle);
 
     /*
      *  Public functions
@@ -26,6 +26,6 @@ contract SignedMessageOracleFactory {
     {
         signedMessageOracle = new SignedMessageOracle(descriptionHash, v, r, s);
         address oracle = ecrecover(descriptionHash, v, r, s);
-        SignedMessageOracleCreation(msg.sender, now, signedMessageOracle, oracle);
+        SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
     }
 }
