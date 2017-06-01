@@ -1,8 +1,9 @@
 pragma solidity 0.4.11;
 import "Tokens/AbstractToken.sol";
+import "Utils/Math.sol";
 
 
-/// @title Standard token contract - Standard token interface implementation
+/// @title Standard token contract with overflow protection
 contract StandardToken is Token {
 
     /*
@@ -23,8 +24,9 @@ contract StandardToken is Token {
         public
         returns (bool)
     {
-        // Balance covers value
-        require(balances[msg.sender] >= value);
+        if (   !Math.safeToSub(balances[msg.sender], value)
+            || !Math.safeToAdd(balances[to], value))
+            return false;
         balances[msg.sender] -= value;
         balances[to] += value;
         Transfer(msg.sender, to, value);
@@ -40,11 +42,13 @@ contract StandardToken is Token {
         public
         returns (bool)
     {
-        // Balance and allowance covers value
-        require(balances[from] >= value && allowances[from][msg.sender] >= value);
-        balances[to] += value;
+        if (   !Math.safeToSub(balances[from], value)
+            || !Math.safeToSub(allowances[from][msg.sender], value)
+            || !Math.safeToAdd(balances[to], value))
+            return false;
         balances[from] -= value;
         allowances[from][msg.sender] -= value;
+        balances[to] += value;
         Transfer(from, to, value);
         return true;
     }

@@ -38,7 +38,7 @@ class TestContracts(AbstractTestContracts):
             (10*10**18, 5),
             (10, 5 * 10 ** 18),
         ]:
-            ether_token = self.create_contract('Tokens/EtherToken.sol')
+            ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
             # Create event
             ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
             oracle_address = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
@@ -55,11 +55,8 @@ class TestContracts(AbstractTestContracts):
             self.assertEqual(ether_token.balanceOf(accounts[investor]), 0)
             # Calculating costs for buying shares and earnings for selling shares
             outcome = 1
-            token_distribution = [funding, funding]
-
             actual = self.lmsr.calcCosts(market.address, outcome, outcome_token_count)
             expected = self.calc_cost(funding, [0, 0], outcome, outcome_token_count)
-
             assert (
                 (funding, outcome_token_count) is not None and
                 isclose(actual, mp.ceil(expected), abs_tol=1)

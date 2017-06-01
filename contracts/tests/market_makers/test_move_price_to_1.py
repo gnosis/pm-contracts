@@ -21,7 +21,7 @@ class TestContracts(AbstractTestContracts):
             (10**20, 10 ** 21),
             (1, 10 ** 21),
         ]:
-            ether_token = self.create_contract('Tokens/EtherToken.sol')
+            ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
             # Create event
             ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
             oracle_address = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
