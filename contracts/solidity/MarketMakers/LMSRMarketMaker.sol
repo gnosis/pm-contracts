@@ -4,9 +4,7 @@ import "MarketMakers/AbstractMarketMaker.sol";
 
 
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
-/// @author Stefan George - <stefan@gnosis.pm>
-/// @author Martin Koeppelmann - <martin.koeppelmann@consensys.net>
-/// @author Michael Lu - <michael.lu@consensys.net>
+/// @author Alan Lu - <alan.lu@gnosis.pm>
 contract LMSRMarketMaker is MarketMaker {
 
     /*
