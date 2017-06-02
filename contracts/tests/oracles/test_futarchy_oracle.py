@@ -20,7 +20,7 @@ class TestContracts(AbstractTestContracts):
         self.futarchy_abi = self.create_abi('Oracles/FutarchyOracle.sol')
 
     def test(self):
-        t.gas_limit = 4712388*4  # Creation gas cost are above gas limit!!!
+        t.gas_limit = 4712388*4  # Creation gas cost is above gas limit!!!
         # Create futarchy oracle
         ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash), self.oracle_abi)

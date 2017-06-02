@@ -105,7 +105,7 @@ contract DefaultMarket is Market {
         // Calculate fee charged by market
         uint fee = calcMarketFee(outcomeTokenCost);
         cost = outcomeTokenCost.add(fee);
-        // Check cost don't exceed max cost
+        // Check cost doesn't exceed max cost
         require(cost > 0 && cost <= maxCost);
         // Transfer tokens to markets contract and buy all outcomes
         require(   eventContract.collateralToken().transferFrom(msg.sender, this, cost)
@@ -133,7 +133,7 @@ contract DefaultMarket is Market {
         // Calculate fee charged by market
         uint fee = calcMarketFee(outcomeTokenProfit);
         profit = outcomeTokenProfit.sub(fee);
-        // Check profit are not too low
+        // Check profit is not too low
         require(profit > 0 && profit >= minProfit);
         // Transfer outcome tokens to markets contract to sell all outcomes
         require(eventContract.outcomeTokens(outcomeTokenIndex).transferFrom(msg.sender, this, outcomeTokenCount));
