@@ -35,22 +35,22 @@ class TestContracts(AbstractTestContracts):
         buyer = 1
         outcome = 0
         token_count = 10**15
-        outcome_token_costs = self.lmsr.calcCosts(market.address, outcome, token_count)
-        fee = market.calcMarketFee(outcome_token_costs)
-        self.assertEqual(fee, outcome_token_costs * 105 // 100 - outcome_token_costs)
-        costs = outcome_token_costs + fee
-        self.ether_token.deposit(value=costs, sender=keys[buyer])
-        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), costs)
-        self.ether_token.approve(market.address, costs, sender=keys[buyer])
-        self.assertEqual(market.buy(outcome, token_count, costs, sender=keys[buyer]), costs)
+        outcome_token_cost = self.lmsr.calcCost(market.address, outcome, token_count)
+        fee = market.calcMarketFee(outcome_token_cost)
+        self.assertEqual(fee, outcome_token_cost * 105 // 100 - outcome_token_cost)
+        cost = outcome_token_cost + fee
+        self.ether_token.deposit(value=cost, sender=keys[buyer])
+        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), cost)
+        self.ether_token.approve(market.address, cost, sender=keys[buyer])
+        self.assertEqual(market.buy(outcome, token_count, cost, sender=keys[buyer]), cost)
         outcome_token = self.contract_at(event.outcomeTokens(outcome), self.token_abi)
         self.assertEqual(outcome_token.balanceOf(accounts[buyer]), token_count)
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), 0)
         # Sell outcome tokens
-        outcome_token_profits = self.lmsr.calcProfits(market.address, outcome, token_count)
-        fee = market.calcMarketFee(outcome_token_profits)
-        profits = outcome_token_profits - fee
+        outcome_token_profit = self.lmsr.calcProfit(market.address, outcome, token_count)
+        fee = market.calcMarketFee(outcome_token_profit)
+        profit = outcome_token_profit - fee
         outcome_token.approve(market.address, token_count, sender=keys[buyer])
-        self.assertEqual(market.sell(outcome, token_count, profits, sender=keys[buyer]), profits)
+        self.assertEqual(market.sell(outcome, token_count, profit, sender=keys[buyer]), profit)
         self.assertEqual(outcome_token.balanceOf(accounts[buyer]), 0)
-        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), profits)
+        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), profit)

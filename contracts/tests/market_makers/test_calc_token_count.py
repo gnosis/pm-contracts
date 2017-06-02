@@ -53,9 +53,9 @@ class TestContracts(AbstractTestContracts):
             ether_token.approve(market.address, funding, sender=keys[investor])
             market.fund(funding, sender=keys[investor])
             self.assertEqual(ether_token.balanceOf(accounts[investor]), 0)
-            # Calculating costs for buying shares and earnings for selling shares
+            # Calculating cost for buying shares and earnings for selling shares
             outcome = 1
-            actual = self.lmsr.calcCosts(market.address, outcome, outcome_token_count)
+            actual = self.lmsr.calcCost(market.address, outcome, outcome_token_count)
             expected = self.calc_cost(funding, [0, 0], outcome, outcome_token_count)
             assert (
                 (funding, outcome_token_count) is not None and

@@ -36,13 +36,13 @@ class TestContracts(AbstractTestContracts):
         outcome = 0
         opposite_outcome = 1
         token_count = 10**15
-        outcome_token_profits = self.lmsr.calcProfits(market.address, outcome, token_count)
-        fee = market.calcMarketFee(outcome_token_profits)
-        costs = token_count - outcome_token_profits + fee
+        outcome_token_profit = self.lmsr.calcProfit(market.address, outcome, token_count)
+        fee = market.calcMarketFee(outcome_token_profit)
+        cost = token_count - outcome_token_profit + fee
         self.ether_token.deposit(value=token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), token_count)
         self.ether_token.approve(market.address, token_count, sender=keys[buyer])
-        self.assertEqual(market.shortSell(outcome, token_count, outcome_token_profits - fee, sender=keys[buyer]), costs)
-        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), token_count - costs)
+        self.assertEqual(market.shortSell(outcome, token_count, outcome_token_profit - fee, sender=keys[buyer]), cost)
+        self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), token_count - cost)
         outcome_token = self.contract_at(event.outcomeTokens(opposite_outcome), self.token_abi)
         self.assertEqual(outcome_token.balanceOf(accounts[buyer]), token_count)

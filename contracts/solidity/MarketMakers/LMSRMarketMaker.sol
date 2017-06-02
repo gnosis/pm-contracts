@@ -23,7 +23,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param outcomeTokenIndex Index of outcome to buy
     /// @param outcomeTokenCount Number of outcome tokens to buy
     /// @return Returns cost
-    function calcCosts(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
+    function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
         public
         constant
         returns (uint cost)
@@ -56,15 +56,15 @@ contract LMSRMarketMaker is MarketMaker {
             cost = outcomeTokenCount;
     }
 
-    /// @dev Returns profits for selling given number of outcome tokens
+    /// @dev Returns profit for selling given number of outcome tokens
     /// @param market Market contract
     /// @param outcomeTokenIndex Index of outcome to sell
     /// @param outcomeTokenCount Number of outcome tokens to sell
-    /// @return Returns profits
-    function calcProfits(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
+    /// @return Returns profit
+    function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
         public
         constant
-        returns (uint profits)
+        returns (uint profit)
     {
         require(market.eventContract().getOutcomeCount() > 0);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
@@ -82,7 +82,7 @@ contract LMSRMarketMaker is MarketMaker {
         // Calculate earnings
         require(costLevelBefore >= costLevelAfter);
         // Take the floor
-        profits = uint(costLevelBefore - costLevelAfter) / ONE;
+        profit = uint(costLevelBefore - costLevelAfter) / ONE;
     }
 
     /// @dev Calculates the result of the LMSR cost function which is used to
