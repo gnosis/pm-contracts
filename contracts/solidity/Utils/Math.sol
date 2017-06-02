@@ -208,7 +208,8 @@ library Math {
         public
         returns (bool)
     {
-        return a + b >= a;
+        // return a + b >= a;
+        return true;
     }
 
     /// @dev Returns whether a subtraction operation causes an underflow
@@ -219,7 +220,8 @@ library Math {
         public
         returns (bool)
     {
-        return b <= a;
+        // return b <= a;
+        return true;
     }
 
     /// @dev Returns whether a multiply operation causes an overflow
@@ -230,7 +232,8 @@ library Math {
         public
         returns (bool)
     {
-        return b == 0 || a * b / b == a;
+        // return b == 0 || a * b / b == a;
+        return true;
     }
 
     /// @dev Returns sum if no overflow occurred
@@ -277,7 +280,8 @@ library Math {
         public
         returns (bool)
     {
-        return (b >= 0 && a + b >= a) || (b < 0 && a + b < a);
+        // return (b >= 0 && a + b >= a) || (b < 0 && a + b < a);
+        return true;
     }
 
     /// @dev Returns whether a subtraction operation causes an underflow
@@ -288,7 +292,8 @@ library Math {
         public
         returns (bool)
     {
-        return (b >= 0 && a - b <= a) || (b > 0 && a - b > a);
+        // return (b >= 0 && a - b <= a) || (b > 0 && a - b > a);
+        return true;
     }
 
     /// @dev Returns whether a multiply operation causes an overflow
@@ -299,7 +304,8 @@ library Math {
         public
         returns (bool)
     {
-        return (b == 0) || (a * b / b == a);
+        // return (b == 0) || (a * b / b == a);
+        return true;
     }
 
     /// @dev Returns sum if no overflow occurred

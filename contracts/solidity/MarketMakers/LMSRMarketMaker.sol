@@ -6,6 +6,7 @@ import "MarketMakers/AbstractMarketMaker.sol";
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
 /// @author Alan Lu - <alan.lu@gnosis.pm>
 contract LMSRMarketMaker is MarketMaker {
+    using Math for *;
 
     /*
      *  Constants
@@ -34,11 +35,8 @@ contract LMSRMarketMaker is MarketMaker {
         uint funding = market.funding();
         int costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
 
-        require(
-            // Math.safeToAdd(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount) &&
-            int(outcomeTokenCount) >= 0
-        );
-        netOutcomeTokensSold[outcomeTokenIndex] += int(outcomeTokenCount);
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
         
         int costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
 
@@ -50,6 +48,7 @@ contract LMSRMarketMaker is MarketMaker {
         if(cost / ONE * ONE == cost)
             cost /= ONE;
         else
+            // integer division by ONE ensures there is room to (+ 1)
             cost = cost / ONE + 1;
 
         if (cost > outcomeTokenCount)
@@ -75,11 +74,8 @@ contract LMSRMarketMaker is MarketMaker {
 
         int costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
 
-        require(
-            // Math.safeToSub(netOutcomeTokensSold[outcomeTokenIndex], outcomeTokenCount) &&
-            int(outcomeTokenCount) >= 0
-        );
-        netOutcomeTokensSold[outcomeTokenIndex] -= int(outcomeTokenCount);
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
 
         int costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
 
@@ -99,12 +95,6 @@ contract LMSRMarketMaker is MarketMaker {
         constant
         returns(int costLevel)
     {
-        // uint innerSum = 0;
-        // for (uint8 i=0; i<netOutcomeTokensSold.length; i++) {
-        //     innerSum += Math.exp(netOutcomeTokensSold[i] * int(logN) / int(funding));
-        // }
-        // costLevel = Math.ln(innerSum) * int(ONE) / int(logN) * int(funding);
-
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)),
         // but naive calculation of this causes an overflow
         // since anything above a bit over 133*ONE supplied to exp will explode
@@ -125,29 +115,22 @@ contract LMSRMarketMaker is MarketMaker {
         // BIG offset will cause the tiny quantities to go really negative
         // causing the associated exponentials to vanish.
 
-        // TODO: deal with large quantities better
         int maxQuantity = Math.max(netOutcomeTokensSold);
         require(
-            // Math.safeToMul(maxQuantity, int(logN)) &&
             logN >= 0 && int(funding) >= 0
         );
-        int offset = maxQuantity * logN / int(funding);
-        // require(Math.safeToSub(offset, EXP_LIMIT));
-        offset -= EXP_LIMIT;
+        int offset = maxQuantity.mul(logN) / int(funding);
+        offset = offset.sub(EXP_LIMIT);
 
         uint innerSum = 0;
         int exponent;
         for (uint8 i=0; i<netOutcomeTokensSold.length; i++) {
-            // require(Math.safeToMul(netOutcomeTokensSold[i], int(logN)));
-            exponent = netOutcomeTokensSold[i] * int(logN) / int(funding);
-            // require(Math.safeToSub(exponent, offset));
-            innerSum += Math.exp(exponent - offset);
+            exponent = netOutcomeTokensSold[i].mul(int(logN)) / int(funding);
+            innerSum = innerSum.add(Math.exp(exponent.sub(offset)));
         }
         int logsum = Math.ln(innerSum);
-        // require(Math.safeToAdd(offset, logsum));
-        costLevel = offset + logsum;
-        // require(Math.safeToMul(costLevel, int(funding)));
-        costLevel = costLevel * int(ONE) / int(logN) * int(funding);
+        costLevel = offset.add(logsum);
+        costLevel = (costLevel.mul(int(ONE)) / int(logN)).mul(int(funding));
     }
 
     /// @dev Gets net outcome tokens sold by market. Since all sets of outcome tokens are backed by
