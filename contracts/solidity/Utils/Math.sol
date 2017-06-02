@@ -184,28 +184,6 @@ library Math {
         }
     }
 
-    /// @dev Returns whether an add operation causes an overflow
-    /// @param a First addend
-    /// @param b Second addend
-    /// @return Did no overflow occur?
-    function safeToAdd(uint a, uint b)
-        public
-        returns (bool)
-    {
-        return (a + b >= a);
-    }
-
-    /// @dev Returns whether a subtraction operation causes an underflow
-    /// @param a Minuend
-    /// @param b Subtrahend
-    /// @return Did no underflow occur?
-    function safeToSub(uint a, uint b)
-        public
-        returns (bool)
-    {
-        return (b <= a);
-    }
-
     /// @dev Returns maximum of an array
     /// @param nums Numbers to look through
     /// @return Maximum number
@@ -222,6 +200,28 @@ library Math {
         }
     }
 
+    /// @dev Returns whether an add operation causes an overflow
+    /// @param a First addend
+    /// @param b Second addend
+    /// @return Did no overflow occur?
+    function safeToAdd(uint a, uint b)
+        public
+        returns (bool)
+    {
+        return a + b >= a;
+    }
+
+    /// @dev Returns whether a subtraction operation causes an underflow
+    /// @param a Minuend
+    /// @param b Subtrahend
+    /// @return Did no underflow occur?
+    function safeToSub(uint a, uint b)
+        public
+        returns (bool)
+    {
+        return b <= a;
+    }
+
     /// @dev Returns whether a multiply operation causes an overflow
     /// @param a First factor
     /// @param b Second factor
@@ -230,9 +230,7 @@ library Math {
         public
         returns (bool)
     {
-        if (a == 0 || b == 0)
-            return true;
-        return a * b / b == a;
+        return b == 0 || a * b / b == a;
     }
 
     /// @dev Returns sum if no overflow occurred
@@ -266,6 +264,75 @@ library Math {
     function mul(uint a, uint b)
         public
         returns (uint)
+    {
+        require(safeToMul(a, b));
+        return a * b;
+    }
+
+    /// @dev Returns whether an add operation causes an overflow
+    /// @param a First addend
+    /// @param b Second addend
+    /// @return Did no overflow occur?
+    function safeToAdd(int a, int b)
+        public
+        returns (bool)
+    {
+        return (b >= 0 && a + b >= a) || (b < 0 && a + b < a);
+    }
+
+    /// @dev Returns whether a subtraction operation causes an underflow
+    /// @param a Minuend
+    /// @param b Subtrahend
+    /// @return Did no underflow occur?
+    function safeToSub(int a, int b)
+        public
+        returns (bool)
+    {
+        return (b >= 0 && a - b <= a) || (b > 0 && a - b > a);
+    }
+
+    /// @dev Returns whether a multiply operation causes an overflow
+    /// @param a First factor
+    /// @param b Second factor
+    /// @return Did no overflow occur?
+    function safeToMul(int a, int b)
+        public
+        returns (bool)
+    {
+        return (b == 0) || (a * b / b == a);
+    }
+
+    /// @dev Returns sum if no overflow occurred
+    /// @param a First addend
+    /// @param b Second addend
+    /// @return Sum
+    function add(int a, int b)
+        public
+        returns (int)
+    {
+        require(safeToAdd(a, b));
+        return a + b;
+    }
+
+    /// @dev Returns difference if no overflow occurred
+    /// @param a Minuend
+    /// @param b Subtrahend
+    /// @return Difference
+    function sub(int a, int b)
+        public
+        returns (int)
+    {
+        require(safeToSub(a, b));
+        return a - b;
+    }
+
+    /// @dev Returns product if no overflow occurred
+    /// @param a First factor
+    /// @param b Second factor
+    /// @return Product
+    function mul(int a, int b)
+        public
+        returns (int)
     {
         require(safeToMul(a, b));
         return a * b;
