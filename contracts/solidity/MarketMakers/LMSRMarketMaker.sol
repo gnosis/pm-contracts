@@ -33,12 +33,12 @@ contract LMSRMarketMaker is MarketMaker {
 
         int logN = Math.ln(netOutcomeTokensSold.length * ONE);
         uint funding = market.funding();
-        int costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
+        int costLevelBefore = calcCostLevel(logN, netOutcomeTokensSold, funding);
 
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
         
-        int costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
+        int costLevelAfter = calcCostLevel(logN, netOutcomeTokensSold, funding);
 
         // Calculate cost
         require(costLevelAfter >= costLevelBefore);
@@ -72,12 +72,12 @@ contract LMSRMarketMaker is MarketMaker {
         int logN = Math.ln(netOutcomeTokensSold.length * ONE);
         uint funding = market.funding();
 
-        int costLevelBefore = calcCostFunction(logN, netOutcomeTokensSold, funding);
+        int costLevelBefore = calcCostLevel(logN, netOutcomeTokensSold, funding);
 
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
 
-        int costLevelAfter = calcCostFunction(logN, netOutcomeTokensSold, funding);
+        int costLevelAfter = calcCostLevel(logN, netOutcomeTokensSold, funding);
 
         // Calculate earnings
         require(costLevelBefore >= costLevelAfter);
@@ -85,12 +85,13 @@ contract LMSRMarketMaker is MarketMaker {
         profits = uint(costLevelBefore - costLevelAfter) / ONE;
     }
 
-    /// @dev Returns current price for given outcome token
+    /// @dev Calculates the result of the LMSR cost function which is used to
+    ///      derive prices from the market state
     /// @param logN Logarithm of the number of outcomes
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
     /// @return Returns costLevel
-    function calcCostFunction(int logN, int[] netOutcomeTokensSold, uint funding)
+    function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding)
         private
         constant
         returns(int costLevel)
