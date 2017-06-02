@@ -5,6 +5,6 @@ import "Markets/AbstractMarket.sol";
 /// @title Abstract market maker contract - Functions to be implemented by market maker contracts
 contract MarketMaker {
 
-    function calcCosts(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public constant returns (uint);
-    function calcProfits(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public constant returns (uint);
+    function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public constant returns (uint);
+    function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public constant returns (uint);
 }

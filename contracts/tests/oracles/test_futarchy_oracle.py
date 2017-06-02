@@ -20,7 +20,7 @@ class TestContracts(AbstractTestContracts):
         self.futarchy_abi = self.create_abi('Oracles/FutarchyOracle.sol')
 
     def test(self):
-        t.gas_limit = 4712388*4  # Creation gas costs are above gas limit!!!
+        t.gas_limit = 4712388*4  # Creation gas cost are above gas limit!!!
         # Create futarchy oracle
         ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.contract_at(self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash), self.oracle_abi)
@@ -46,16 +46,16 @@ class TestContracts(AbstractTestContracts):
         buyer = 1
         outcome = 0
         token_count = 10 ** 15
-        outcome_token_costs = self.lmsr.calcCosts(market.address, outcome, token_count)
-        fee = market.calcMarketFee(outcome_token_costs)
-        costs = outcome_token_costs + fee
+        outcome_token_cost = self.lmsr.calcCost(market.address, outcome, token_count)
+        fee = market.calcMarketFee(outcome_token_cost)
+        cost = outcome_token_cost + fee
         # Buy all outcomes
-        self.ether_token.deposit(value=costs, sender=keys[buyer])
-        self.ether_token.approve(categorical_event.address, costs, sender=keys[buyer])
-        categorical_event.buyAllOutcomes(costs, sender=keys[buyer])
+        self.ether_token.deposit(value=cost, sender=keys[buyer])
+        self.ether_token.approve(categorical_event.address, cost, sender=keys[buyer])
+        categorical_event.buyAllOutcomes(cost, sender=keys[buyer])
         collateral_token = self.contract_at(categorical_event.outcomeTokens(1), self.token_abi)
-        collateral_token.approve(market.address, costs, sender=keys[buyer])
-        self.assertEqual(market.buy(outcome, token_count, costs, sender=keys[buyer]), costs)
+        collateral_token.approve(market.address, cost, sender=keys[buyer])
+        self.assertEqual(market.buy(outcome, token_count, cost, sender=keys[buyer]), cost)
         # Set outcome of futarchy oracle
         self.assertRaises(TransactionFailed, futarchy.setOutcome)
         self.s.block.timestamp = deadline

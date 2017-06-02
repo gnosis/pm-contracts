@@ -41,17 +41,17 @@ class TestContracts(AbstractTestContracts):
         event.buyAllOutcomes(token_count * loop_count, sender=keys[trader])
         # User sells tokens
         buyer_balance = self.ether_token.balanceOf(accounts[trader])
-        profits = None
+        profit = None
         for i in range(loop_count):
             # Calculate profit for selling tokens
-            profits = self.lmsr.calcProfits(market.address, outcome, token_count)
-            if profits == 0:
+            profit = self.lmsr.calcProfit(market.address, outcome, token_count)
+            if profit == 0:
                 break
             # Selling tokens
             outcome_token = self.contract_at(event.outcomeTokens(outcome), self.token_abi)
             outcome_token.approve(market.address, token_count, sender=keys[trader])
-            self.assertEqual(market.sell(outcome, token_count, profits, sender=keys[trader]), profits)
+            self.assertEqual(market.sell(outcome, token_count, profit, sender=keys[trader]), profit)
         # Selling of tokens is worth less than 1 Wei
-        self.assertEqual(profits, 0)
+        self.assertEqual(profit, 0)
         # User's Ether balance increased
         self.assertGreater(self.ether_token.balanceOf(accounts[trader]), buyer_balance)

@@ -42,12 +42,12 @@ class TestContracts(AbstractTestContracts):
             loop_count = 10
             ether_token.deposit(value=token_count * loop_count, sender=keys[trader])
             # User buys outcome tokens from market maker
-            costs = None
+            cost = None
             for i in range(loop_count):
                 # Calculate profit for selling tokens
-                costs = self.lmsr.calcCosts(market.address, outcome, token_count)
+                cost = self.lmsr.calcCost(market.address, outcome, token_count)
                 # Buying tokens
                 ether_token.approve(market.address, token_count, sender=keys[trader])
-                self.assertEqual(market.buy(outcome, token_count, costs, sender=keys[trader]), costs)
+                self.assertEqual(market.buy(outcome, token_count, cost, sender=keys[trader]), cost)
             # Price is equal to 1
-            self.assertEqual(costs, token_count)
+            self.assertEqual(cost, token_count)
