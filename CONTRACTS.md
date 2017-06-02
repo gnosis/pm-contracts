@@ -238,7 +238,7 @@ Allows to buy outcome tokens from market maker as long as the price does not exc
 Allows to sell outcome tokens to market maker as long as the price is greater than a specified minimum
 
 #### shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) returns (uint)
-Buys all outcomes, then sells all shares of selected outcome which were bought, keeping shares of all other outcome tokens, as long as selling the shares of the shorted outcome would result in a return more than a specified minimum
+Buys all outcomes, then sells all shares of selected outcome which were bought, keeping shares of all other outcome tokens, as long as selling the shares of the shorted outcome would result in a return more than a specified minimum. Note that this method will return the _cost_ of short selling an outcome, a trader performing a short sell actually ends up buying every other outcome.
 
 #### calcMarketFee(uint outcomeTokenCost) returns (uint)
 Calculates fee to be paid to market for transactions with specified cost.
