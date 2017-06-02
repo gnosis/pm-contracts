@@ -7,6 +7,7 @@ import "Markets/AbstractMarketFactory.sol";
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
 /// @author Stefan George - <stefan@gnosis.pm>
 contract FutarchyOracle is Oracle {
+    using Math for *;
 
     /*
      *  Storage
@@ -128,12 +129,27 @@ contract FutarchyOracle is Oracle {
     {
         // Outcome is not set yet and deadline has passed
         require(!isSet && deadline <= now);
+
         uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(markets[0]);
+
+        // require(
+        //     int(outcomeTokenDistribution[0]) >= 0 &&
+        //     int(outcomeTokenDistribution[1]) >= 0
+        // );
+        // int highest = int(outcomeTokenDistribution[0]).sub(int(outcomeTokenDistribution[1]));
         uint highest = outcomeTokenDistribution[0] - outcomeTokenDistribution[1];
+
         int highestIndex = 0;
         for (uint8 i=1; i<markets.length; i++) {
             outcomeTokenDistribution = getOutcomeTokenDistribution(markets[i]);
-            if ((outcomeTokenDistribution[0] - outcomeTokenDistribution[1]) > highest)
+
+            // require(
+            //     int(outcomeTokenDistribution[0]) >= 0 &&
+            //     int(outcomeTokenDistribution[1]) >= 0
+            // );
+
+            // if (int(outcomeTokenDistribution[0]).sub(int(outcomeTokenDistribution[1])) > highest)
+            if (outcomeTokenDistribution[0] - outcomeTokenDistribution[1] > highest)
                 highestIndex = i;
         }
         outcome = highestIndex;

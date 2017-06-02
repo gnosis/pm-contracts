@@ -8,6 +8,7 @@ import "MarketMakers/AbstractMarketMaker.sol";
 /// @title Market factory contract - Allows to create market contracts
 /// @author Stefan George - <stefan@gnosis.pm>
 contract DefaultMarket is Market {
+    using Math for *;
 
     /*
      *  Constants
@@ -65,7 +66,7 @@ contract DefaultMarket is Market {
         require(   eventContract.collateralToken().transferFrom(msg.sender, this, _funding)
                 && eventContract.collateralToken().approve(eventContract, _funding));
         eventContract.buyAllOutcomes(_funding);
-        funding += _funding;
+        funding = funding.add(_funding);
     }
 
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
@@ -103,7 +104,7 @@ contract DefaultMarket is Market {
         uint outcomeTokenCosts = marketMaker.calcCosts(this, outcomeTokenIndex, outcomeTokenCount);
         // Calculate fee charged by market
         uint fee = calcMarketFee(outcomeTokenCosts);
-        costs = outcomeTokenCosts + fee;
+        costs = outcomeTokenCosts.add(fee);
         // Check costs don't exceed max costs
         require(costs > 0 && costs <= maxCosts);
         // Transfer tokens to markets contract and buy all outcomes
@@ -114,11 +115,8 @@ contract DefaultMarket is Market {
         // Transfer outcome tokens to buyer
         require(eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount));
 
-        require(
-            int(outcomeTokenCount) >= 0 &&
-            netOutcomeTokensSold[outcomeTokenIndex] + int(outcomeTokenCount) >= netOutcomeTokensSold[outcomeTokenIndex]
-        );
-        netOutcomeTokensSold[outcomeTokenIndex] += int(outcomeTokenCount);
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
     }
 
     /// @dev Allows to sell outcome tokens to market maker
@@ -134,7 +132,7 @@ contract DefaultMarket is Market {
         uint outcomeTokenProfits = marketMaker.calcProfits(this, outcomeTokenIndex, outcomeTokenCount);
         // Calculate fee charged by market
         uint fee = calcMarketFee(outcomeTokenProfits);
-        profits = outcomeTokenProfits - fee;
+        profits = outcomeTokenProfits.sub(fee);
         // Check profits are not too low
         require(profits > 0 && profits >= minProfits);
         // Transfer outcome tokens to markets contract to sell all outcomes
@@ -144,11 +142,8 @@ contract DefaultMarket is Market {
         // Transfer profits to seller
         require(eventContract.collateralToken().transfer(msg.sender, profits));
 
-        require(
-            int(outcomeTokenCount) >= 0 &&
-            netOutcomeTokensSold[outcomeTokenIndex] - int(outcomeTokenCount) <= netOutcomeTokensSold[outcomeTokenIndex]
-        );
-        netOutcomeTokensSold[outcomeTokenIndex] -= int(outcomeTokenCount);
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
     }
 
     /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping

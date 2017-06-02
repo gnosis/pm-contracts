@@ -7,6 +7,7 @@ import "Utils/Math.sol";
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
 /// @author Stefan George - <stefan@gnosis.pm>
 contract UltimateOracle is Oracle {
+    using Math for *;
 
     /*
      *  Storage
@@ -133,7 +134,7 @@ contract UltimateOracle is Oracle {
         public
         returns (bool)
     {
-        return outcomeSetTimestamp != 0 && now - outcomeSetTimestamp > challengePeriod;
+        return outcomeSetTimestamp != 0 && now.sub(outcomeSetTimestamp) > challengePeriod;
     }
 
     /// @dev Checks if time to overbid the front runner is over
@@ -142,7 +143,7 @@ contract UltimateOracle is Oracle {
         public
         returns (bool)
     {
-        return frontRunnerSetTimestamp != 0 && now - frontRunnerSetTimestamp > frontRunnerPeriod;
+        return frontRunnerSetTimestamp != 0 && now.sub(frontRunnerSetTimestamp) > frontRunnerPeriod;
     }
 
     /// @dev Checks if outcome was challenged

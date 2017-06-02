@@ -5,6 +5,7 @@ import "Tokens/StandardToken.sol";
 /// @title Token contract - Token exchanging Ether 1:1
 /// @author Stefan George - <stefan@gnosis.pm>
 contract EtherToken is StandardToken {
+    using Math for *;
 
     /*
      *  Events
@@ -27,8 +28,8 @@ contract EtherToken is StandardToken {
         public
         payable
     {
-        balances[msg.sender] += msg.value;
-        totalSupply += msg.value;
+        balances[msg.sender] = balances[msg.sender].add(msg.value);
+        totalSupply = totalSupply.add(msg.value);
         Deposit(msg.sender, msg.value);
     }
 
@@ -38,9 +39,8 @@ contract EtherToken is StandardToken {
         public
     {
         // Balance covers value
-        require(balances[msg.sender] >= value);
-        balances[msg.sender] -= value;
-        totalSupply -= value;
+        balances[msg.sender] = balances[msg.sender].sub(value);
+        totalSupply = totalSupply.sub(value);
         msg.sender.transfer(value);
         Withdrawal(msg.sender, value);
     }

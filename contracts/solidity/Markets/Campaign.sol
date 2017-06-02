@@ -7,6 +7,7 @@ import "Utils/Math.sol";
 /// @title Campaign contract - Allows to crowdfund a market
 /// @author Stefan George - <stefan@gnosis.pm>
 contract Campaign {
+    using Math for *;
 
     /*
      *  Constants
@@ -93,7 +94,7 @@ contract Campaign {
         atStage(Stages.AuctionStarted)
     {
         uint raisedAmount = eventContract.collateralToken().balanceOf(this);
-        uint maxAmount = funding - raisedAmount;
+        uint maxAmount = funding.sub(raisedAmount);
         if (maxAmount < amount)
             amount = maxAmount;
         // Collect collateral tokens
