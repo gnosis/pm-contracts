@@ -42,21 +42,6 @@ class TestContracts(AbstractTestContracts):
         for x in chain(
             (0, 2448597794190215440622, MAX_POWER),
             (random.randrange(MAX_POWER) for _ in range(10)),
-        ):
-            X, actual, expected = (
-                mpf(x) / ONE,
-                mpf(self.math.exp(x)) / ONE,
-                mp.exp(mpf(x) / ONE),
-            )
-            assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE)
-
-        for x in chain(
-            (MAX_POWER + 1, 2**255-1),
-            (random.randrange(MAX_POWER+1, 2**255) for _ in range(10)),
-        ):
-            self.assertRaises(TransactionFailed, partial(self.math.exp, x))
-
-        for x in chain(
             (MIN_POWER, -497882689251500345055, -1),
             (random.randrange(MIN_POWER, 0) for _ in range(10)),
         ):
@@ -65,7 +50,17 @@ class TestContracts(AbstractTestContracts):
                 mpf(self.math.exp(x)) / ONE,
                 mp.exp(mpf(x) / ONE),
             )
-            assert X is not None and isclose(actual, expected, rel_tol=RELATIVE_TOLERANCE, abs_tol=ABSOLUTE_TOLERANCE)
+            assert X is not None and isclose(
+                actual, expected,
+                rel_tol=RELATIVE_TOLERANCE,
+                abs_tol=ABSOLUTE_TOLERANCE
+            )
+
+        for x in chain(
+            (MAX_POWER + 1, 2**255-1),
+            (random.randrange(MAX_POWER+1, 2**255) for _ in range(10)),
+        ):
+            self.assertRaises(TransactionFailed, partial(self.math.exp, x))
 
         for _ in range(10):
             int_seq = [random.randrange(-2**255, 2**255) for _ in range(10)]
