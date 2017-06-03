@@ -1,4 +1,4 @@
-from ..abstract_test import AbstractTestContracts, accounts
+from ..abstract_test import AbstractTestContracts, accounts, keys
 
 
 class TestContracts(AbstractTestContracts):
@@ -21,10 +21,10 @@ class TestContracts(AbstractTestContracts):
         # Buy all outcomes
         buyer = 0
         collateral_token_count = 10
-        self.ether_token.deposit(value=collateral_token_count)
+        self.ether_token.deposit(value=collateral_token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), collateral_token_count)
-        self.ether_token.approve(event_address, collateral_token_count)
-        event.buyAllOutcomes(collateral_token_count)
+        self.ether_token.approve(event_address, collateral_token_count, sender=keys[buyer])
+        event.buyAllOutcomes(collateral_token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(event_address), collateral_token_count)
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), 0)
         outcome_token_1 = self.contract_at(event.outcomeTokens(0), self.token_abi)
@@ -32,7 +32,7 @@ class TestContracts(AbstractTestContracts):
         self.assertEqual(outcome_token_1.balanceOf(accounts[buyer]), collateral_token_count)
         self.assertEqual(outcome_token_2.balanceOf(accounts[buyer]), collateral_token_count)
         # Sell all outcomes
-        event.sellAllOutcomes(collateral_token_count)
+        event.sellAllOutcomes(collateral_token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), collateral_token_count)
         self.assertEqual(self.ether_token.balanceOf(event_address), 0)
         self.assertEqual(outcome_token_1.balanceOf(accounts[buyer]), 0)

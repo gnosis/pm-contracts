@@ -1,4 +1,4 @@
-from ..abstract_test import AbstractTestContracts, accounts
+from ..abstract_test import AbstractTestContracts, accounts, keys
 
 
 class TestContracts(AbstractTestContracts):
@@ -20,10 +20,10 @@ class TestContracts(AbstractTestContracts):
         # Buy all outcomes
         buyer = 0
         collateral_token_count = 10
-        self.ether_token.deposit(value=collateral_token_count)
+        self.ether_token.deposit(value=collateral_token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), collateral_token_count)
-        self.ether_token.approve(event_address, collateral_token_count)
-        event.buyAllOutcomes(collateral_token_count)
+        self.ether_token.approve(event_address, collateral_token_count, sender=keys[buyer])
+        event.buyAllOutcomes(collateral_token_count, sender=keys[buyer])
         self.assertEqual(self.ether_token.balanceOf(event_address), collateral_token_count)
         self.assertEqual(self.ether_token.balanceOf(accounts[buyer]), 0)
         # Validate getters
