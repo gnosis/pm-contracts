@@ -13,6 +13,14 @@ contract Market {
     uint public fee;
     uint public funding;
     int[] public netOutcomeTokensSold;
+    Stages public stage;
+
+    enum Stages {
+        MarketCreated,
+        MarketFunded,
+        MarketClosed
+    }
+
     function fund(uint _funding) public;
     function close() public;
     function withdrawFees() public returns (uint);

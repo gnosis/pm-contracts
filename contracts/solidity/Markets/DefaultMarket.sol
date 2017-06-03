@@ -27,12 +27,6 @@ contract DefaultMarket is Market {
     int[] public netOutcomeTokensSold;
     Stages public stage;
 
-    enum Stages {
-        MarketCreated,
-        MarketFunded,
-        MarketClosed
-    }
-
     /*
      *  Modifiers
      */
