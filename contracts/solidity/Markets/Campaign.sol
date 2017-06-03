@@ -99,7 +99,7 @@ contract Campaign {
             amount = maxAmount;
         // Collect collateral tokens
         require(eventContract.collateralToken().transferFrom(msg.sender, this, amount));
-        contributions[msg.sender] = Math.add(contributions[msg.sender], amount);
+        contributions[msg.sender] = contributions[msg.sender].add(amount);
         if (amount == maxAmount)
             stage = Stages.AuctionSuccessful;
     }
@@ -119,7 +119,7 @@ contract Campaign {
     }
 
     /// @dev Allows to create market after successful funding
-    /// @return Returns market address
+    /// @return Market address
     function createMarket()
         public
         timedTransitions
@@ -155,7 +155,7 @@ contract Campaign {
         atStage(Stages.MarketClosed)
         returns (uint fees)
     {
-        fees = Math.mul(finalBalance, contributions[msg.sender]) / funding;
+        fees = finalBalance.mul(contributions[msg.sender]) / funding;
         contributions[msg.sender] = 0;
         // Send fee share to contributor
         require(eventContract.collateralToken().transfer(msg.sender, fees));

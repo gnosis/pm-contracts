@@ -5,6 +5,7 @@ import "Tokens/StandardToken.sol";
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
 contract OutcomeToken is StandardToken {
+    using Math for *;
 
     /*
      *  Events
@@ -43,8 +44,8 @@ contract OutcomeToken is StandardToken {
         public
         isEventContract
     {
-        balances[_for] = Math.add(balances[_for], outcomeTokenCount);
-        totalSupply = Math.add(totalSupply, outcomeTokenCount);
+        balances[_for] = balances[_for].add(outcomeTokenCount);
+        totalSupply = totalSupply.add(outcomeTokenCount);
         Issue(_for, outcomeTokenCount);
     }
 
@@ -55,8 +56,8 @@ contract OutcomeToken is StandardToken {
         public
         isEventContract
     {
-        balances[_for] = Math.sub(balances[_for], outcomeTokenCount);
-        totalSupply = Math.sub(totalSupply, outcomeTokenCount);
+        balances[_for] = balances[_for].sub(outcomeTokenCount);
+        totalSupply = totalSupply.sub(outcomeTokenCount);
         Revoke(_for, outcomeTokenCount);
     }
 }

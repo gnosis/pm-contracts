@@ -5,6 +5,7 @@ import "Events/AbstractEvent.sol";
 /// @title Scalar event contract - Scalar events resolve to a number within a range
 /// @author Stefan George - <stefan@gnosis.pm>
 contract ScalarEvent is Event {
+    using Math for *;
 
     /*
      *  Constants
@@ -42,13 +43,13 @@ contract ScalarEvent is Event {
         upperBound = _upperBound;
     }
 
-    /// @dev Exchanges user's winning outcome tokens for collateral tokens
-    /// @return Returns user's winnings
+    /// @dev Exchanges sender's winning outcome tokens for collateral tokens
+    /// @return Sender's winnings
     function redeemWinnings()
         public
         returns (uint winnings)
     {
-        // Winning outcome should not be set yet
+        // Winning outcome has to be set
         require(isWinningOutcomeSet);
         // Calculate winnings
         uint16 convertedWinningOutcome;
@@ -65,16 +66,16 @@ contract ScalarEvent is Event {
         uint factorLong = OUTCOME_RANGE - factorShort;
         uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);
         uint longOutcomeTokenCount = outcomeTokens[LONG].balanceOf(msg.sender);
-        winnings = Math.add(Math.mul(shortOutcomeTokenCount, factorShort), Math.mul(longOutcomeTokenCount, factorLong)) / OUTCOME_RANGE;
-        // Revoke all tokens of all outcomes
+        winnings = shortOutcomeTokenCount.mul(factorShort).add(longOutcomeTokenCount.mul(factorLong)) / OUTCOME_RANGE;
+        // Revoke all outcome tokens
         outcomeTokens[SHORT].revoke(msg.sender, shortOutcomeTokenCount);
         outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);
-        // Payout winnings
+        // Payout winnings to sender
         require(collateralToken.transfer(msg.sender, winnings));
     }
 
     /// @dev Calculates and returns event hash
-    /// @return Returns event hash
+    /// @return Event hash
     function getEventHash()
         public
         constant

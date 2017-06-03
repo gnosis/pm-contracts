@@ -5,6 +5,7 @@ import "Utils/Math.sol";
 
 /// @title Standard token contract with overflow protection
 contract StandardToken is Token {
+    using Math for *;
 
     /*
      *  Storage
@@ -19,13 +20,13 @@ contract StandardToken is Token {
     /// @dev Transfers sender's tokens to a given address. Returns success
     /// @param to Address of token receiver
     /// @param value Number of tokens to transfer
-    /// @return Returns success of function call
+    /// @return Was transfer successful?
     function transfer(address to, uint value)
         public
         returns (bool)
     {
-        if (   !Math.safeToSub(balances[msg.sender], value)
-            || !Math.safeToAdd(balances[to], value))
+        if (   !balances[msg.sender].safeToSub(value)
+            || !balances[to].safeToAdd(value))
             return false;
         balances[msg.sender] -= value;
         balances[to] += value;
@@ -37,14 +38,14 @@ contract StandardToken is Token {
     /// @param from Address from where tokens are withdrawn
     /// @param to Address to where tokens are sent
     /// @param value Number of tokens to transfer
-    /// @return Returns success of function call
+    /// @return Was transfer successful?
     function transferFrom(address from, address to, uint value)
         public
         returns (bool)
     {
-        if (   !Math.safeToSub(balances[from], value)
-            || !Math.safeToSub(allowances[from][msg.sender], value)
-            || !Math.safeToAdd(balances[to], value))
+        if (   !balances[from].safeToSub(value)
+            || !allowances[from][msg.sender].safeToSub(value)
+            || !balances[to].safeToAdd(value))
             return false;
         balances[from] -= value;
         allowances[from][msg.sender] -= value;
@@ -56,7 +57,7 @@ contract StandardToken is Token {
     /// @dev Sets approved amount of tokens for spender. Returns success
     /// @param spender Address of allowed account
     /// @param value Number of approved tokens
-    /// @return Returns success of function call
+    /// @return Was approval successful?
     function approve(address spender, uint value)
         public
         returns (bool)
@@ -69,7 +70,7 @@ contract StandardToken is Token {
     /// @dev Returns number of allowed tokens for given address
     /// @param owner Address of token owner
     /// @param spender Address of token spender
-    /// @return Returns remaining allowance for spender
+    /// @return Remaining allowance for spender
     function allowance(address owner, address spender)
         public
         constant
@@ -80,7 +81,7 @@ contract StandardToken is Token {
 
     /// @dev Returns number of tokens owned by given address
     /// @param owner Address of token owner
-    /// @return Returns balance of owner
+    /// @return Balance of owner
     function balanceOf(address owner)
         public
         constant

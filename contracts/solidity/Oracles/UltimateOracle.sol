@@ -31,7 +31,7 @@ contract UltimateOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets Ultimate oracle properties
+    /// @dev Constructor sets ultimate oracle properties
     /// @param _oracle Oracle address
     /// @param _collateralToken Collateral token address
     /// @param _spreadMultiplier Defines the spread as a multiple of the money bet on other outcomes
@@ -97,16 +97,16 @@ contract UltimateOracle is Oracle {
     function voteForOutcome(int _outcome, uint amount)
         public
     {
-        uint maxAmount = Math.mul(totalAmount - totalOutcomeAmounts[_outcome], spreadMultiplier);
+        uint maxAmount = (totalAmount - totalOutcomeAmounts[_outcome]).mul(spreadMultiplier);
         if (amount > maxAmount)
             amount = maxAmount;
         // Outcome is challenged and front runner period is not over yet and tokens can be transferred
         require(   isChallenged()
                 && !isFrontRunnerPeriodOver()
                 && collateralToken.transferFrom(msg.sender, this, amount));
-        outcomeAmounts[msg.sender][_outcome] = Math.add(outcomeAmounts[msg.sender][_outcome], amount);
-        totalOutcomeAmounts[_outcome] = Math.add(totalOutcomeAmounts[_outcome], amount);
-        totalAmount = Math.add(totalAmount, amount);
+        outcomeAmounts[msg.sender][_outcome] = outcomeAmounts[msg.sender][_outcome].add(amount);
+        totalOutcomeAmounts[_outcome] = totalOutcomeAmounts[_outcome].add(amount);
+        totalAmount = totalAmount.add(amount);
         if (_outcome != frontRunner && totalOutcomeAmounts[_outcome] > totalOutcomeAmounts[frontRunner])
         {
             frontRunner = _outcome;
@@ -115,21 +115,21 @@ contract UltimateOracle is Oracle {
     }
 
     /// @dev Withdraws winnings for user
-    /// @return Returns winnings
+    /// @return Winnings
     function withdraw()
         public
         returns (uint amount)
     {
         // Outcome was challenged and ultimate outcome decided
         require(isFrontRunnerPeriodOver());
-        amount = Math.mul(totalAmount, outcomeAmounts[msg.sender][frontRunner]) / totalOutcomeAmounts[frontRunner];
+        amount = totalAmount.mul(outcomeAmounts[msg.sender][frontRunner]) / totalOutcomeAmounts[frontRunner];
         outcomeAmounts[msg.sender][frontRunner] = 0;
         // Transfer earnings to contributor
         require(collateralToken.transfer(msg.sender, amount));
     }
 
     /// @dev Checks if time to challenge the outcome is over
-    /// @return Returns if challenge period is over
+    /// @return Is challenge period over?
     function isChallengePeriodOver()
         public
         returns (bool)
@@ -138,7 +138,7 @@ contract UltimateOracle is Oracle {
     }
 
     /// @dev Checks if time to overbid the front runner is over
-    /// @return Returns if front runner period is over
+    /// @return Is front runner period over?
     function isFrontRunnerPeriodOver()
         public
         returns (bool)
@@ -147,7 +147,7 @@ contract UltimateOracle is Oracle {
     }
 
     /// @dev Checks if outcome was challenged
-    /// @return Returns if outcome was challenged
+    /// @return Is challenged?
     function isChallenged()
         public
         returns (bool)
@@ -155,8 +155,8 @@ contract UltimateOracle is Oracle {
         return frontRunnerSetTimestamp != 0;
     }
 
-    /// @dev Returns if winning outcome is set for given event
-    /// @return Returns if outcome is set
+    /// @dev Returns if winning outcome is set
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -166,8 +166,8 @@ contract UltimateOracle is Oracle {
                || isFrontRunnerPeriodOver();
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns winning outcome
+    /// @return Outcome
     function getOutcome()
         public
         constant
