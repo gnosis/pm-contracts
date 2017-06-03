@@ -35,7 +35,7 @@ contract DifficultyOracle is Oracle {
     }
 
     /// @dev Returns if difficulty is set
-    /// @return Returns if outcome is set
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -45,8 +45,8 @@ contract DifficultyOracle is Oracle {
         return outcome > 0;
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns difficulty
+    /// @return Outcome
     function getOutcome()
         public
         constant

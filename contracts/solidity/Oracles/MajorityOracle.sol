@@ -21,15 +21,15 @@ contract MajorityOracle is Oracle {
     {
         // At least 2 oracles should be defined
         require(_oracles.length > 2);
-        for (uint i=0; i<_oracles.length; i++)
+        for (uint i = 0; i < _oracles.length; i++)
             // Oracle address cannot be null
             require(address(_oracles[i]) != 0);
         oracles = _oracles;
     }
 
     /// @dev Allows to registers oracles for a majority vote
-    /// @return Returns if outcome is set
-    /// @return Returns outcome
+    /// @return Is outcome set?
+    /// @return Outcome
     function getStatusAndOutcome()
         public
         returns (bool outcomeSet, int outcome)
@@ -37,10 +37,10 @@ contract MajorityOracle is Oracle {
         uint i;
         int[] memory outcomes = new int[](oracles.length);
         uint[] memory validations = new uint[](oracles.length);
-        for (i=0; i<oracles.length; i++)
+        for (i = 0; i < oracles.length; i++)
             if (oracles[i].isOutcomeSet()) {
                 int _outcome = oracles[i].getOutcome();
-                for (uint j=0; j<=i; j++)
+                for (uint j = 0; j <= i; j++)
                     if (_outcome == outcomes[j]) {
                         validations[j] += 1;
                         break;
@@ -53,7 +53,7 @@ contract MajorityOracle is Oracle {
             }
         uint outcomeValidations = 0;
         uint outcomeIndex = 0;
-        for (i=0; i<oracles.length; i++)
+        for (i = 0; i < oracles.length; i++)
             if (validations[i] > outcomeValidations) {
                 outcomeValidations = validations[i];
                 outcomeIndex = i;
@@ -65,8 +65,8 @@ contract MajorityOracle is Oracle {
         }
     }
 
-    /// @dev Returns if winning outcome is set for given event
-    /// @return Returns if outcome is set
+    /// @dev Returns if winning outcome is set
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -76,8 +76,8 @@ contract MajorityOracle is Oracle {
         return outcomeSet;
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns winning outcome
+    /// @return Outcome
     function getOutcome()
         public
         constant

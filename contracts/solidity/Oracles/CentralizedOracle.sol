@@ -60,8 +60,8 @@ contract CentralizedOracle is Oracle {
         outcome = _outcome;
     }
 
-    /// @dev Returns if winning outcome is set for given event
-    /// @return Returns if outcome is set
+    /// @dev Returns if winning outcome is set
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -70,8 +70,8 @@ contract CentralizedOracle is Oracle {
         return isSet;
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns outcome
+    /// @return Outcome
     function getOutcome()
         public
         constant

@@ -23,14 +23,14 @@ contract UltimateOracleFactory {
     /*
      *  Public functions
      */
-    /// @dev Creates a new Ultimate Oracle contract
+    /// @dev Creates a new ultimate Oracle contract
     /// @param oracle Oracle address
     /// @param collateralToken Collateral token address
     /// @param spreadMultiplier Defines the spread as a multiple of the money bet on other outcomes
     /// @param challengePeriod Time to challenge oracle outcome
     /// @param challengeAmount Amount to challenge the outcome
     /// @param frontRunnerPeriod Time to overbid the front-runner
-    /// @return Returns oracle contract
+    /// @return Oracle contract
     function createUltimateOracle(
         Oracle oracle,
         Token collateralToken,

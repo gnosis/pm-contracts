@@ -16,7 +16,7 @@ contract DifficultyOracleFactory {
      */
     /// @dev Creates a new difficulty oracle contract
     /// @param blockNumber Target block number
-    /// @return Returns oracle contract
+    /// @return Oracle contract
     function createDifficultyOracle(uint blockNumber)
         public
         returns (DifficultyOracle difficultyOracle)

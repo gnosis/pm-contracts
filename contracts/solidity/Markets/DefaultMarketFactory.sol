@@ -14,7 +14,7 @@ contract DefaultMarketFactory is MarketFactory {
     /// @param eventContract Event contract
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
-    /// @return Returns market contract
+    /// @return Market contract
     function createMarket(Event eventContract, MarketMaker marketMaker, uint fee)
         public
         returns (Market market)

@@ -31,36 +31,36 @@ contract Event {
         require(address(_collateralToken) != 0 && address(_oracle) != 0 && outcomeCount >= 2);
         collateralToken = _collateralToken;
         oracle = _oracle;
-        // Create outcome tokens for each outcome
-        for (uint8 i=0; i<outcomeCount; i++)
+        // Create an outcome token for each outcome
+        for (uint8 i = 0; i < outcomeCount; i++)
             outcomeTokens.push(new OutcomeToken());
     }
 
-    /// @dev Buys equal number of tokens of all outcomes, exchanging collateral tokens and all outcome tokens 1:1
+    /// @dev Buys equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
     /// @param collateralTokenCount Number of collateral tokens
     function buyAllOutcomes(uint collateralTokenCount)
         public
     {
-        // Transfer tokens to events contract
+        // Transfer collateral tokens to events contract
         require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
-        // Issue new event tokens to owner
-        for (uint8 i=0; i<outcomeTokens.length; i++)
+        // Issue new outcome tokens to sender
+        for (uint8 i = 0; i < outcomeTokens.length; i++)
             outcomeTokens[i].issue(msg.sender, collateralTokenCount);
     }
 
-    /// @dev Sells equal number of tokens of all outcomes, exchanging collateral tokens and all outcome tokens 1:1
+    /// @dev Sells equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
     /// @param outcomeTokenCount Number of outcome tokens
     function sellAllOutcomes(uint outcomeTokenCount)
         public
     {
-        // Revoke tokens of all outcomes
-        for (uint8 i=0; i<outcomeTokens.length; i++)
+        // Revoke sender's outcome tokens of all outcomes
+        for (uint8 i = 0; i < outcomeTokens.length; i++)
             outcomeTokens[i].revoke(msg.sender, outcomeTokenCount);
-        // Transfer redeemed tokens
+        // Transfer collateral tokens to sender
         require(collateralToken.transfer(msg.sender, outcomeTokenCount));
     }
 
-    /// @dev Sets winning event outcome if resolved by oracle
+    /// @dev Sets winning event outcome
     function setWinningOutcome()
         public
     {
@@ -99,15 +99,15 @@ contract Event {
         returns (uint[] outcomeTokenDistribution)
     {
         outcomeTokenDistribution = new uint[](outcomeTokens.length);
-        for (uint8 i=0; i<outcomeTokenDistribution.length; i++)
+        for (uint8 i = 0; i < outcomeTokenDistribution.length; i++)
             outcomeTokenDistribution[i] = outcomeTokens[i].balanceOf(owner);
     }
 
     /// @dev Calculates and returns event hash
-    /// @return Returns event hash
+    /// @return Event hash
     function getEventHash() public constant returns (bytes32);
 
-    /// @dev Exchanges user's winning outcome tokens for collateral tokens
-    /// @return Returns user's winnings
+    /// @dev Exchanges sender's winning outcome tokens for collateral tokens
+    /// @return Sender's winnings
     function redeemWinnings() public returns (uint);
 }

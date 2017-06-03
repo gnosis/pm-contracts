@@ -72,8 +72,8 @@ contract SignedMessageOracle is Oracle {
         outcome = _outcome;
     }
 
-    /// @dev Returns if winning outcome is set for given event
-    /// @return Returns if outcome is set
+    /// @dev Returns if winning outcome
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -82,8 +82,8 @@ contract SignedMessageOracle is Oracle {
         return isSet;
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns winning outcome
+    /// @return Outcome
     function getOutcome()
         public
         constant

@@ -19,7 +19,7 @@ library Math {
      */
     /// @dev Returns natural exponential function value of given x
     /// @param x x
-    /// @return Returns e**x
+    /// @return e**x
     function exp(int x)
         public
         constant
@@ -28,14 +28,12 @@ library Math {
         // revert if x is > MAX_POWER, where
         // MAX_POWER = int(mp.floor(mp.log(mpf(2**256 - 1) / ONE) * ONE))
         require(x <= 2454971259878909886679);
-
         // return 0 if exp(x) is tiny, using
         // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE) * ONE))
-        if(x < -818323753292969962227) return 0;
-
+        if(x < -818323753292969962227)
+            return 0;
         // Transform so that e^x -> 2^x
         x = x * int(ONE) / int(LN2);
-
         // 2^x = 2^whole(x) * 2^frac(x)
         //       ^^^^^^^^^^ is a bit shift
         // so Taylor expand on z = frac(x)
@@ -49,8 +47,6 @@ library Math {
             shift = x / int(ONE) - 1;
             z = ONE - uint(-x % int(ONE));
         }
-
-
         // 2^x = 1 + (ln 2) x + (ln 2)^2/2! x^2 + ...
         //
         // Can generate the z coefficients using mpmath and the following lines
@@ -64,7 +60,6 @@ library Math {
         // 0x276556df749cee5
         // 0x5761ff9e299cc4
         // 0xa184897c363c3
-
         uint zpow = z;
         uint result = ONE;
         result += 0xb17217f7d1cf79ab * zpow / ONE;
@@ -98,37 +93,31 @@ library Math {
         result += 0xe1b7 * zpow / ONE;
         zpow = zpow * z / ONE;
         result += 0x9c7 * zpow / ONE;
-
         if(shift >= 0) {
             if(result >> (256-shift) > 0)
                 return (2**256-1);
-
             return result << shift;
         }
-        else {
+        else
             return result >> (-shift);
-        }
     }
 
     /// @dev Returns natural logarithm value of given x
     /// @param x x
-    /// @return Returns ln(x)
+    /// @return ln(x)
     function ln(uint x)
         public
         constant
         returns (int)
     {
         require(x > 0);
-
         // binary search for floor(log2(x))
         int ilog2 = floorLog2(x);
-
         int z;
         if(ilog2 < 0)
             z = int(x << uint(-ilog2));
         else
             z = int(x >> uint(ilog2));
-
         // z = x * 2^-⌊log₂x⌋
         // so 1 <= z < 2
         // and ln z = ln x - ⌊log₂x⌋/log₂e
@@ -165,7 +154,7 @@ library Math {
 
     /// @dev Returns base 2 logarithm value of given x
     /// @param x x
-    /// @return Returns logarithmic value
+    /// @return logarithmic value
     function floorLog2(uint x)
         public
         constant
@@ -193,11 +182,9 @@ library Math {
     {
         require(nums.length > 0);
         max = -2**255;
-        for(uint i = 0; i < nums.length; i++) {
-            if(nums[i] > max) {
+        for (uint i = 0; i < nums.length; i++)
+            if(nums[i] > max)
                 max = nums[i];
-            }
-        }
     }
 
     /// @dev Returns whether an add operation causes an overflow

@@ -2,7 +2,7 @@ pragma solidity 0.4.11;
 import "Events/AbstractEvent.sol";
 
 
-/// @title Categorical event contract - Categorical events resolve to an outcome from a list of outcomes
+/// @title Categorical event contract - Categorical events resolve to an outcome from a set of outcomes
 /// @author Stefan George - <stefan@gnosis.pm>
 contract CategoricalEvent is Event {
 
@@ -24,8 +24,8 @@ contract CategoricalEvent is Event {
 
     }
 
-    /// @dev Exchanges user's winning outcome tokens for collateral tokens
-    /// @return Returns user's winnings
+    /// @dev Exchanges sender's winning outcome tokens for collateral tokens
+    /// @return Sender's winnings
     function redeemWinnings()
         public
         returns (uint winnings)
@@ -41,7 +41,7 @@ contract CategoricalEvent is Event {
     }
 
     /// @dev Calculates and returns event hash
-    /// @return Returns event hash
+    /// @return Event hash
     function getEventHash()
         public
         constant
