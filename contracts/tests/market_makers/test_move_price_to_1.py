@@ -1,4 +1,5 @@
 from ..abstract_test import AbstractTestContracts, accounts, keys
+from ..math_utils import isclose, lmsr_marginal_price, mpf, ONE
 
 
 class TestContracts(AbstractTestContracts):
@@ -23,9 +24,10 @@ class TestContracts(AbstractTestContracts):
         ]:
             ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
             # Create event
+            num_outcomes = 2
             ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
             oracle_address = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
-            event = self.contract_at(self.event_factory.createCategoricalEvent(ether_token.address, oracle_address, 2), self.event_abi)
+            event = self.contract_at(self.event_factory.createCategoricalEvent(ether_token.address, oracle_address, num_outcomes), self.event_abi)
             # Create market
             fee = 0  # 0%
             market = self.contract_at(self.market_factory.createMarket(event.address, self.lmsr.address, fee), self.market_abi)
@@ -49,5 +51,10 @@ class TestContracts(AbstractTestContracts):
                 # Buying tokens
                 ether_token.approve(market.address, token_count, sender=keys[trader])
                 self.assertEqual(market.buy(outcome, token_count, cost, sender=keys[trader]), cost)
+                net_outcome_tokens_sold = [market.netOutcomeTokensSold(i) for i in range(num_outcomes)]
+                expected = lmsr_marginal_price(funding, net_outcome_tokens_sold, outcome)
+                actual = mpf(self.lmsr.calcMarginalPrice(market.address, outcome)) / ONE
+                assert (i, funding, net_outcome_tokens_sold) and isclose(expected, actual)
+
             # Price is equal to 1
             self.assertEqual(cost, token_count)

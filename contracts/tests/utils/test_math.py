@@ -6,7 +6,7 @@ import random
 
 from ethereum.tester import TransactionFailed
 
-from ..math_utils import isclose, mp, mpf
+from ..math_utils import isclose, mp, mpf, ONE
 from ..abstract_test import AbstractTestContracts
 
 
@@ -17,7 +17,6 @@ class TestContracts(AbstractTestContracts):
         self.math = self.create_contract('Utils/Math.sol')
 
     def test(self):
-        ONE = 0x10000000000000000
         RELATIVE_TOLERANCE = 1e-9
         ABSOLUTE_TOLERANCE = 1e-18
 
