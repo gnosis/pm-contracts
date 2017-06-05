@@ -7,9 +7,9 @@ Introduction
 ------------
 The Gnosis smart contract design follows a modular contract structure making it easy to split functionalities to upgrade or reuse parts. The current Gnosis implementation consists of over 25 smart contracts ranging from different oracle solutions to market makers. All of them have been written in Solidity.
 
-For every prediction market two main objects have to be created:
-1. An event object referencing an oracle to resolve the event and a collateral token to exchange outcome tokens for collateral tokens.
-2. A market object, which connects a market maker with the event.
+For every prediction market two main contracts have to be created:
+1. An event contract referencing an oracle to resolve the event and a collateral token to exchange outcome tokens for collateral tokens.
+2. A market contract, which connects a market maker with the event.
 
 
 Events
