@@ -44,7 +44,7 @@ class TestContracts(AbstractTestContracts):
         # Buy into market for outcome token 1
         market = self.contract_at(futarchy.markets(1), self.market_abi)
         buyer = 1
-        outcome = 0
+        outcome = 1
         token_count = 10 ** 15
         outcome_token_cost = self.lmsr.calcCost(market.address, outcome, token_count)
         fee = market.calcMarketFee(outcome_token_cost)
@@ -65,7 +65,7 @@ class TestContracts(AbstractTestContracts):
         categorical_event.setWinningOutcome()
         # Set winning outcome for scalar events
         self.assertRaises(TransactionFailed, futarchy.close)
-        oracle.setOutcome(50)
+        oracle.setOutcome(-50)
         scalar_event = self.contract_at(market.eventContract(), self.event_abi)
         scalar_event.setWinningOutcome()
         # Close winning market and transfer collateral tokens to creator

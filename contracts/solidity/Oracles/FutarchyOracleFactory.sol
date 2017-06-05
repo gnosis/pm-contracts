@@ -50,7 +50,7 @@ contract FutarchyOracleFactory {
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @param deadline Decision deadline
-    /// @return Returns oracle contract
+    /// @return Oracle contract
     function createFutarchyOracle(
         Token collateralToken,
         Oracle oracle,

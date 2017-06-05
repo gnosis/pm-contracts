@@ -10,6 +10,11 @@ contract FutarchyOracle is Oracle {
     using Math for *;
 
     /*
+     *  Constants
+     */
+    uint8 public constant LONG = 1;
+
+    /*
      *  Storage
      */
     address creator;
@@ -63,7 +68,7 @@ contract FutarchyOracle is Oracle {
         // Create decision event
         categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
         // Create outcome events
-        for (uint8 i=0; i<categoricalEvent.getOutcomeCount(); i++) {
+        for (uint8 i = 0; i < categoricalEvent.getOutcomeCount(); i++) {
             ScalarEvent scalarEvent = eventFactory.createScalarEvent(
                 categoricalEvent.outcomeTokens(i),
                 oracle,
@@ -87,7 +92,7 @@ contract FutarchyOracle is Oracle {
                 && categoricalEvent.collateralToken().approve(categoricalEvent, funding));
         categoricalEvent.buyAllOutcomes(funding);
         // Fund each market with outcome tokens from categorical event
-        for (uint8 i=0; i<markets.length; i++) {
+        for (uint8 i = 0; i < markets.length; i++) {
             Market market = markets[i];
             // Approve funding for market
             require(market.eventContract().collateralToken().approve(market, funding));
@@ -112,52 +117,28 @@ contract FutarchyOracle is Oracle {
         require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
     }
 
-    /// @dev Returns the amount of outcome tokens held by market
-    /// @return Outcome token distribution
-    function getOutcomeTokenDistribution(Market market)
-        public
-        returns (uint[] outcomeTokenDistribution)
-    {
-        outcomeTokenDistribution = new uint[](2);
-        for (uint i=0; i<outcomeTokenDistribution.length; i++)
-            outcomeTokenDistribution[i] = market.eventContract().outcomeTokens(i).balanceOf(market);
-    }
-
     /// @dev Allows to set the oracle outcome based on the market with largest long position
     function setOutcome()
         public
     {
         // Outcome is not set yet and deadline has passed
         require(!isSet && deadline <= now);
-
-        uint[] memory outcomeTokenDistribution = getOutcomeTokenDistribution(markets[0]);
-
-        // require(
-        //     int(outcomeTokenDistribution[0]) >= 0 &&
-        //     int(outcomeTokenDistribution[1]) >= 0
-        // );
-        // int highest = int(outcomeTokenDistribution[0]).sub(int(outcomeTokenDistribution[1]));
-        uint highest = outcomeTokenDistribution[0] - outcomeTokenDistribution[1];
-
+        // Find market with highest marginal price for long outcome tokens
+        uint highestMarginalPrice = markets[0].marketMaker().calcMarginalPrice(markets[0], LONG);
         int highestIndex = 0;
-        for (uint8 i=1; i<markets.length; i++) {
-            outcomeTokenDistribution = getOutcomeTokenDistribution(markets[i]);
-
-            // require(
-            //     int(outcomeTokenDistribution[0]) >= 0 &&
-            //     int(outcomeTokenDistribution[1]) >= 0
-            // );
-
-            // if (int(outcomeTokenDistribution[0]).sub(int(outcomeTokenDistribution[1])) > highest)
-            if (outcomeTokenDistribution[0] - outcomeTokenDistribution[1] > highest)
+        for (uint8 i = 1; i < markets.length; i++) {
+            uint marginalPrice = markets[i].marketMaker().calcMarginalPrice(markets[i], LONG);
+            if (marginalPrice > highestMarginalPrice) {
+                highestMarginalPrice = marginalPrice;
                 highestIndex = i;
+            }
         }
         outcome = highestIndex;
         isSet = true;
     }
 
-    /// @dev Returns if winning outcome is set for given event
-    /// @return Returns if outcome is set
+    /// @dev Returns if winning outcome is set
+    /// @return Is outcome set?
     function isOutcomeSet()
         public
         constant
@@ -166,8 +147,8 @@ contract FutarchyOracle is Oracle {
         return isSet;
     }
 
-    /// @dev Returns winning outcome for given event
-    /// @return Returns outcome
+    /// @dev Returns winning outcome
+    /// @return Outcome
     function getOutcome()
         public
         constant
