@@ -12,7 +12,7 @@ contract ScalarEvent is Event {
      */
     uint8 public constant SHORT = 0;
     uint8 public constant LONG = 1;
-    uint16 public constant OUTCOME_RANGE = 10000;
+    uint24 public constant OUTCOME_RANGE = 1000000;
 
     /*
      *  Storage
@@ -52,7 +52,7 @@ contract ScalarEvent is Event {
         // Winning outcome has to be set
         require(isWinningOutcomeSet);
         // Calculate winnings
-        uint16 convertedWinningOutcome;
+        uint24 convertedWinningOutcome;
         // Outcome is lower than defined lower bound
         if (winningOutcome < lowerBound)
             convertedWinningOutcome = 0;
@@ -61,7 +61,7 @@ contract ScalarEvent is Event {
             convertedWinningOutcome = OUTCOME_RANGE;
         // Map outcome to outcome range
         else
-            convertedWinningOutcome = uint16(OUTCOME_RANGE * (winningOutcome - lowerBound) / (upperBound - lowerBound));
+            convertedWinningOutcome = uint24(OUTCOME_RANGE * (winningOutcome - lowerBound) / (upperBound - lowerBound));
         uint factorShort = OUTCOME_RANGE - convertedWinningOutcome;
         uint factorLong = OUTCOME_RANGE - factorShort;
         uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);
