@@ -95,8 +95,8 @@ contract LMSRMarketMaker is MarketMaker {
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        SumExpOffsetResult memory sumExpOffRes = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
-        return sumExpOffRes.outcomeExpTerm / (sumExpOffRes.sum / ONE);
+        var (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
+        return outcomeExpTerm / (sum / ONE);
     }
 
     /*
@@ -116,16 +116,10 @@ contract LMSRMarketMaker is MarketMaker {
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)).
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
-        SumExpOffsetResult memory sumExpOffRes = sumExpOffset(logN, netOutcomeTokensSold, funding, 0);
-        costLevel = Math.ln(sumExpOffRes.sum);
-        costLevel = costLevel.add(sumExpOffRes.offset);
-        costLevel = (costLevel.mul(int(ONE)) / int(logN)).mul(int(funding));
-    }
-
-    struct SumExpOffsetResult {
-        uint sum;
-        int offset;
-        uint outcomeExpTerm;
+        var (sum, offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0);
+        costLevel = Math.ln(sum);
+        costLevel = costLevel.add(offset);
+        costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));
     }
 
     /// @dev Calculates sum(exp(q/b - offset) for q in quantities), where offset is set
@@ -138,7 +132,7 @@ contract LMSRMarketMaker is MarketMaker {
     function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex)
         private
         constant
-        returns (SumExpOffsetResult result)
+        returns (uint sum, int offset, uint outcomeExpTerm)
     {
         // Naive calculation of this causes an overflow
         // since anything above a bit over 133*ONE supplied to exp will explode
@@ -157,14 +151,14 @@ contract LMSRMarketMaker is MarketMaker {
 
         int maxQuantity = Math.max(netOutcomeTokensSold);
         require(logN >= 0 && int(funding) >= 0);
-        result.offset = maxQuantity.mul(logN) / int(funding);
-        result.offset = result.offset.sub(EXP_LIMIT);
+        offset = maxQuantity.mul(logN) / int(funding);
+        offset = offset.sub(EXP_LIMIT);
         uint term;
         for (uint8 i = 0; i < netOutcomeTokensSold.length; i++) {
-            term = Math.exp(Math.sub(netOutcomeTokensSold[i].mul(int(logN)) / int(funding), result.offset));
+            term = Math.exp((netOutcomeTokensSold[i].mul(logN) / int(funding)).sub(offset));
             if(i == outcomeIndex)
-                result.outcomeExpTerm = term;
-            result.sum = result.sum.add(term);
+                outcomeExpTerm = term;
+            sum = sum.add(term);
         }
     }
 
