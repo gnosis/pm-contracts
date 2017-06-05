@@ -79,6 +79,14 @@ contract LMSRMarketMaker is MarketMaker {
         profit = uint(costLevelBefore - costLevelAfter) / ONE;
     }
 
+    function calcMarginalPrice(Market market, uint8 outcomeTokenIndex)
+        public
+        constant
+        returns (uint price)
+    {
+        return price;
+    }
+
     /*
      *  Private functions
      */
