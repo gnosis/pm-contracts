@@ -92,13 +92,10 @@ contract LMSRMarketMaker is MarketMaker {
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         int logN = Math.ln(netOutcomeTokensSold.length * ONE);
         uint funding = market.funding();
-
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        SumExpOffsetResult memory sumExpOffRes = sumExpOffset(
-            logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
-
+        SumExpOffsetResult memory sumExpOffRes = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
         return sumExpOffRes.outcomeExpTerm / (sumExpOffRes.sum / ONE);
     }
 
@@ -162,13 +159,11 @@ contract LMSRMarketMaker is MarketMaker {
         require(logN >= 0 && int(funding) >= 0);
         result.offset = maxQuantity.mul(logN) / int(funding);
         result.offset = result.offset.sub(EXP_LIMIT);
-
         uint term;
         for (uint8 i = 0; i < netOutcomeTokensSold.length; i++) {
             term = Math.exp(Math.sub(netOutcomeTokensSold[i].mul(int(logN)) / int(funding), result.offset));
-            if(i == outcomeIndex) {
+            if(i == outcomeIndex)
                 result.outcomeExpTerm = term;
-            }
             result.sum = result.sum.add(term);
         }
     }
