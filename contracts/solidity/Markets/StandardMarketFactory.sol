@@ -1,11 +1,11 @@
 pragma solidity 0.4.11;
 import "Markets/AbstractMarketFactory.sol";
-import "Markets/DefaultMarket.sol";
+import "Markets/StandardMarket.sol";
 
 
 /// @title Market factory contract - Allows to create market contracts
 /// @author Stefan George - <stefan@gnosis.pm>
-contract DefaultMarketFactory is MarketFactory {
+contract StandardMarketFactory is MarketFactory {
 
     /*
      *  Public functions
@@ -19,7 +19,7 @@ contract DefaultMarketFactory is MarketFactory {
         public
         returns (Market market)
     {
-        market = new DefaultMarket(msg.sender, eventContract, marketMaker, fee);
+        market = new StandardMarket(msg.sender, eventContract, marketMaker, fee);
         MarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

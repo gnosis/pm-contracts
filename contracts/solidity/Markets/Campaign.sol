@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
 import "Events/AbstractEvent.sol";
-import "Markets/DefaultMarketFactory.sol";
+import "Markets/StandardMarketFactory.sol";
 import "Utils/Math.sol";
 
 

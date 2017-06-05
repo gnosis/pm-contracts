@@ -7,7 +7,7 @@ import "MarketMakers/AbstractMarketMaker.sol";
 
 /// @title Market factory contract - Allows to create market contracts
 /// @author Stefan George - <stefan@gnosis.pm>
-contract DefaultMarket is Market {
+contract StandardMarket is Market {
     using Math for *;
 
     /*
@@ -50,7 +50,7 @@ contract DefaultMarket is Market {
     /// @param _eventContract Event contract
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
-    function DefaultMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint _fee)
+    function StandardMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint _fee)
         public
     {
         // Validate inputs
