@@ -56,7 +56,7 @@ class TestContracts(AbstractTestContracts):
             net_outcome_tokens_sold = [market.netOutcomeTokensSold(i) for i in range(num_outcomes)]
             expected = lmsr_marginal_price(funding, net_outcome_tokens_sold, outcome)
             actual = mpf(self.lmsr.calcMarginalPrice(market.address, outcome)) / ONE
-            assert (i, funding, net_outcome_tokens_sold) and isclose(expected, actual)
+            assert (i, funding, net_outcome_tokens_sold) and isclose(expected, actual, abs_tol=1e-18)
 
         # Selling of tokens is worth less than 1 Wei
         self.assertEqual(profit, 0)
