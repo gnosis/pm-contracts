@@ -62,7 +62,7 @@ contract LMSRMarketMaker is MarketMaker {
         constant
         returns (uint profit)
     {
-        require(market.eventContract().getOutcomeCount() > 0);
+        require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         // Calculate cost level based on net outcome token balances
         int logN = Math.ln(netOutcomeTokensSold.length * ONE);
