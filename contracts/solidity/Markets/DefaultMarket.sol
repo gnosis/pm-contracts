@@ -13,7 +13,7 @@ contract DefaultMarket is Market {
     /*
      *  Constants
      */
-    uint public constant FEE_RANGE = 1000000; // 100%
+    uint24 public constant FEE_RANGE = 1000000; // 100%
 
     /*
      *  Storage
