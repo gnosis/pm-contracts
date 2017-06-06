@@ -31,8 +31,8 @@ class TestContracts(AbstractTestContracts):
         centralized_oracle.setOutcome(1)
         self.assertEqual(centralized_oracle.getOutcome(), 1)
         # Set outcome in ultimate oracle
-        ultimate_oracle.setOutcome()
-        self.assertEqual(ultimate_oracle.outcome(), 1)
+        ultimate_oracle.setForwardedOutcome()
+        self.assertEqual(ultimate_oracle.forwardedOutcome(), 1)
         self.assertFalse(ultimate_oracle.isOutcomeSet())
         # Challenge outcome
         sender_1 = 0
