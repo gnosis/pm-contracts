@@ -12,7 +12,7 @@ contract StandardToken is Token {
      */
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowances;
-    uint public totalSupply;
+    uint totalTokens;
 
     /*
      *  Public functions
@@ -88,5 +88,15 @@ contract StandardToken is Token {
         returns (uint)
     {
         return balances[owner];
+    }
+
+    /// @dev Returns total supply of tokens
+    /// @return Total supply
+    function totalSupply()
+        public
+        constant
+        returns (uint)
+    {
+        return totalTokens;
     }
 }

@@ -29,7 +29,7 @@ contract EtherToken is StandardToken {
         payable
     {
         balances[msg.sender] = balances[msg.sender].add(msg.value);
-        totalSupply = totalSupply.add(msg.value);
+        totalTokens = totalTokens.add(msg.value);
         Deposit(msg.sender, msg.value);
     }
 
@@ -40,7 +40,7 @@ contract EtherToken is StandardToken {
     {
         // Balance covers value
         balances[msg.sender] = balances[msg.sender].sub(value);
-        totalSupply = totalSupply.sub(value);
+        totalTokens = totalTokens.sub(value);
         msg.sender.transfer(value);
         Withdrawal(msg.sender, value);
     }

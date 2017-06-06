@@ -10,8 +10,8 @@ contract OutcomeToken is StandardToken {
     /*
      *  Events
      */
-    event Issue(address indexed owner, uint amount);
-    event Revoke(address indexed owner, uint amount);
+    event Issuance(address indexed owner, uint amount);
+    event Revocation(address indexed owner, uint amount);
 
     /*
      *  Storage
@@ -45,8 +45,8 @@ contract OutcomeToken is StandardToken {
         isEventContract
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
-        totalSupply = totalSupply.add(outcomeTokenCount);
-        Issue(_for, outcomeTokenCount);
+        totalTokens = totalTokens.add(outcomeTokenCount);
+        Issuance(_for, outcomeTokenCount);
     }
 
     /// @dev Events contract revokes tokens for address. Returns success
@@ -57,7 +57,7 @@ contract OutcomeToken is StandardToken {
         isEventContract
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
-        totalSupply = totalSupply.sub(outcomeTokenCount);
-        Revoke(_for, outcomeTokenCount);
+        totalTokens = totalTokens.sub(outcomeTokenCount);
+        Revocation(_for, outcomeTokenCount);
     }
 }
