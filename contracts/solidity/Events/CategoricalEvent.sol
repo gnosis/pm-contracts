@@ -38,6 +38,7 @@ contract CategoricalEvent is Event {
         outcomeTokens[uint(winningOutcome)].revoke(msg.sender, winnings);
         // Payout winnings
         require(collateralToken.transfer(msg.sender, winnings));
+        WinningsRedemption(msg.sender, winnings);
     }
 
     /// @dev Calculates and returns event hash

@@ -9,6 +9,14 @@ import "Oracles/AbstractOracle.sol";
 contract Event {
 
     /*
+     *  Events
+     */
+    event OutcomeTokenSetIssuance(address indexed buyer, uint collateralTokenCount);
+    event OutcomeTokenSetRevocation(address indexed seller, uint outcomeTokenCount);
+    event WinningOutcomeAssignment(int outcome);
+    event WinningsRedemption(address indexed receiver, uint winnings);
+
+    /*
      *  Storage
      */
     Token public collateralToken;
@@ -46,6 +54,7 @@ contract Event {
         // Issue new outcome tokens to sender
         for (uint8 i = 0; i < outcomeTokens.length; i++)
             outcomeTokens[i].issue(msg.sender, collateralTokenCount);
+        OutcomeTokenSetIssuance(msg.sender, collateralTokenCount);
     }
 
     /// @dev Sells equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
@@ -58,6 +67,7 @@ contract Event {
             outcomeTokens[i].revoke(msg.sender, outcomeTokenCount);
         // Transfer collateral tokens to sender
         require(collateralToken.transfer(msg.sender, outcomeTokenCount));
+        OutcomeTokenSetRevocation(msg.sender, outcomeTokenCount);
     }
 
     /// @dev Sets winning event outcome
@@ -69,6 +79,7 @@ contract Event {
         // Set winning outcome
         winningOutcome = oracle.getOutcome();
         isWinningOutcomeSet = true;
+        WinningOutcomeAssignment(winningOutcome);
     }
 
     /// @dev Returns outcome count
