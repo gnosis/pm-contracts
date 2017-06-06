@@ -62,12 +62,12 @@ class TestContracts(AbstractTestContracts):
         futarchy.setOutcome()
         self.assertTrue(futarchy.isOutcomeSet())
         self.assertEqual(futarchy.getOutcome(), 1)
-        categorical_event.setWinningOutcome()
+        categorical_event.setOutcome()
         # Set winning outcome for scalar events
         self.assertRaises(TransactionFailed, futarchy.close)
         oracle.setOutcome(-50)
         scalar_event = self.contract_at(market.eventContract(), self.event_abi)
-        scalar_event.setWinningOutcome()
+        scalar_event.setOutcome()
         # Close winning market and transfer collateral tokens to creator
         futarchy.close(sender=keys[creator])
         self.assertGreater(self.ether_token.balanceOf(accounts[creator]), collateral_token_count)

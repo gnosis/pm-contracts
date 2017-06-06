@@ -71,7 +71,7 @@ contract Event {
     }
 
     /// @dev Sets winning event outcome
-    function setWinningOutcome()
+    function setOutcome()
         public
     {
         // Winning outcome is not set yet in event contract but in oracle contract

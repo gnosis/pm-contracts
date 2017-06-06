@@ -39,7 +39,7 @@ class TestContracts(AbstractTestContracts):
         self.assertEqual(oracle.getOutcome(), 1)
         self.assertTrue(oracle.isOutcomeSet())
         # Set outcome in event
-        event.setWinningOutcome()
+        event.setOutcome()
         self.assertEqual(event.outcome(), 1)
         self.assertTrue(event.isOutcomeSet())
         # Redeem winnings for buyer account

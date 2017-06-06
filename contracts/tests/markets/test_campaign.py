@@ -60,7 +60,7 @@ class TestContracts(AbstractTestContracts):
         self.assertEqual(market.buy(outcome, token_count, cost, sender=keys[buyer]), cost)
         # Set outcome
         oracle.setOutcome(1)
-        event.setWinningOutcome()
+        event.setOutcome()
         # Withdraw fees
         campaign.closeMarket()
         final_balance = campaign.finalBalance()
