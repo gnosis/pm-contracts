@@ -30,7 +30,7 @@ library Math {
         require(x <= 2454971259878909886679);
         // return 0 if exp(x) is tiny, using
         // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE) * ONE))
-        if(x < -818323753292969962227)
+        if (x < -818323753292969962227)
             return 0;
         // Transform so that e^x -> 2^x
         x = x * int(ONE) / int(LN2);
@@ -39,7 +39,7 @@ library Math {
         // so Taylor expand on z = frac(x)
         int shift;
         uint z;
-        if(x >= 0) {
+        if (x >= 0) {
             shift = x / int(ONE);
             z = uint(x % int(ONE));
         }
@@ -93,8 +93,8 @@ library Math {
         result += 0xe1b7 * zpow / ONE;
         zpow = zpow * z / ONE;
         result += 0x9c7 * zpow / ONE;
-        if(shift >= 0) {
-            if(result >> (256-shift) > 0)
+        if (shift >= 0) {
+            if (result >> (256-shift) > 0)
                 return (2**256-1);
             return result << shift;
         }
@@ -114,7 +114,7 @@ library Math {
         // binary search for floor(log2(x))
         int ilog2 = floorLog2(x);
         int z;
-        if(ilog2 < 0)
+        if (ilog2 < 0)
             z = int(x << uint(-ilog2));
         else
             z = int(x >> uint(ilog2));
@@ -183,7 +183,7 @@ library Math {
         require(nums.length > 0);
         max = -2**255;
         for (uint i = 0; i < nums.length; i++)
-            if(nums[i] > max)
+            if (nums[i] > max)
                 max = nums[i];
     }
 

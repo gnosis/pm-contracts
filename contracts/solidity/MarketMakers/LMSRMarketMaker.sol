@@ -42,7 +42,7 @@ contract LMSRMarketMaker is MarketMaker {
         require(costLevelAfter >= costLevelBefore);
         cost = uint(costLevelAfter - costLevelBefore);
         // Take the ceiling to account for rounding
-        if(cost / ONE * ONE == cost)
+        if (cost / ONE * ONE == cost)
             cost /= ONE;
         else
             // Integer division by ONE ensures there is room to (+ 1)
@@ -156,7 +156,7 @@ contract LMSRMarketMaker is MarketMaker {
         uint term;
         for (uint8 i = 0; i < netOutcomeTokensSold.length; i++) {
             term = Math.exp((netOutcomeTokensSold[i].mul(logN) / int(funding)).sub(offset));
-            if(i == outcomeIndex)
+            if (i == outcomeIndex)
                 outcomeExpTerm = term;
             sum = sum.add(term);
         }
