@@ -62,11 +62,11 @@ class TestContracts(AbstractTestContracts):
         oracle.setOutcome(1)
         event.setWinningOutcome()
         # Withdraw fees
-        campaign.withdrawFeesFromMarket()
+        campaign.closeMarket()
         final_balance = campaign.finalBalance()
         self.assertGreater(final_balance, funding)
-        self.assertEqual(campaign.withdrawFeesFromCampaign(sender=keys[backer_1]) // 100, final_balance // 4 * 3 // 100)
-        self.assertEqual(campaign.withdrawFeesFromCampaign(sender=keys[backer_2]) // 100, final_balance // 4 // 100)
+        self.assertEqual(campaign.withdrawFees(sender=keys[backer_1]) // 100, final_balance // 4 * 3 // 100)
+        self.assertEqual(campaign.withdrawFees(sender=keys[backer_2]) // 100, final_balance // 4 // 100)
         # Withdraw works only once
-        self.assertEqual(campaign.withdrawFeesFromCampaign(sender=keys[backer_1]), 0)
-        self.assertEqual(campaign.withdrawFeesFromCampaign(sender=keys[backer_2]), 0)
+        self.assertEqual(campaign.withdrawFees(sender=keys[backer_1]), 0)
+        self.assertEqual(campaign.withdrawFees(sender=keys[backer_2]), 0)
