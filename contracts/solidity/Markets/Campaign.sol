@@ -10,6 +10,15 @@ contract Campaign {
     using Math for *;
 
     /*
+     *  Events
+     */
+    event CampaignFunding(address indexed sender, uint funding);
+    event CampaignRefund(address indexed sender, uint refund);
+    event MarketCreation(Market indexed market);
+    event MarketClosing();
+    event FeeWithdrawal(address indexed receiver, uint fees);
+
+     /*
      *  Constants
      */
     uint public constant FEE_RANGE = 1000000; // 100%
@@ -102,6 +111,7 @@ contract Campaign {
         contributions[msg.sender] = contributions[msg.sender].add(amount);
         if (amount == maxAmount)
             stage = Stages.AuctionSuccessful;
+        CampaignFunding(msg.sender, amount);
     }
 
     /// @dev Withdraws refund amount
@@ -116,6 +126,7 @@ contract Campaign {
         contributions[msg.sender] = 0;
         // Refund collateral tokens
         require(eventContract.collateralToken().transfer(msg.sender, refundAmount));
+        CampaignRefund(msg.sender, refundAmount);
     }
 
     /// @dev Allows to create market after successful funding
@@ -130,12 +141,13 @@ contract Campaign {
         require(eventContract.collateralToken().approve(market, funding));
         market.fund(funding);
         stage = Stages.MarketCreated;
+        MarketCreation(market);
         return market;
     }
 
     /// @dev Allows to withdraw fees from market contract to campaign contract
     /// @return Fee amount
-    function withdrawFeesFromMarket()
+    function closeMarket()
         public
         atStage(Stages.MarketCreated)
     {
@@ -146,11 +158,12 @@ contract Campaign {
         eventContract.redeemWinnings();
         finalBalance = eventContract.collateralToken().balanceOf(this);
         stage = Stages.MarketClosed;
+        MarketClosing();
     }
 
     /// @dev Allows to withdraw fees from campaign contract to contributor
     /// @return Fee amount
-    function withdrawFeesFromCampaign()
+    function withdrawFees()
         public
         atStage(Stages.MarketClosed)
         returns (uint fees)
@@ -159,5 +172,6 @@ contract Campaign {
         contributions[msg.sender] = 0;
         // Send fee share to contributor
         require(eventContract.collateralToken().transfer(msg.sender, fees));
+        FeeWithdrawal(msg.sender, fees);
     }
 }
