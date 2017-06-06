@@ -6,6 +6,19 @@ import "MarketMakers/AbstractMarketMaker.sol";
 /// @title Abstract market contract - Functions to be implemented by market contracts
 contract Market {
 
+    /*
+     *  Events
+     */
+    event MarketFunding(uint funding);
+    event MarketClosing();
+    event FeeWithdrawal(uint fees);
+    event OutcomeTokenPurchase(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint cost);
+    event OutcomeTokenSale(address indexed seller, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint profit);
+    event OutcomeTokenShortSale(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint cost);
+
+    /*
+     *  Storage
+     */
     address public creator;
     uint public createdAtBlock;
     Event public eventContract;
@@ -21,6 +34,9 @@ contract Market {
         MarketClosed
     }
 
+    /*
+     *  Public functions
+     */
     function fund(uint _funding) public;
     function close() public;
     function withdrawFees() public returns (uint);
