@@ -10,6 +10,13 @@ contract FutarchyOracle is Oracle {
     using Math for *;
 
     /*
+     *  Events
+     */
+    event FutarchyFunding(uint funding);
+    event FutarchyClosing();
+    event OutcomeAssignment(uint winningMarketIndex);
+
+    /*
      *  Constants
      */
     uint8 public constant LONG = 1;
@@ -21,7 +28,7 @@ contract FutarchyOracle is Oracle {
     Market[] public markets;
     CategoricalEvent public categoricalEvent;
     uint public deadline;
-    int public outcome;
+    uint public winningMarketIndex;
     bool public isSet;
 
     /*
@@ -98,6 +105,7 @@ contract FutarchyOracle is Oracle {
             require(market.eventContract().collateralToken().approve(market, funding));
             market.fund(funding);
         }
+        FutarchyFunding(funding);
     }
 
     /// @dev Closes market for winning outcome and redeems winnings and sends all collateral tokens to creator
@@ -115,6 +123,7 @@ contract FutarchyOracle is Oracle {
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
         require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
+        FutarchyClosing();
     }
 
     /// @dev Allows to set the oracle outcome based on the market with largest long position
@@ -125,7 +134,7 @@ contract FutarchyOracle is Oracle {
         require(!isSet && deadline <= now);
         // Find market with highest marginal price for long outcome tokens
         uint highestMarginalPrice = markets[0].marketMaker().calcMarginalPrice(markets[0], LONG);
-        int highestIndex = 0;
+        uint highestIndex = 0;
         for (uint8 i = 1; i < markets.length; i++) {
             uint marginalPrice = markets[i].marketMaker().calcMarginalPrice(markets[i], LONG);
             if (marginalPrice > highestMarginalPrice) {
@@ -133,8 +142,9 @@ contract FutarchyOracle is Oracle {
                 highestIndex = i;
             }
         }
-        outcome = highestIndex;
+        winningMarketIndex = highestIndex;
         isSet = true;
+        OutcomeAssignment(winningMarketIndex);
     }
 
     /// @dev Returns if winning outcome is set
@@ -154,6 +164,6 @@ contract FutarchyOracle is Oracle {
         constant
         returns (int)
     {
-        return outcome;
+        return int(winningMarketIndex);
     }
 }

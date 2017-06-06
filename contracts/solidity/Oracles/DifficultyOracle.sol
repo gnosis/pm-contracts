@@ -7,10 +7,15 @@ import "Oracles/AbstractOracle.sol";
 contract DifficultyOracle is Oracle {
 
     /*
+     *  Events
+     */
+    event OutcomeAssignment(uint difficulty);
+
+    /*
      *  Storage
      */
     uint public blockNumber;
-    int public outcome;
+    uint public difficulty;
 
     /*
      *  Public functions
@@ -30,8 +35,9 @@ contract DifficultyOracle is Oracle {
         public
     {
         // Block number was reached and outcome was not set yet
-        require(block.number >= blockNumber && outcome == 0);
-        outcome = int(block.difficulty);
+        require(block.number >= blockNumber && difficulty == 0);
+        difficulty = block.difficulty;
+        OutcomeAssignment(difficulty);
     }
 
     /// @dev Returns if difficulty is set
@@ -42,7 +48,7 @@ contract DifficultyOracle is Oracle {
         returns (bool)
     {
         // Difficulty is always bigger than 0
-        return outcome > 0;
+        return difficulty > 0;
     }
 
     /// @dev Returns difficulty
@@ -52,6 +58,6 @@ contract DifficultyOracle is Oracle {
         constant
         returns (int)
     {
-        return outcome;
+        return int(difficulty);
     }
 }

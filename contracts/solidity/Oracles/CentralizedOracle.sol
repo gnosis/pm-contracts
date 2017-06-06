@@ -7,6 +7,12 @@ import "Oracles/AbstractOracle.sol";
 contract CentralizedOracle is Oracle {
 
     /*
+     *  Events
+     */
+    event OwnerReplacement(address indexed newOwner);
+    event OutcomeAssignment(int outcome);
+
+    /*
      *  Storage
      */
     address public owner;
@@ -38,14 +44,15 @@ contract CentralizedOracle is Oracle {
     }
 
     /// @dev Replaces owner
-    /// @param _owner New owner
-    function replaceOwner(address _owner)
+    /// @param newOwner New owner
+    function replaceOwner(address newOwner)
         public
         isOwner
     {
         // Result is not set yet
         require(!isSet);
-        owner = _owner;
+        owner = newOwner;
+        OwnerReplacement(newOwner);
     }
 
     /// @dev Sets event outcome
@@ -58,6 +65,7 @@ contract CentralizedOracle is Oracle {
         require(!isSet);
         isSet = true;
         outcome = _outcome;
+        OutcomeAssignment(_outcome);
     }
 
     /// @dev Returns if winning outcome is set
