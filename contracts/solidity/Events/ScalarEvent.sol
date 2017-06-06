@@ -50,18 +50,18 @@ contract ScalarEvent is Event {
         returns (uint winnings)
     {
         // Winning outcome has to be set
-        require(isWinningOutcomeSet);
+        require(isOutcomeSet);
         // Calculate winnings
         uint24 convertedWinningOutcome;
         // Outcome is lower than defined lower bound
-        if (winningOutcome < lowerBound)
+        if (outcome < lowerBound)
             convertedWinningOutcome = 0;
         // Outcome is higher than defined upper bound
-        else if (winningOutcome > upperBound)
+        else if (outcome > upperBound)
             convertedWinningOutcome = OUTCOME_RANGE;
         // Map outcome to outcome range
         else
-            convertedWinningOutcome = uint24(OUTCOME_RANGE * (winningOutcome - lowerBound) / (upperBound - lowerBound));
+            convertedWinningOutcome = uint24(OUTCOME_RANGE * (outcome - lowerBound) / (upperBound - lowerBound));
         uint factorShort = OUTCOME_RANGE - convertedWinningOutcome;
         uint factorLong = OUTCOME_RANGE - factorShort;
         uint shortOutcomeTokenCount = outcomeTokens[SHORT].balanceOf(msg.sender);

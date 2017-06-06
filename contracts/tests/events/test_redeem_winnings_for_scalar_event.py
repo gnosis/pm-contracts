@@ -40,8 +40,8 @@ class TestContracts(AbstractTestContracts):
         self.assertTrue(oracle.isOutcomeSet())
         # Set outcome in event
         event.setWinningOutcome()
-        self.assertEqual(event.winningOutcome(), 0)
-        self.assertTrue(event.isWinningOutcomeSet())
+        self.assertEqual(event.outcome(), 0)
+        self.assertTrue(event.isOutcomeSet())
         # Redeem winnings
         self.assertEqual(event.redeemWinnings(sender=keys[buyer]), collateral_token_count)
         self.assertEqual(outcome_token_1.balanceOf(accounts[buyer]), 0)

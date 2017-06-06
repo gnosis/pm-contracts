@@ -115,7 +115,7 @@ contract FutarchyOracle is Oracle {
     {
         // Winning outcome has to be set
         Market market = markets[uint(getOutcome())];
-        require(categoricalEvent.isWinningOutcomeSet() && market.eventContract().isWinningOutcomeSet());
+        require(categoricalEvent.isOutcomeSet() && market.eventContract().isOutcomeSet());
         // Close market and transfer all outcome tokens from winning outcome to this contract
         market.close();
         market.eventContract().redeemWinnings();

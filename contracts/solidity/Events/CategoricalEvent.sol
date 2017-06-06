@@ -31,11 +31,11 @@ contract CategoricalEvent is Event {
         returns (uint winnings)
     {
         // Winning outcome has to be set
-        require(isWinningOutcomeSet);
+        require(isOutcomeSet);
         // Calculate winnings
-        winnings = outcomeTokens[uint(winningOutcome)].balanceOf(msg.sender);
+        winnings = outcomeTokens[uint(outcome)].balanceOf(msg.sender);
         // Revoke tokens from winning outcome
-        outcomeTokens[uint(winningOutcome)].revoke(msg.sender, winnings);
+        outcomeTokens[uint(outcome)].revoke(msg.sender, winnings);
         // Payout winnings
         require(collateralToken.transfer(msg.sender, winnings));
         WinningsRedemption(msg.sender, winnings);

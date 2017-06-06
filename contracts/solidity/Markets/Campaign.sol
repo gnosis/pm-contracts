@@ -152,7 +152,7 @@ contract Campaign {
         atStage(Stages.MarketCreated)
     {
         // Winning outcome should be set
-        require(eventContract.isWinningOutcomeSet());
+        require(eventContract.isOutcomeSet());
         market.close();
         market.withdrawFees();
         eventContract.redeemWinnings();

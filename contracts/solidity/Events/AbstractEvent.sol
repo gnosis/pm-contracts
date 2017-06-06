@@ -13,7 +13,7 @@ contract Event {
      */
     event OutcomeTokenSetIssuance(address indexed buyer, uint collateralTokenCount);
     event OutcomeTokenSetRevocation(address indexed seller, uint outcomeTokenCount);
-    event WinningOutcomeAssignment(int outcome);
+    event OutcomeAssignment(int outcome);
     event WinningsRedemption(address indexed receiver, uint winnings);
 
     /*
@@ -21,8 +21,8 @@ contract Event {
      */
     Token public collateralToken;
     Oracle public oracle;
-    bool public isWinningOutcomeSet;
-    int public winningOutcome;
+    bool public isOutcomeSet;
+    int public outcome;
     OutcomeToken[] public outcomeTokens;
 
     /*
@@ -75,11 +75,11 @@ contract Event {
         public
     {
         // Winning outcome is not set yet in event contract but in oracle contract
-        require(!isWinningOutcomeSet && oracle.isOutcomeSet());
+        require(!isOutcomeSet && oracle.isOutcomeSet());
         // Set winning outcome
-        winningOutcome = oracle.getOutcome();
-        isWinningOutcomeSet = true;
-        WinningOutcomeAssignment(winningOutcome);
+        outcome = oracle.getOutcome();
+        isOutcomeSet = true;
+        OutcomeAssignment(outcome);
     }
 
     /// @dev Returns outcome count
