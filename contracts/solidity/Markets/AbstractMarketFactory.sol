@@ -10,10 +10,10 @@ contract MarketFactory {
     /*
      *  Events
      */
-    event MarketCreation(address indexed creator, Market market, Event eventContract, MarketMaker marketMaker, uint fee);
+    event MarketCreation(address indexed creator, Market market, Event eventContract, MarketMaker marketMaker, uint24 fee);
 
     /*
      *  Public functions
      */
-    function createMarket(Event eventContract, MarketMaker marketMaker, uint fee) public returns (Market);
+    function createMarket(Event eventContract, MarketMaker marketMaker, uint24 fee) public returns (Market);
 }

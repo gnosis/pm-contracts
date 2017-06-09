@@ -15,7 +15,7 @@ contract StandardMarketFactory is MarketFactory {
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @return Market contract
-    function createMarket(Event eventContract, MarketMaker marketMaker, uint fee)
+    function createMarket(Event eventContract, MarketMaker marketMaker, uint24 fee)
         public
         returns (Market market)
     {

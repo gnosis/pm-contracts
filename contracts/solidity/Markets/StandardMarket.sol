@@ -16,18 +16,6 @@ contract StandardMarket is Market {
     uint24 public constant FEE_RANGE = 1000000; // 100%
 
     /*
-     *  Storage
-     */
-    address public creator;
-    uint public createdAtBlock;
-    Event public eventContract;
-    MarketMaker public marketMaker;
-    uint public fee;
-    uint public funding;
-    int[] public netOutcomeTokensSold;
-    Stages public stage;
-
-    /*
      *  Modifiers
      */
     modifier isCreator () {
@@ -50,7 +38,7 @@ contract StandardMarket is Market {
     /// @param _eventContract Event contract
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
-    function StandardMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint _fee)
+    function StandardMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
         public
     {
         // Validate inputs
@@ -118,9 +106,9 @@ contract StandardMarket is Market {
     {
         // Calculate cost to buy outcome tokens
         uint outcomeTokenCost = marketMaker.calcCost(this, outcomeTokenIndex, outcomeTokenCount);
-        // Calculate fee charged by market
-        uint fee = calcMarketFee(outcomeTokenCost);
-        cost = outcomeTokenCost.add(fee);
+        // Calculate fees charged by market
+        uint fees = calcMarketFee(outcomeTokenCost);
+        cost = outcomeTokenCost.add(fees);
         // Check cost doesn't exceed max cost
         require(cost > 0 && cost <= maxCost);
         // Transfer tokens to markets contract and buy all outcomes
@@ -149,8 +137,8 @@ contract StandardMarket is Market {
         // Calculate profit for selling outcome tokens
         uint outcomeTokenProfit = marketMaker.calcProfit(this, outcomeTokenIndex, outcomeTokenCount);
         // Calculate fee charged by market
-        uint fee = calcMarketFee(outcomeTokenProfit);
-        profit = outcomeTokenProfit.sub(fee);
+        uint fees = calcMarketFee(outcomeTokenProfit);
+        profit = outcomeTokenProfit.sub(fees);
         // Check profit is not too low
         require(profit > 0 && profit >= minProfit);
         // Transfer outcome tokens to markets contract to sell all outcomes
