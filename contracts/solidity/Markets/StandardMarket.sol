@@ -16,18 +16,6 @@ contract StandardMarket is Market {
     uint24 public constant FEE_RANGE = 1000000; // 100%
 
     /*
-     *  Storage
-     */
-    address public creator;
-    uint public createdAtBlock;
-    Event public eventContract;
-    MarketMaker public marketMaker;
-    uint24 public fee;
-    uint public funding;
-    int[] public netOutcomeTokensSold;
-    Stages public stage;
-
-    /*
      *  Modifiers
      */
     modifier isCreator () {
