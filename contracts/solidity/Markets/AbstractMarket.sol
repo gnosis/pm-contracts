@@ -23,7 +23,7 @@ contract Market {
     uint public createdAtBlock;
     Event public eventContract;
     MarketMaker public marketMaker;
-    uint public fee;
+    uint24 public fee;
     uint public funding;
     int[] public netOutcomeTokensSold;
     Stages public stage;
