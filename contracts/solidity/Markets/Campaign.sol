@@ -21,7 +21,7 @@ contract Campaign {
      /*
      *  Constants
      */
-    uint public constant FEE_RANGE = 1000000; // 100%
+    uint24 public constant FEE_RANGE = 1000000; // 100%
 
     /*
      *  Storage
@@ -30,7 +30,7 @@ contract Campaign {
     MarketFactory public marketFactory;
     MarketMaker public marketMaker;
     Market public market;
-    uint public fee;
+    uint24 public fee;
     uint public funding;
     uint public deadline;
     uint public finalBalance;
@@ -74,7 +74,7 @@ contract Campaign {
         Event _eventContract,
         MarketFactory _marketFactory,
         MarketMaker _marketMaker,
-        uint _fee,
+        uint24 _fee,
         uint _funding,
         uint _deadline
     )

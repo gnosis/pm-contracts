@@ -65,7 +65,7 @@ contract FutarchyOracle is Oracle {
         int upperBound,
         MarketFactory marketFactory,
         MarketMaker marketMaker,
-        uint fee,
+        uint24 fee,
         uint _deadline
     )
         public

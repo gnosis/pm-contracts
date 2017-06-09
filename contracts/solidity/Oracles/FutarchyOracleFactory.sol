@@ -19,7 +19,7 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketFactory marketFactory,
         MarketMaker marketMaker,
-        uint fee,
+        uint24 fee,
         uint deadline
     );
 
@@ -59,7 +59,7 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketFactory marketFactory,
         MarketMaker marketMaker,
-        uint fee,
+        uint24 fee,
         uint deadline
     )
         public

@@ -9,7 +9,7 @@ contract CampaignFactory {
     /*
      *  Events
      */
-    event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, MarketFactory marketFactory, MarketMaker marketMaker, uint fee, uint funding, uint deadline);
+    event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, MarketFactory marketFactory, MarketMaker marketMaker, uint24 fee, uint funding, uint deadline);
 
     /*
      *  Public functions
@@ -26,7 +26,7 @@ contract CampaignFactory {
         Event eventContract,
         MarketFactory marketFactory,
         MarketMaker marketMaker,
-        uint fee,
+        uint24 fee,
         uint funding,
         uint deadline
     )
