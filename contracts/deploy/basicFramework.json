@@ -35,6 +35,6 @@
   },
   {
     "type": "deployment",
-    "file": "Markets/DefaultMarketFactory.sol"
+    "file": "Markets/StandardMarketFactory.sol"
   }
 ]
