@@ -11,6 +11,7 @@ contract Event {
     /*
      *  Events
      */
+    event OutcomeTokenCreation(OutcomeToken outcomeToken, uint8 index);
     event OutcomeTokenSetIssuance(address indexed buyer, uint collateralTokenCount);
     event OutcomeTokenSetRevocation(address indexed seller, uint outcomeTokenCount);
     event OutcomeAssignment(int outcome);
@@ -40,8 +41,11 @@ contract Event {
         collateralToken = _collateralToken;
         oracle = _oracle;
         // Create an outcome token for each outcome
-        for (uint8 i = 0; i < outcomeCount; i++)
-            outcomeTokens.push(new OutcomeToken());
+        for (uint8 i = 0; i < outcomeCount; i++) {
+            OutcomeToken outcomeToken = new OutcomeToken();
+            outcomeTokens.push(outcomeToken);
+            OutcomeTokenCreation(outcomeToken, i);
+        }
     }
 
     /// @dev Buys equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
