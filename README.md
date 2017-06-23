@@ -12,43 +12,32 @@ Install
 -------------
 ### Install requirements with pip:
 ```
-git clone https://github.com/gnosis/gnosis-contracts.git
-cd gnosis-contracts
 pip install -r requirements.txt
-```
-
-### Install virtual machine environment via vagrant:
-```
-cd gnosis-contracts
-vagrant up
 ```
 
 Test
 -------------
 ### Run all tests:
-```
-cd gnosis-contracts/contracts/tests/
+```bash
 pytest
 ```
 
 ### Run one test:
-```
-cd gnosis-contracts/contracts/tests/
-pytest utils/test_math.py
+```bash
+pytest test/utils/test_math.py
 ```
 
-Deploy & ABI generation
------------------------
+Compile and Deploy
+------------------
+### Compile all contracts to obtain ABI and bytecode:
+```bash
+npm run compile
+```
+
+
 ### Deploy all contracts required for the basic framework:
-```
-cd gnosis-contracts/contracts/
-python ethdeploy.py --f deploy/basicFramework.json --optimize
-```
-
-### Generate ABIs for all contracts
-```
-cd gnosis-contracts/contracts/
-python ethabi.py
+```bash
+npm run deploy
 ```
 
 Security and Liability
