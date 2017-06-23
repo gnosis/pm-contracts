@@ -22,10 +22,10 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/gnosis-contracts-truffle.git"
+    "url": "git+https://github.com/gnosis/gnosis-contracts.git"
   },
   "bugs": {
-    "url": "https://github.com/gnosis/gnosis-contracts-truffle/issues"
+    "url": "https://github.com/gnosis/gnosis-contracts/issues"
   },
-  "homepage": "https://github.com/gnosis/gnosis-contracts-truffle#readme"
+  "homepage": "https://github.com/gnosis/gnosis-contracts#readme"
 }
