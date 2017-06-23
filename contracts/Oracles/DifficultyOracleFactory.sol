@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/DifficultyOracle.sol";
+import "../Oracles/DifficultyOracle.sol";
 
 
 /// @title Difficulty oracle factory contract - Allows to create difficulty oracle contracts

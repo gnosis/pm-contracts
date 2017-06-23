@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Events/AbstractEvent.sol";
+import "../Events/AbstractEvent.sol";
 
 
 /// @title Categorical event contract - Categorical events resolve to an outcome from a set of outcomes

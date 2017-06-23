@@ -1,7 +1,7 @@
 pragma solidity 0.4.11;
-import "Oracles/AbstractOracle.sol";
-import "Tokens/AbstractToken.sol";
-import "Utils/Math.sol";
+import "../Oracles/AbstractOracle.sol";
+import "../Tokens/AbstractToken.sol";
+import "../Utils/Math.sol";
 
 
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result

@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/AbstractOracle.sol";
+import "../Oracles/AbstractOracle.sol";
 
 
 /// @title Signed message oracle contract - Allows to set an outcome with a signed message

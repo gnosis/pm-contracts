@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
-import "Utils/Math.sol";
-import "MarketMakers/AbstractMarketMaker.sol";
+import "../Utils/Math.sol";
+import "../MarketMakers/AbstractMarketMaker.sol";
 
 
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding

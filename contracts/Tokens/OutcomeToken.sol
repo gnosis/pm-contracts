@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Tokens/StandardToken.sol";
+import "../Tokens/StandardToken.sol";
 
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens

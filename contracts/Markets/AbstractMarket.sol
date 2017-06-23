@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
-import "Events/AbstractEvent.sol";
-import "MarketMakers/AbstractMarketMaker.sol";
+import "../Events/AbstractEvent.sol";
+import "../MarketMakers/AbstractMarketMaker.sol";
 
 
 /// @title Abstract market contract - Functions to be implemented by market contracts

@@ -10,21 +10,31 @@ To interact with those contracts have a look at (https://github.com/gnosis/gnosi
 
 Install
 -------------
-### Install requirements with pip:
+### Install requirements with npm and pip:
 ```
-pip install -r requirements.txt
+npm install
 ```
 
 Test
 -------------
 ### Run all tests:
 ```bash
+npm test
+```
+
+### Run all truffle tests:
+```bash
+truffle test
+```
+
+### Run all python tests:
+```bash
 pytest
 ```
 
-### Run one test:
+### Run one python test:
 ```bash
-pytest test/utils/test_math.py
+pytest test/python/utils/test_math.py
 ```
 
 Compile and Deploy
@@ -34,10 +44,14 @@ Compile and Deploy
 npm run compile
 ```
 
-
-### Deploy all contracts required for the basic framework:
+### Migrate all contracts required for the basic framework onto network associated with RPC provider:
 ```bash
-npm run deploy
+npm run migrate
+```
+
+### Clean up network artifacts for networks not named in `truffle.js`
+```bash
+npm run netclean
 ```
 
 Security and Liability
@@ -53,3 +67,5 @@ Contributors
 - Stefan George ([Georgi87](https://github.com/Georgi87))
 - Martin Koeppelmann ([koeppelmann](https://github.com/koeppelmann))
 - Alan Lu ([cag](https://github.com/cag))
+- Roland Kofler ([rolandkofler](https://github.com/rolandkofler))
+- Collin Chen ([collinc97](https://github.com/collinc97))

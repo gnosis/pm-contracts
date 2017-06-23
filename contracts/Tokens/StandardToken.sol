@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
-import "Tokens/AbstractToken.sol";
-import "Utils/Math.sol";
+import "../Tokens/AbstractToken.sol";
+import "../Utils/Math.sol";
 
 
 /// @title Standard token contract with overflow protection

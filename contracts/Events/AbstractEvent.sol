@@ -1,7 +1,7 @@
 pragma solidity 0.4.11;
-import "Tokens/AbstractToken.sol";
-import "Tokens/OutcomeToken.sol";
-import "Oracles/AbstractOracle.sol";
+import "../Tokens/AbstractToken.sol";
+import "../Tokens/OutcomeToken.sol";
+import "../Oracles/AbstractOracle.sol";
 
 
 /// @title Event contract - Provide basic functionality required by different event types

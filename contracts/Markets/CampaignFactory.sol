@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Markets/Campaign.sol";
+import "../Markets/Campaign.sol";
 
 
 /// @title Campaign factory contract - Allows to create campaign contracts

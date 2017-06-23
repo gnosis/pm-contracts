@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/AbstractOracle.sol";
+import "../Oracles/AbstractOracle.sol";
 
 
 /// @title Centralized oracle contract - Allows the contract owner to set an outcome

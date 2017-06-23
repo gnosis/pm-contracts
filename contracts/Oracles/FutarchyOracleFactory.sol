@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/FutarchyOracle.sol";
+import "../Oracles/FutarchyOracle.sol";
 
 
 /// @title Futarchy oracle factory contract - Allows to create Futarchy oracle contracts

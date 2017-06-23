@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/UltimateOracle.sol";
+import "../Oracles/UltimateOracle.sol";
 
 
 /// @title Ultimate oracle factory contract - Allows to create ultimate oracle contracts

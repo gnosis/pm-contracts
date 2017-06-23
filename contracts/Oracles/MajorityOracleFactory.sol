@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/MajorityOracle.sol";
+import "../Oracles/MajorityOracle.sol";
 
 
 /// @title Majority oracle factory contract - Allows to create majority oracle contracts

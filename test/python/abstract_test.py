@@ -26,7 +26,7 @@ class AbstractTestContracts(TestCase):
         return all(c in string.hexdigits for c in s)
 
     def get_dirs(self, path):
-        abs_contract_path = os.path.realpath(os.path.join(OWN_DIR, '..', 'contracts'))
+        abs_contract_path = os.path.realpath(os.path.join(OWN_DIR, '..', '..', 'contracts'))
         sub_dirs = [x[0] for x in os.walk(abs_contract_path)]
         extra_args = ' '.join(['{}={}'.format(d.split('/')[-1], d) for d in sub_dirs])
         path = '{}/{}'.format(abs_contract_path, path)

@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
-import "Events/CategoricalEvent.sol";
-import "Events/ScalarEvent.sol";
+import "../Events/CategoricalEvent.sol";
+import "../Events/ScalarEvent.sol";
 
 
 /// @title Event factory contract - Allows creation of categorical and scalar events

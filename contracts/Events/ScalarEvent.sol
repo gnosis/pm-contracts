@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Events/AbstractEvent.sol";
+import "../Events/AbstractEvent.sol";
 
 
 /// @title Scalar event contract - Scalar events resolve to a number within a range

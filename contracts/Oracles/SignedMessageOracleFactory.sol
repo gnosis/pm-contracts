@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/SignedMessageOracle.sol";
+import "../Oracles/SignedMessageOracle.sol";
 
 
 /// @title Signed message oracle factory contract - Allows to create signed message oracle contracts

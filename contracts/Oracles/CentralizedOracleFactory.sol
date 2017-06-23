@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "Oracles/CentralizedOracle.sol";
+import "../Oracles/CentralizedOracle.sol";
 
 
 /// @title Centralized oracle factory contract - Allows to create centralized oracle contracts
