@@ -1,9 +1,9 @@
 Gnosis Smart Contracts
 ===================
 
-<img src="assets/logo.png" />
+[![Logo](assets/logo.png)](https://gnosis.pm/)
 
-[![Slack Status](http://slack.gnosis.pm/badge.svg)](http://slack.gnosis.pm)
+[![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
 
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
 To interact with those contracts have a look at (https://github.com/gnosis/gnosis.js/).
