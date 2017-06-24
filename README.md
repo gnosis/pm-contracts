@@ -1,54 +1,57 @@
 Gnosis Smart Contracts
 ===================
 
-<img src="assets/logo.png" />
+[![Logo](assets/logo.png)](https://gnosis.pm/)
 
-[![Slack Status](http://slack.gnosis.pm/badge.svg)](http://slack.gnosis.pm)
+[![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
 
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
 To interact with those contracts have a look at (https://github.com/gnosis/gnosis.js/).
 
 Install
 -------------
-### Install requirements with pip:
+### Install requirements with npm and pip:
 ```
-git clone https://github.com/gnosis/gnosis-contracts.git
-cd gnosis-contracts
-pip install -r requirements.txt
-```
-
-### Install virtual machine environment via vagrant:
-```
-cd gnosis-contracts
-vagrant up
+npm install
 ```
 
 Test
 -------------
 ### Run all tests:
+```bash
+npm test
 ```
-cd gnosis-contracts/contracts/tests/
+
+### Run all truffle tests:
+```bash
+truffle test
+```
+
+### Run all python tests:
+```bash
 pytest
 ```
 
-### Run one test:
-```
-cd gnosis-contracts/contracts/tests/
-pytest utils/test_math.py
-```
-
-Deploy & ABI generation
------------------------
-### Deploy all contracts required for the basic framework:
-```
-cd gnosis-contracts/contracts/
-python ethdeploy.py --f deploy/basicFramework.json --optimize
+### Run one python test:
+```bash
+pytest test/python/utils/test_math.py
 ```
 
-### Generate ABIs for all contracts
+Compile and Deploy
+------------------
+### Compile all contracts to obtain ABI and bytecode:
+```bash
+npm run compile
 ```
-cd gnosis-contracts/contracts/
-python ethabi.py
+
+### Migrate all contracts required for the basic framework onto network associated with RPC provider:
+```bash
+npm run migrate
+```
+
+### Clean up network artifacts for networks not named in `truffle.js`
+```bash
+npm run netclean
 ```
 
 Security and Liability
@@ -64,3 +67,5 @@ Contributors
 - Stefan George ([Georgi87](https://github.com/Georgi87))
 - Martin Koeppelmann ([koeppelmann](https://github.com/koeppelmann))
 - Alan Lu ([cag](https://github.com/cag))
+- Roland Kofler ([rolandkofler](https://github.com/rolandkofler))
+- Collin Chen ([collinc97](https://github.com/collinc97))
