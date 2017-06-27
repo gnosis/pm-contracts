@@ -10,7 +10,7 @@ To interact with those contracts have a look at (https://github.com/gnosis/gnosi
 
 Install
 -------------
-### Install requirements with npm and pip:
+### Install requirements with npm:
 ```
 npm install
 ```
@@ -20,21 +20,6 @@ Test
 ### Run all tests:
 ```bash
 npm test
-```
-
-### Run all truffle tests:
-```bash
-truffle test
-```
-
-### Run all python tests:
-```bash
-pytest
-```
-
-### Run one python test:
-```bash
-pytest test/python/utils/test_math.py
 ```
 
 Compile and Deploy
