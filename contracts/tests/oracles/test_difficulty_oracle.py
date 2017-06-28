@@ -10,7 +10,7 @@ class TestContracts(AbstractTestContracts):
 
     def test(self):
         # Create oracle
-        block_number = self.s.block.number + 100
+        block_number = self.s.state.block_number + 100
         oracle = self.contract_at(self.difficulty_oracle_factory.createDifficultyOracle(block_number), self.oracle_abi)
         # Set outcome
         self.assertRaises(TransactionFailed, oracle.setOutcome)
@@ -20,3 +20,4 @@ class TestContracts(AbstractTestContracts):
         oracle.setOutcome()
         self.assertTrue(oracle.isOutcomeSet())
         self.assertGreater(oracle.getOutcome(), 0)
+

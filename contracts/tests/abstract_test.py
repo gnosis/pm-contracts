@@ -2,7 +2,7 @@
 from contracts import ROOT_DIR
 # ethereum pacakge
 from ethereum import tester as t
-from ethereum.tester import keys, accounts, TransactionFailed, ABIContract
+from ethereum.tester import keys, accounts, TransactionFailed, ABIContract, GAS_PRICE
 from ethereum import _solidity
 from ethereum.abi import ContractTranslator
 # standard libraries
@@ -11,6 +11,23 @@ from unittest import TestCase
 from os import walk
 import string
 
+class GasCounter(object):
+
+    def __init__(self, account, state):
+        self.account = account
+        self.state = state
+        self.balance_on_enter = 0
+        self.balance_on_exit = 0
+
+    def __enter__(self):
+        self.balance_on_enter = self.state.get_balance(self.account)
+        return self
+
+    def __exit__(self, *args):
+        self.balance_on_exit = self.state.get_balance(self.account)
+
+    def gas_cost(self):
+        return (self.balance_on_enter - self.balance_on_exit)/GAS_PRICE
 
 class AbstractTestContracts(TestCase):
 
@@ -20,8 +37,11 @@ class AbstractTestContracts(TestCase):
     def __init__(self, *args, **kwargs):
         super(AbstractTestContracts, self).__init__(*args, **kwargs)
         self.s = t.state()
-        self.s.block.number = self.HOMESTEAD_BLOCK
-        t.gas_limit = 4712388
+        self.s.state.block_number = self.HOMESTEAD_BLOCK
+        t.gas_limit = 10000000  # To allow estimation of gas costs larger than 4.7M
+
+    def gas_counter(self):
+        return GasCounter(accounts[0], self.s.state)
 
     @staticmethod
     def is_hex(s):
@@ -64,3 +84,4 @@ class AbstractTestContracts(TestCase):
                                    language='solidity',
                                    extra_args=extra_args,
                                    sender=keys[sender if sender else 0])
+

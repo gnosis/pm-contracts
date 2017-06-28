@@ -50,8 +50,9 @@ class TestContracts(AbstractTestContracts):
         self.assertRaises(TransactionFailed, ultimate_oracle.withdraw, sender=keys[sender_2])
         # Wait for front runner period to pass
         self.assertFalse(ultimate_oracle.isOutcomeSet())
-        self.s.block.timestamp += front_runner_period + 1
+        self.s.state.timestamp += front_runner_period + 1
         self.assertTrue(ultimate_oracle.isOutcomeSet())
         self.assertEqual(ultimate_oracle.getOutcome(), 3)
         # Withdraw winnings
         self.assertEqual(ultimate_oracle.withdraw(sender=keys[sender_2]), 300)
+

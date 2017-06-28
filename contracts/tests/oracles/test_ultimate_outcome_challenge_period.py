@@ -35,6 +35,7 @@ class TestContracts(AbstractTestContracts):
         self.assertEqual(ultimate_oracle.forwardedOutcome(), 1)
         self.assertFalse(ultimate_oracle.isOutcomeSet())
         # Wait for challenge period to pass
-        self.s.block.timestamp += challenge_period + 1
+        self.s.state.timestamp += challenge_period + 1
         self.assertTrue(ultimate_oracle.isOutcomeSet())
         self.assertEqual(ultimate_oracle.getOutcome(), 1)
+
