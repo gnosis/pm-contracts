@@ -21,7 +21,10 @@
   "dependencies": {},
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.1.1"
+    "decimal.js": "^7.2.1",
+    "eslint": "^4.1.1",
+    "lodash": "^4.17.4",
+    "truffle": "^3.3.0"
   },
   "repository": {
     "type": "git",
