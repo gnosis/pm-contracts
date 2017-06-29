@@ -20,6 +20,7 @@
   "license": "GPL-3.0",
   "dependencies": {},
   "devDependencies": {
+    "@digix/tempo": "^0.2.0",
     "babel-eslint": "^7.2.3",
     "decimal.js": "^7.2.1",
     "eslint": "^4.1.1",
