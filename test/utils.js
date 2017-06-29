@@ -10,3 +10,15 @@ exports.getParamFromTxEvent = function (transaction, paramName, contractFactory)
         return param
     }
 }
+
+exports.assertRejects = async function(q, msg) {
+    let res, catchFlag = false
+    try {
+        res = await q
+    } catch(e) {
+        catchFlag = true
+    } finally {
+        if(!catchFlag)
+            assert.fail(res, null, msg)
+    }
+}
