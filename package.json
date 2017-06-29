@@ -18,11 +18,18 @@
   ],
   "author": "Gnosis (https://gnosis.pm)",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "eslint-config-standard": "^10.2.1"
+  },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "decimal.js": "^7.2.1",
     "eslint": "^4.1.1",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-import": "^2.6.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "lodash": "^4.17.4",
     "truffle": "^3.3.0"
   },
