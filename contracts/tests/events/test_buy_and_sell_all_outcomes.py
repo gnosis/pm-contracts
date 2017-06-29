@@ -87,3 +87,40 @@ class TestContracts(AbstractTestContracts):
         self.assertEqual([40957L, 48194L, 55431L, 62668L, 69905L, 77142L, 84379L, 91616L, 98853L,
                           106090L, 113327L, 120564L], gas_costs)
 
+    def test_get_outcome_tokens(self):
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        oracle = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
+
+        gas_costs = []
+        for num_outcomes in xrange(2, 14):
+            event_address = self.event_factory.createCategoricalEvent(self.ether_token.address, oracle, num_outcomes)
+            event = self.contract_at(event_address, self.event_abi)
+            with self.gas_counter() as gc:
+               outcome_tokens = event.getOutcomeTokens()
+            gas_costs.append(gc.gas_cost())
+            self.assertEqual(num_outcomes, len(outcome_tokens))
+        self.assertEquals([22610L, 22839L, 23068L, 23297L, 23526L, 23755L, 23985L, 24214L, 24443L,
+                           24672L, 24901L, 25131L], gas_costs)
+
+    def test_get_outcome_token_distribution(self):
+        # Create event
+        ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        oracle = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
+        gas_costs = []
+        for num_outcomes in xrange(2, 14):
+            event_address = self.event_factory.createCategoricalEvent(self.ether_token.address, oracle, num_outcomes)
+            event = self.contract_at(event_address, self.event_abi)
+            # Buy all outcomes
+            buyer = 0
+            collateral_token_count = 10
+            self.ether_token.deposit(value=collateral_token_count, sender=keys[buyer])
+            self.ether_token.approve(event_address, collateral_token_count, sender=keys[buyer])
+            event.buyAllOutcomes(collateral_token_count, sender=keys[buyer])
+            distribution = event.getOutcomeTokenDistribution(accounts[buyer])
+            with self.gas_counter() as gc:
+                distribution = event.getOutcomeTokenDistribution(accounts[buyer])
+            gas_costs.append(gc.gas_cost())
+            self.assertEqual([collateral_token_count] * num_outcomes, distribution)
+        self.assertEqual([25898L, 27190L, 28482L, 29774L, 31066L, 32358L, 33651L, 34943L, 36235L,
+                          37527L, 38819L, 40112L], gas_costs)
+
