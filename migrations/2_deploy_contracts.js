@@ -2,6 +2,7 @@ let Math = artifacts.require('Math')
 let EventFactory = artifacts.require('EventFactory')
 let EtherToken = artifacts.require('EtherToken')
 let CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
+let MajorityOracleFactory = artifacts.require('MajorityOracleFactory')
 let UltimateOracleFactory = artifacts.require('UltimateOracleFactory')
 let LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 let StandardMarketFactory = artifacts.require('StandardMarketFactory')
@@ -14,6 +15,7 @@ module.exports = function (deployer) {
     deployer.deploy(EventFactory)
 
     deployer.deploy(CentralizedOracleFactory)
+    deployer.deploy(MajorityOracleFactory)
 
     deployer.link(Math, UltimateOracleFactory)
     deployer.deploy(UltimateOracleFactory)
