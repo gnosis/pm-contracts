@@ -53,6 +53,7 @@ async function assertRejects(q, msg) {
 
 function lmsrMarginalPrice(funding, netOutcomeTokensSold, outcomeIndex) {
     const b = Decimal(funding.valueOf()).div(netOutcomeTokensSold.length).ln()
+
     return Decimal(netOutcomeTokensSold[outcomeIndex].valueOf()).div(b).exp().div(
         netOutcomeTokensSold.reduce(
             (acc, tokensSold) => acc.add(Decimal(tokensSold.valueOf()).div(b).exp()),

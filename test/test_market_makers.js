@@ -41,31 +41,28 @@ contract('MarketMaker', function(accounts) {
     //     )
 
     it('should calculate outcome token cost', async () => {
-
-    })
-    // def test(self):
     //     for funding, outcomeTokenCount in [
-    //         (10*10**18, 5 * 10 ** 18),
+    //         (10*1e18, 5 * 1e18),
     //         (10, 5),
-    //         (10*10**18, 5000),
-    //         (10*10**18, 5),
-    //         (10, 5 * 10 ** 18),
+    //         (10*1e18, 5000),
+    //         (10*1e18, 5),
+    //         (10, 5 * 1e18),
     //     ]:
     //         ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
     //         // Create event
     //         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
     //         oracleAddress = await centralizedOracleFactory.createCentralizedOracle(ipfsHash)
-    //         event = Event.at(await eventFactory.createCategoricalEvent(ether_token.address, oracleAddress, 2))
+    //         event = Event.at(await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, 2))
     //         // Create market
     //         fee = 50000  // 5%
     //         market = Market.at(await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, fee))
     //         // Fund market
     //         investor = 0
-    //         ether_token.deposit({ value: funding, from: accounts[investor] })
-    //         assert.equal(ether_token.balanceOf(accounts[investor]), funding)
-    //         ether_token.approve(market.address, funding, { from: accounts[investor] })
+    //         await etherToken.deposit({ value: funding, from: accounts[investor] })
+    //         assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
+    //         await etherToken.approve(market.address, funding, { from: accounts[investor] })
     //         await market.fund(funding, { from: accounts[investor] })
-    //         assert.equal(ether_token.balanceOf(accounts[investor]), 0)
+    //         assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
     //         // Calculating cost for buying shares and earnings for selling shares
     //         outcome = 1
     //         actual = await lmsrMarketMaker.calcCost(market.address, outcome, outcomeTokenCount)
@@ -74,6 +71,7 @@ contract('MarketMaker', function(accounts) {
     //             (funding, outcomeTokenCount) is not None and
     //             isclose(actual, mp.ceil(expected), abs_tol=1)
     //         )
+    })
 
     it('should move price of an outcome to 0 after participants sell lots of that outcome to market maker', async () => {
         // Create event
@@ -87,13 +85,15 @@ contract('MarketMaker', function(accounts) {
             'categoricalEvent', Event)
 
         // Create market
+        const investor = 0
+
         const feeFactor = 0  // 0%
         const market = getParamFromTxEvent(
-            await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor),
+            await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
+                { from: accounts[investor] }),
             'market', Market)
 
         // Fund market
-        const investor = 0
         const funding = 1e17
 
         await etherToken.deposit({ value: funding, from: accounts[investor] })
@@ -107,7 +107,7 @@ contract('MarketMaker', function(accounts) {
         const trader = 1
         const outcome = 1
         const outcomeToken = Token.at(await event.outcomeTokens(outcome))
-        const tokenCount = 1e18  // 100 Ether
+        const tokenCount = 1e18
         const loopCount = 10
 
         await etherToken.deposit({ value: tokenCount * loopCount, from: accounts[trader] })
@@ -134,7 +134,11 @@ contract('MarketMaker', function(accounts) {
             actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
             assert(
                 isClose(actual, expected),
-                `Marginal price calculation is off for iteration ${i}`
+                `Marginal price calculation is off for iteration ${i}:\n` +
+                `        funding: ${funding}\n` +
+                `        net outcome tokens sold: ${netOutcomeTokensSold}\n` +
+                `        actual: ${actual}\n` +
+                `        expected: ${expected}`
             )
         }
         // Selling of tokens is worth less than 1 Wei
@@ -144,49 +148,69 @@ contract('MarketMaker', function(accounts) {
     })
 
     it('should move price of an outcome to 1 after participants buy lots of that outcome from market maker', async () => {
+        for(let [investor, funding, tokenCount] of [
+            [2, 1e17, 1e18],
+            [3, 1, 10],
+            [4, 1, 1e18],
+        ]) {
+            // Create event
+            const numOutcomes = 2
+            const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+            const oracleAddress = getParamFromTxEvent(
+                await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
+                'centralizedOracle')
+            const event = getParamFromTxEvent(
+                await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
+                'categoricalEvent', Event)
 
+            // Create market
+            const feeFactor = 0  // 0%
+            const market = getParamFromTxEvent(
+                await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
+                    { from: accounts[investor] }),
+                'market', Market)
+
+            // Fund market
+            await etherToken.deposit({ value: funding, from: accounts[investor] })
+            assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
+
+            await etherToken.approve(market.address, funding, { from: accounts[investor] })
+            await market.fund(funding, { from: accounts[investor] })
+            assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
+
+            // User buys ether tokens
+            const trader = 1
+            const outcome = 1
+            const loopCount = 10
+            await etherToken.deposit({ value: tokenCount * loopCount, from: accounts[trader] })
+
+            // User buys outcome tokens from market maker
+            let cost
+            for(let i of _.range(loopCount)) {
+                // Calculate profit for selling tokens
+                cost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
+
+                // Buying tokens
+                await etherToken.approve(market.address, tokenCount, { from: accounts[trader] })
+                assert.equal(getParamFromTxEvent(
+                    await market.buy(outcome, tokenCount, cost, { from: accounts[trader] }), 'cost'
+                ).valueOf(), cost.valueOf())
+
+                netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
+                expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
+                actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
+                assert(
+                    isClose(actual, expected) || expected.toString() == 'NaN',
+                    `Marginal price calculation is off for iteration ${i}:\n` +
+                    `        funding: ${funding}\n` +
+                    `        net outcome tokens sold: ${netOutcomeTokensSold}\n` +
+                    `        actual: ${actual}\n` +
+                    `        expected: ${expected}`
+                )
+            }
+
+            // Price is equal to 1
+            assert.equal(cost, tokenCount)
+        }
     })
-    // def test(self):
-    //     for funding, tokenCount in [
-    //         (10*10**18, 100 * 10 ** 18),
-    //         (1, 10),
-    //         (10**20, 10 ** 21),
-    //         (1, 10 ** 21),
-    //     ]:
-    //         ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
-    //         // Create event
-    //         numOutcomes = 2
-    //         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-    //         oracleAddress = await centralizedOracleFactory.createCentralizedOracle(ipfsHash)
-    //         event = Event.at(await eventFactory.createCategoricalEvent(ether_token.address, oracleAddress, numOutcomes))
-    //         // Create market
-    //         fee = 0  // 0%
-    //         market = Market.at(await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, fee))
-    //         // Fund market
-    //         investor = 0
-    //         ether_token.deposit({ value: funding, from: accounts[investor] })
-    //         assert.equal(ether_token.balanceOf(accounts[investor]), funding)
-    //         ether_token.approve(market.address, funding, { from: accounts[investor] })
-    //         await market.fund(funding, { from: accounts[investor] })
-    //         assert.equal(ether_token.balanceOf(accounts[investor]), 0)
-    //         // User buys ether tokens
-    //         trader = 1
-    //         outcome = 1
-    //         loopCount = 10
-    //         ether_token.deposit({ value: tokenCount * loopCount, from: accounts[trader] })
-    //         // User buys outcome tokens from market maker
-    //         cost = None
-    //         for(let i of _.range(loopCount))
-    //             // Calculate profit for selling tokens
-    //             cost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
-    //             // Buying tokens
-    //             ether_token.approve(market.address, tokenCount, { from: accounts[trader] })
-    //             assert.equal(await market.buy(outcome, tokenCount, cost, { from: accounts[trader] }), cost)
-    //             netOutcomeTokensSold = [await market.netOutcomeTokensSold(i) for i in _.range(numOutcomes)]
-    //             expected = lmsr_marginal_price(funding, netOutcomeTokensSold, outcome)
-    //             actual = mpf(await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)) / ONE
-    //             assert (i, funding, netOutcomeTokensSold) and isclose(expected, actual)
-
-    //         // Price is equal to 1
-    //         assert.equal(cost, tokenCount)
 })
