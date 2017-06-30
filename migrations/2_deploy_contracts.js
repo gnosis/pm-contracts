@@ -1,30 +1,39 @@
-var Math = artifacts.require("./Utils/Math");
-var EventFactory = artifacts.require("./Events/EventFactory.sol");
-var EtherToken = artifacts.require("./Tokens/EtherToken.sol");
-var CentralizedOracleFactory = artifacts.require("./Oracles/CentralizedOracleFactory.sol")
-var UltimateOracleFactory = artifacts.require("./Oracles/UltimateOracleFactory.sol");
-var LMSRMarketMaker = artifacts.require("./MarketMakers/LMSRMarketMaker.sol");
-var StandardMarketFactory = artifacts.require("./Markets/StandardMarketFactory.sol");
+let Math = artifacts.require('Math')
+let EventFactory = artifacts.require('EventFactory')
+let EtherToken = artifacts.require('EtherToken')
+let CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
+let MajorityOracleFactory = artifacts.require('MajorityOracleFactory')
+let DifficultyOracleFactory = artifacts.require('DifficultyOracleFactory')
+let FutarchyOracleFactory = artifacts.require('FutarchyOracleFactory')
+let UltimateOracleFactory = artifacts.require('UltimateOracleFactory')
+let LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
+let StandardMarketFactory = artifacts.require('StandardMarketFactory')
+let CampaignFactory = artifacts.require('CampaignFactory')
 
-//this can't be made async await.
-module.exports = function(deployer) {
-  deployer.deploy(Math)
+module.exports = function (deployer) {
+    deployer.deploy(Math)
 
-  .then( () => deployer.link(Math, EventFactory))
-  .then( () => deployer.deploy(EventFactory, Math.address))
+    deployer.link(Math, EventFactory)
+    deployer.deploy(EventFactory).then(() => {
+        deployer.deploy(FutarchyOracleFactory, EventFactory.address)
+    })
 
-  .then( () => deployer.deploy(CentralizedOracleFactory))
+    deployer.deploy(CentralizedOracleFactory)
+    deployer.deploy(MajorityOracleFactory)
+    deployer.deploy(DifficultyOracleFactory)
 
-  .then( () => deployer.link(Math, UltimateOracleFactory))
-  .then( () => deployer.deploy(UltimateOracleFactory))
+    deployer.link(Math, UltimateOracleFactory)
+    deployer.deploy(UltimateOracleFactory)
 
-  .then( () => deployer.link(Math, LMSRMarketMaker))
-  .then( () => deployer.deploy(LMSRMarketMaker, Math.address))
+    deployer.link(Math, LMSRMarketMaker)
+    deployer.deploy(LMSRMarketMaker)
 
-  .then( () => deployer.link(Math, StandardMarketFactory))
-  .then( () => deployer.deploy(StandardMarketFactory, Math.address))
+    deployer.link(Math, StandardMarketFactory)
+    deployer.deploy(StandardMarketFactory)
 
-  .then( () => deployer.link(Math, EtherToken))
-  .then( () => deployer.deploy(EtherToken, Math.address));
+    deployer.link(Math, EtherToken)
+    deployer.deploy(EtherToken)
 
-};
+    deployer.link(Math, CampaignFactory)
+    deployer.deploy(CampaignFactory)
+}

@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
-    "postinstall": "[ \"$NODE_ENV\" != production ] && pip install -r requirements.txt",
+    "lint": "eslint .",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "netclean": "truffle networks --clean",
-    "test": "truffle test && pytest"
+    "test": "truffle test"
   },
   "keywords": [
     "Ethereum",
@@ -18,8 +18,22 @@
   ],
   "author": "Gnosis (https://gnosis.pm)",
   "license": "GPL-3.0",
-  "dependencies": {},
-  "devDependencies": {},
+  "dependencies": {
+    "eslint-config-standard": "^10.2.1"
+  },
+  "devDependencies": {
+    "@digix/tempo": "^0.2.0",
+    "babel-eslint": "^7.2.3",
+    "decimal.js": "^7.2.1",
+    "eslint": "^4.1.1",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-import": "^2.6.0",
+    "eslint-plugin-node": "^5.1.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "lodash": "^4.17.4",
+    "truffle": "^3.3.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gnosis/gnosis-contracts.git"
