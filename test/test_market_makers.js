@@ -1,7 +1,6 @@
 const _ = require('lodash')
 
-const utils = require('./utils')
-const { ONE, isClose, lmsrMarginalPrice } = utils
+const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent } = require('./utils')
 
 const EventFactory = artifacts.require('EventFactory')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
@@ -80,16 +79,16 @@ contract('MarketMaker', function(accounts) {
         // Create event
         const numOutcomes = 2
         const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        const oracleAddress = utils.getParamFromTxEvent(
+        const oracleAddress = getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
             'centralizedOracle')
-        const event = utils.getParamFromTxEvent(
+        const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
             'categoricalEvent', Event)
 
         // Create market
         const feeFactor = 0  // 0%
-        const market = utils.getParamFromTxEvent(
+        const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor),
             'market', Market)
 
@@ -126,7 +125,7 @@ contract('MarketMaker', function(accounts) {
 
             // Selling tokens
             await outcomeToken.approve(market.address, tokenCount, { from: accounts[trader] })
-            assert.equal(utils.getParamFromTxEvent(
+            assert.equal(getParamFromTxEvent(
                 await market.sell(outcome, tokenCount, profit, { from: accounts[trader] }), 'profit'
             ).valueOf(), profit.valueOf())
 

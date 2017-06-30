@@ -51,10 +51,10 @@ async function assertRejects(q, msg) {
     }
 }
 
-function lmsrMarginalPrice(funding, net_outcome_tokens_sold, outcome_index) {
-    const b = Decimal(funding.valueOf()).div(net_outcome_tokens_sold.length).ln()
-    return Decimal(net_outcome_tokens_sold[outcome_index].valueOf()).div(b).exp().div(
-        net_outcome_tokens_sold.reduce(
+function lmsrMarginalPrice(funding, netOutcomeTokensSold, outcomeIndex) {
+    const b = Decimal(funding.valueOf()).div(netOutcomeTokensSold.length).ln()
+    return Decimal(netOutcomeTokensSold[outcomeIndex].valueOf()).div(b).exp().div(
+        netOutcomeTokensSold.reduce(
             (acc, tokensSold) => acc.add(Decimal(tokensSold.valueOf()).div(b).exp()),
             Decimal(0)
         )

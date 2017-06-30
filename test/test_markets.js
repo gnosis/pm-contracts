@@ -1,6 +1,6 @@
 const { wait } = require('@digix/tempo')(web3)
 
-const utils = require('./utils')
+const { getParamFromTxEvent, assertRejects } = require('./utils')
 
 const Event = artifacts.require('Event')
 const EventFactory = artifacts.require('EventFactory')
@@ -33,11 +33,11 @@ contract('Market', function (accounts) {
 
         // create event
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        centralizedOracle = utils.getParamFromTxEvent(
+        centralizedOracle = getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
             'centralizedOracle', CentralizedOracle
         )
-        event = utils.getParamFromTxEvent(
+        event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle.address, 2),
             'categoricalEvent', Event
         )
@@ -48,7 +48,7 @@ contract('Market', function (accounts) {
         const buyer = 5
 
         const feeFactor = 0
-        const market = utils.getParamFromTxEvent(
+        const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[buyer] }),
             'market', Market
         )
@@ -66,7 +66,7 @@ contract('Market', function (accounts) {
         await etherToken.deposit({ value: funding, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf(accounts[buyer]), funding)
         await etherToken.approve(market.address, funding, { from: accounts[buyer] })
-        await utils.assertRejects(market.fund(funding, { from: accounts[buyer] }), 'market funded twice')
+        await assertRejects(market.fund(funding, { from: accounts[buyer] }), 'market funded twice')
 
         assert.equal(await etherToken.balanceOf(accounts[buyer]), funding)
 
@@ -74,7 +74,7 @@ contract('Market', function (accounts) {
         await market.close({ from: accounts[buyer] })
 
         // Market can only be closed once
-        await utils.assertRejects(market.close({ from: accounts[buyer] }), 'market closed twice')
+        await assertRejects(market.close({ from: accounts[buyer] }), 'market closed twice')
 
         // Sell all outcomes
         await event.sellAllOutcomes(funding, { from: accounts[buyer] })
@@ -86,7 +86,7 @@ contract('Market', function (accounts) {
         const investor = 0
 
         const feeFactor = 50000  // 5%
-        const market = utils.getParamFromTxEvent(
+        const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[investor] }),
             'market', Market
         )
@@ -116,7 +116,7 @@ contract('Market', function (accounts) {
         assert.equal(await etherToken.balanceOf(accounts[buyer]), cost.valueOf())
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
-        assert.equal(utils.getParamFromTxEvent(
+        assert.equal(getParamFromTxEvent(
             await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost'
         ), cost.valueOf())
 
@@ -130,7 +130,7 @@ contract('Market', function (accounts) {
         const profit = outcomeTokenProfit.sub(fee)
 
         await outcomeToken.approve(market.address, tokenCount, { from: accounts[buyer] })
-        assert.equal(utils.getParamFromTxEvent(
+        assert.equal(getParamFromTxEvent(
             await market.sell(outcome, tokenCount, profit, { from: accounts[buyer] }), 'profit'
         ), profit.valueOf())
 
@@ -143,7 +143,7 @@ contract('Market', function (accounts) {
         const investor = 7
 
         const feeFactor = 50000  // 5%
-        const market = utils.getParamFromTxEvent(
+        const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[investor] }),
             'market', Market
         )
@@ -173,7 +173,7 @@ contract('Market', function (accounts) {
         await etherToken.approve(market.address, tokenCount, { from: accounts[buyer] })
 
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await market.shortSell(outcome, tokenCount, outcomeTokenProfit - fee, { from: accounts[buyer] }),
                 'cost', null, 'OutcomeTokenShortSale'
             ).valueOf(), cost)
@@ -187,7 +187,7 @@ contract('Market', function (accounts) {
         const feeFactor = 50000  // 5%
         const funding = 1e18
         const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
-        const campaign = Campaign.at(utils.getParamFromTxEvent(
+        const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaigns(
                 event.address,
                 standardMarketFactory.address,
@@ -215,7 +215,7 @@ contract('Market', function (accounts) {
         assert.equal(await campaign.stage(), 1)
 
         // Create market
-        const market = Market.at(utils.getParamFromTxEvent(await campaign.createMarket(), 'market'))
+        const market = Market.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
 
         // Trade
         const buyer = 4
@@ -232,7 +232,7 @@ contract('Market', function (accounts) {
         assert.equal((await etherToken.balanceOf(accounts[buyer])).valueOf(), cost.valueOf())
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
-        assert.equal(utils.getParamFromTxEvent(
+        assert.equal(getParamFromTxEvent(
             await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost').valueOf()
         , cost.valueOf())
 
@@ -247,24 +247,24 @@ contract('Market', function (accounts) {
         assert.isAbove(finalBalance, funding)
 
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.withdrawFees({ from: accounts[backer1] }),
                 'fees'
             ).valueOf(), finalBalance.mul(.75).floor().valueOf())
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.withdrawFees({ from: accounts[backer2] }),
                 'fees'
             ).valueOf(), finalBalance.mul(.25).floor().valueOf())
 
         // Withdraw works only once
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.withdrawFees({ from: accounts[backer1] }),
                 'fees'
             ).valueOf(), 0)
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.withdrawFees({ from: accounts[backer2] }),
                 'fees'
             ).valueOf(), 0)
@@ -275,7 +275,7 @@ contract('Market', function (accounts) {
         const feeFactor = 50000  // 5%
         const funding = 1e18
         const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
-        const campaign = Campaign.at(utils.getParamFromTxEvent(
+        const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaigns(
                 event.address,
                 standardMarketFactory.address,
@@ -297,11 +297,11 @@ contract('Market', function (accounts) {
         // Deadline passes
         await wait(61)
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.refund({ from: accounts[backer1] }), 'refund'),
             amount)
         assert.equal(
-            utils.getParamFromTxEvent(
+            getParamFromTxEvent(
                 await campaign.refund({ from: accounts[backer1] }), 'refund'),
             0)
     })

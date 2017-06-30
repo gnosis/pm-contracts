@@ -1,7 +1,6 @@
 const _ = require('lodash')
 
-const utils = require('./utils')
-const { Decimal, isClose, randrange, randnums, ONE } = utils
+const { Decimal, isClose, randrange, randnums, ONE, assertRejects } = require('./utils')
 
 const MathLib = artifacts.require('Math')
 
@@ -15,7 +14,7 @@ contract('Math', function () {
     })
 
     it('should compute ln', async () => {
-        await utils.assertRejects(mathLib.ln(0), "ln(0) didn't reject!")
+        await assertRejects(mathLib.ln(0), "ln(0) didn't reject!")
 
         for(let x of [1, ONE, MAX_VALUE, randrange(1, MAX_VALUE)].concat(randnums(1, MAX_VALUE, 10))) {
             let X = Decimal(x.valueOf()).div(ONE)
@@ -42,7 +41,7 @@ contract('Math', function () {
         }
 
         for(let x of [MAX_POWER.add(1), MAX_SVALUE].concat(randnums(MAX_POWER.add(1), MAX_SVALUE, 10))) {
-            await utils.assertRejects(mathLib.exp(x.valueOf()), `exp(${x.div(ONE).valueOf()}) didn't reject!`)
+            await assertRejects(mathLib.exp(x.valueOf()), `exp(${x.div(ONE).valueOf()}) didn't reject!`)
         }
     })
 
