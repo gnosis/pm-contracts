@@ -26,53 +26,6 @@ contract('MarketMaker', function(accounts) {
         etherToken = await EtherToken.deployed()
     })
 
-    // @staticmethod
-    // def calc_cost(funding, netOutcomeTokensSold, outcome, outcomeTokenCount):
-    //     b = mpf(funding) / mp.log(len(netOutcomeTokensSold))
-    //     return b * (
-    //         mp.log(sum(
-    //             mp.exp((tokens_sold + (outcomeTokenCount if i == outcome else 0)) / b)
-    //             for i, tokens_sold in enumerate(netOutcomeTokensSold)
-    //         )) -
-    //         mp.log(sum(
-    //             mp.exp(tokens_sold / b)
-    //             for tokens_sold in netOutcomeTokensSold
-    //         ))
-    //     )
-
-    it('should calculate outcome token cost', async () => {
-    //     for funding, outcomeTokenCount in [
-    //         (10*1e18, 5 * 1e18),
-    //         (10, 5),
-    //         (10*1e18, 5000),
-    //         (10*1e18, 5),
-    //         (10, 5 * 1e18),
-    //     ]:
-    //         ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
-    //         // Create event
-    //         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-    //         oracleAddress = await centralizedOracleFactory.createCentralizedOracle(ipfsHash)
-    //         event = Event.at(await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, 2))
-    //         // Create market
-    //         fee = 50000  // 5%
-    //         market = Market.at(await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, fee))
-    //         // Fund market
-    //         investor = 0
-    //         await etherToken.deposit({ value: funding, from: accounts[investor] })
-    //         assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
-    //         await etherToken.approve(market.address, funding, { from: accounts[investor] })
-    //         await market.fund(funding, { from: accounts[investor] })
-    //         assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
-    //         // Calculating cost for buying shares and earnings for selling shares
-    //         outcome = 1
-    //         actual = await lmsrMarketMaker.calcCost(market.address, outcome, outcomeTokenCount)
-    //         expected = self.calc_cost(funding, [0, 0], outcome, outcomeTokenCount)
-    //         assert (
-    //             (funding, outcomeTokenCount) is not None and
-    //             isclose(actual, mp.ceil(expected), abs_tol=1)
-    //         )
-    })
-
     it('should move price of an outcome to 0 after participants sell lots of that outcome to market maker', async () => {
         // Create event
         const numOutcomes = 2
