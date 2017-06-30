@@ -1,6 +1,6 @@
 pragma solidity 0.4.11;
-import "../Oracles/AbstractOracle.sol";
-import "../Tokens/AbstractToken.sol";
+import "../Oracles/Oracle.sol";
+import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
 
 

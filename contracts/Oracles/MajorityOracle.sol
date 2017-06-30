@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "../Oracles/AbstractOracle.sol";
+import "../Oracles/Oracle.sol";
 
 
 /// @title Majority oracle contract - Allows to resolve an event based on multiple oracles with majority vote

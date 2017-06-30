@@ -1,7 +1,7 @@
 pragma solidity 0.4.11;
-import "../Oracles/AbstractOracle.sol";
+import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
-import "../Markets/AbstractMarketFactory.sol";
+import "../Markets/MarketFactory.sol";
 
 
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour

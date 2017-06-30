@@ -1,5 +1,5 @@
 pragma solidity 0.4.11;
-import "../Oracles/AbstractOracle.sol";
+import "../Oracles/Oracle.sol";
 
 
 /// @title Difficulty oracle contract - Oracle to resolve difficulty events at given block
