@@ -7,10 +7,12 @@ module.exports = {
     "env": {
         "node": true,
         "mocha": true,
+        "es6": true
     },
     "globals": {
         "assert": true,
         "artifacts": true,
-        "contract": true
+        "contract": true,
+        "web3": true
     }
 };

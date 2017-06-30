@@ -22,6 +22,7 @@
     "eslint-config-standard": "^10.2.1"
   },
   "devDependencies": {
+    "@digix/tempo": "^0.2.0",
     "babel-eslint": "^7.2.3",
     "decimal.js": "^7.2.1",
     "eslint": "^4.1.1",
