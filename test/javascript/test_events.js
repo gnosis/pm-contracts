@@ -1,13 +1,13 @@
-const utils = require('../utils')
+const utils = require('./utils')
 
 const Event = artifacts.require('Event')
 const EventFactory = artifacts.require('EventFactory')
 const Token = artifacts.require('Token')
 const EtherToken = artifacts.require('EtherToken')
-const centralizedOracle = artifacts.require('centralizedOracle')
+const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 
-contract('event', function (accounts) {
+contract('Event', function (accounts) {
     let centralizedOracleFactory
     let eventFactory
     let etherToken
@@ -22,7 +22,7 @@ contract('event', function (accounts) {
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-            'centralizedOracle', centralizedOracle
+            'centralizedOracle', CentralizedOracle
         )
         event = utils.getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracle.address, 2),
