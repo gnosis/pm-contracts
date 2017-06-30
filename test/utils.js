@@ -1,4 +1,28 @@
-exports.getParamFromTxEvent = function (transaction, paramName, contractFactory, eventName) {
+const PRECISION = 80
+const Decimal = require('decimal.js').clone({ precision: PRECISION })
+
+const ONE = Decimal(2).pow(64)
+
+function isClose(a, b, relTol=1e9, absTol=1e18) {
+    return Decimal(a.valueOf()).sub(b).abs().lte(
+        Decimal.max(
+            Decimal.max(
+                Decimal.abs(a.valueOf()),
+                Decimal.abs(b.valueOf())
+            ).mul(relTol),
+            absTol))
+}
+
+// random int in [a, b)
+function randrange(a, b) {
+    return Decimal.random(PRECISION).mul(Decimal(b.valueOf()).sub(a)).add(a).floor()
+}
+
+function randnums(a, b, n) {
+    return _.range(n).map(() => randrange(a, b))
+}
+
+function getParamFromTxEvent(transaction, paramName, contractFactory, eventName) {
     assert.isObject(transaction)
     let logs = transaction.logs
     if(eventName != null) {
@@ -15,7 +39,7 @@ exports.getParamFromTxEvent = function (transaction, paramName, contractFactory,
     }
 }
 
-exports.assertRejects = async function(q, msg) {
+async function assertRejects(q, msg) {
     let res, catchFlag = false
     try {
         res = await q
@@ -26,3 +50,24 @@ exports.assertRejects = async function(q, msg) {
             assert.fail(res, null, msg)
     }
 }
+
+function lmsrMarginalPrice(funding, net_outcome_tokens_sold, outcome_index) {
+    const b = Decimal(funding.valueOf()).div(net_outcome_tokens_sold.length).ln()
+    return Decimal(net_outcome_tokens_sold[outcome_index].valueOf()).div(b).exp().div(
+        net_outcome_tokens_sold.reduce(
+            (acc, tokensSold) => acc.add(Decimal(tokensSold.valueOf()).div(b).exp()),
+            Decimal(0)
+        )
+    ).valueOf()
+}
+
+Object.assign(exports, {
+    Decimal,
+    ONE,
+    isClose,
+    randrange,
+    randnums,
+    getParamFromTxEvent,
+    assertRejects,
+    lmsrMarginalPrice
+})

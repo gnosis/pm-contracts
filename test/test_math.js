@@ -1,26 +1,9 @@
 const _ = require('lodash')
 
-const PRECISION = 80
-const Decimal = require('decimal.js').clone({ precision: PRECISION })
-
 const utils = require('./utils')
+const { Decimal, isClose, randrange, randnums, ONE } = utils
 
 const MathLib = artifacts.require('Math')
-
-const ONE = Decimal(2).pow(64)
-
-function isClose(a, b, relTol=1e9, absTol=1e18) {
-    return a.sub(b).abs().lte(Decimal.max(Decimal.max(a.abs(),b.abs()).mul(relTol),absTol))
-}
-
-// random int in [a, b)
-function randrange(a, b) {
-    return Decimal.random(PRECISION).mul(Decimal(b.valueOf()).sub(a)).add(a).floor()
-}
-
-function randnums(a, b, n) {
-    return _.range(n).map(() => randrange(a, b))
-}
 
 contract('Math', function () {
     const MAX_SVALUE = Decimal(2).pow(255).sub(1)
