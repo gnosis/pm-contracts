@@ -82,9 +82,9 @@ contract('MarketMaker', function(accounts) {
                 await market.sell(outcome, tokenCount, profit, { from: accounts[trader] }), 'profit'
             ).valueOf(), profit.valueOf())
 
-            netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
-            expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
-            actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
+            let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
+            let expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
+            let actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
             assert(
                 isClose(actual, expected),
                 `Marginal price calculation is off for iteration ${i}:\n` +
@@ -149,9 +149,9 @@ contract('MarketMaker', function(accounts) {
                     await market.buy(outcome, tokenCount, cost, { from: accounts[trader] }), 'cost'
                 ).valueOf(), cost.valueOf())
 
-                netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
-                expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
-                actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
+                let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
+                let expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
+                let actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
                 assert(
                     isClose(actual, expected) || expected.toString() == 'NaN',
                     `Marginal price calculation is off for iteration ${i}:\n` +
