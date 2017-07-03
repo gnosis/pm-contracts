@@ -3,6 +3,8 @@ Gnosis Smart Contracts
 
 [![Logo](assets/logo.png)](https://gnosis.pm/)
 
+[![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
+
 [![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
 
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
