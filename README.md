@@ -24,7 +24,7 @@ npm test
 
 Compile and Deploy
 ------------------
-These commands apply to the RPC provider running on port 8545. You may need to have TestRPC running in the background. They are really wrappers around the [corresponding Truffle commands](http://truffleframework.com/docs/advanced/commands).
+These commands apply to the RPC provider running on port 8545. You may want to have TestRPC running in the background. They are really wrappers around the [corresponding Truffle commands](http://truffleframework.com/docs/advanced/commands).
 
 ### Compile all contracts to obtain ABI and bytecode:
 ```bash
