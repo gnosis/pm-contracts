@@ -178,6 +178,7 @@ library Math {
     /// @return Maximum number
     function max(int[] nums)
         public
+        constant
         returns (int max)
     {
         require(nums.length > 0);
@@ -193,6 +194,7 @@ library Math {
     /// @return Did no overflow occur?
     function safeToAdd(uint a, uint b)
         public
+        constant
         returns (bool)
     {
         return a + b >= a;
@@ -204,6 +206,7 @@ library Math {
     /// @return Did no underflow occur?
     function safeToSub(uint a, uint b)
         public
+        constant
         returns (bool)
     {
         return a >= b;
@@ -215,6 +218,7 @@ library Math {
     /// @return Did no overflow occur?
     function safeToMul(uint a, uint b)
         public
+        constant
         returns (bool)
     {
         return b == 0 || a * b / b == a;
@@ -226,6 +230,7 @@ library Math {
     /// @return Sum
     function add(uint a, uint b)
         public
+        constant
         returns (uint)
     {
         require(safeToAdd(a, b));
@@ -238,6 +243,7 @@ library Math {
     /// @return Difference
     function sub(uint a, uint b)
         public
+        constant
         returns (uint)
     {
         require(safeToSub(a, b));
@@ -250,6 +256,7 @@ library Math {
     /// @return Product
     function mul(uint a, uint b)
         public
+        constant
         returns (uint)
     {
         require(safeToMul(a, b));
@@ -262,6 +269,7 @@ library Math {
     /// @return Did no overflow occur?
     function safeToAdd(int a, int b)
         public
+        constant
         returns (bool)
     {
         return (b >= 0 && a + b >= a) || (b < 0 && a + b < a);
@@ -273,6 +281,7 @@ library Math {
     /// @return Did no underflow occur?
     function safeToSub(int a, int b)
         public
+        constant
         returns (bool)
     {
         return (b >= 0 && a - b <= a) || (b < 0 && a - b > a);
@@ -284,6 +293,7 @@ library Math {
     /// @return Did no overflow occur?
     function safeToMul(int a, int b)
         public
+        constant
         returns (bool)
     {
         return (b == 0) || (a * b / b == a);
@@ -295,6 +305,7 @@ library Math {
     /// @return Sum
     function add(int a, int b)
         public
+        constant
         returns (int)
     {
         require(safeToAdd(a, b));
@@ -307,6 +318,7 @@ library Math {
     /// @return Difference
     function sub(int a, int b)
         public
+        constant
         returns (int)
     {
         require(safeToSub(a, b));
@@ -319,6 +331,7 @@ library Math {
     /// @return Product
     function mul(int a, int b)
         public
+        constant
         returns (int)
     {
         require(safeToMul(a, b));

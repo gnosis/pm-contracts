@@ -47,7 +47,7 @@ contract('Math', function () {
 
     it('should compute max', async () => {
         for(let seq of _.range(10).map(() => randnums(-100, 100, 10))) {
-            assert.equal((await mathLib.max.call(seq)).valueOf(), Decimal.max(...seq).valueOf())
+            assert.equal((await mathLib.max(seq)).valueOf(), Decimal.max(...seq).valueOf())
         }
     })
 })

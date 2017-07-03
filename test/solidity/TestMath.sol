@@ -2,9 +2,9 @@ pragma solidity 0.4.11;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../contracts/Utils/Math.sol";
+import "../../contracts/Utils/Math.sol";
 
-contract TestUtils {
+contract TestMath {
     function testMathOverloaded() {
         /* Test Overloaded functions using integers */
 
