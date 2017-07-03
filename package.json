@@ -6,8 +6,9 @@
     "lint": "eslint .",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "netclean": "truffle networks --clean",
-    "test": "truffle test"
+    "networks": "truffle networks",
+    "test": "node test_local.js",
+    "prepublish": "truffle compile && truffle networks --clean"
   },
   "keywords": [
     "Ethereum",
@@ -31,7 +32,9 @@
     "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "ethereumjs-testrpc": "^4.0.1",
     "lodash": "^4.17.4",
+    "npm-prepublish": "^1.2.2",
     "truffle": "^3.3.0"
   },
   "repository": {

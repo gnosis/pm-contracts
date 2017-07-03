@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+- 'node'
+- '7'
+before_deploy:
+- npm-prepublish --verbose --lax
+deploy:
+  provider: npm
+  email: alanlu1023@gmail.com
+  api_key: $NPM_TOKEN
+  on:
+    all_branches: true
+    tags: true
+    node: '7'
+    repo: gnosis/gnosis-contracts
