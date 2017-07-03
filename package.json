@@ -7,7 +7,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "netclean": "truffle networks --clean",
-    "test": "truffle test"
+    "test": "node test_local.js"
   },
   "keywords": [
     "Ethereum",
@@ -31,6 +31,7 @@
     "eslint-plugin-node": "^5.1.0",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "ethereumjs-testrpc": "^4.0.1",
     "lodash": "^4.17.4",
     "truffle": "^3.3.0"
   },
