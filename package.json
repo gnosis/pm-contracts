@@ -7,7 +7,8 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
-    "test": "node test_local.js"
+    "test": "node test_local.js",
+    "prepublish": "truffle compile && truffle networks --clean"
   },
   "keywords": [
     "Ethereum",
