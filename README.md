@@ -17,7 +17,7 @@ npm install
 
 Test
 -------------
-### Run all tests:
+### Run all tests (requires Node version >=7 for `async/await`):
 ```bash
 npm test
 ```
