@@ -6,7 +6,7 @@
     "lint": "eslint .",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
-    "netclean": "truffle networks --clean",
+    "networks": "truffle networks",
     "test": "node test_local.js"
   },
   "keywords": [

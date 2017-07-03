@@ -17,13 +17,15 @@ npm install
 
 Test
 -------------
-### Run all tests (requires Node version >=7 for `async/await`):
+### Run all tests (requires Node version >=7 for `async/await`, and will automatically run TestRPC in the background):
 ```bash
 npm test
 ```
 
 Compile and Deploy
 ------------------
+These commands apply to the RPC provider running on port 8545. You may need to have TestRPC running in the background. They are really wrappers around the [corresponding Truffle commands](http://truffleframework.com/docs/advanced/commands).
+
 ### Compile all contracts to obtain ABI and bytecode:
 ```bash
 npm run compile
@@ -34,9 +36,16 @@ npm run compile
 npm run migrate
 ```
 
-### Clean up network artifacts for networks not named in `truffle.js`
+### Show the deployed addresses of all contracts on all networks:
 ```bash
-npm run netclean
+npm run networks
+```
+
+Command line options for `truffle` can be passed down through NPM by preceding the options list with `--`. For example:
+
+### Clean network artifacts:
+```bash
+npm run networks -- --clean
 ```
 
 Security and Liability
