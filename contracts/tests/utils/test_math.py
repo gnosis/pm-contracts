@@ -91,3 +91,41 @@ class TestContracts(AbstractTestContracts):
         # # Mul
         # self.assertRaises(TransactionFailed, self.math.mul, 2**128, 2**128)
         # self.assertEqual(self.math.mul(5, 5), 25)
+
+    def test_gas_cost(self):
+        RELATIVE_TOLERANCE = 1e-9
+        ABSOLUTE_TOLERANCE = 1e-18
+
+        MAX_POWER = int(mp.floor(mp.log(mpf(2**256 - 1) / ONE) * ONE))
+        MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE) * ONE))
+        gas_costs = []
+        for x in chain(
+            (1, ONE, 2**256-1),
+            (random.randrange(1, ONE) for _ in range(10)),
+            (random.randrange(ONE+1, 2**256) for _ in range(10)),
+        ):
+            with self.gas_counter() as gc:
+                X, actual, expected = (
+                    mpf(x) / ONE,
+                    mpf(self.math.ln(x)) / ONE,
+                    mp.log(mpf(x) / ONE),
+                )
+            gas_costs.append(gc.gas_cost())
+        self.assertTrue(max(gas_costs) < 28000L)
+        # EXP
+        gas_costs = []
+        for x in chain(
+            (0, 2448597794190215440622, MAX_POWER),
+            (random.randrange(MAX_POWER) for _ in range(10)),
+            (MIN_POWER, -497882689251500345055, -1),
+            (random.randrange(MIN_POWER, 0) for _ in range(10)),
+        ):
+            with self.gas_counter() as gc:
+                X, actual, expected = (
+                    mpf(x) / ONE,
+                    mpf(self.math.exp(x)) / ONE,
+                    mp.exp(mpf(x) / ONE),
+                )
+            gas_costs.append(gc.gas_cost())
+        self.assertTrue(max(gas_costs) < 26000L)
+
