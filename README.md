@@ -64,4 +64,4 @@ Contributors
 - Martin Koeppelmann ([koeppelmann](https://github.com/koeppelmann))
 - Alan Lu ([cag](https://github.com/cag))
 - Roland Kofler ([rolandkofler](https://github.com/rolandkofler))
-- Collin Chen ([collinc97](https://github.com/collinc97))
+- Collin Chin ([collinc97](https://github.com/collinc97))
