@@ -1,0 +1,83 @@
+{
+  "contract_name": "MarketMaker",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "market",
+          "type": "address"
+        },
+        {
+          "name": "outcomeTokenIndex",
+          "type": "uint8"
+        },
+        {
+          "name": "outcomeTokenCount",
+          "type": "uint256"
+        }
+      ],
+      "name": "calcProfit",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "market",
+          "type": "address"
+        },
+        {
+          "name": "outcomeTokenIndex",
+          "type": "uint8"
+        },
+        {
+          "name": "outcomeTokenCount",
+          "type": "uint256"
+        }
+      ],
+      "name": "calcCost",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "market",
+          "type": "address"
+        },
+        {
+          "name": "outcomeTokenIndex",
+          "type": "uint8"
+        }
+      ],
+      "name": "calcMarginalPrice",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1499270851573
+}
