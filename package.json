@@ -20,7 +20,8 @@
   "author": "Gnosis (https://gnosis.pm)",
   "license": "GPL-3.0",
   "dependencies": {
-    "eslint-config-standard": "^10.2.1"
+    "eslint-config-standard": "^10.2.1",
+    "truffle-hdwallet-provider": "0.0.3"
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
