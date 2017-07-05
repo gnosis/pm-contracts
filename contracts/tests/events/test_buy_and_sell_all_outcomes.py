@@ -53,7 +53,8 @@ class TestContracts(AbstractTestContracts):
         # Create event
         ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
-        gas_costs = []
+        gas_costs_1 = []
+        gas_costs_2 = []
         for num_outcomes in xrange(2, 14):
             event_address = self.event_factory.createCategoricalEvent(self.ether_token.address, oracle, num_outcomes)
             event = self.contract_at(event_address, self.event_abi)
@@ -63,16 +64,21 @@ class TestContracts(AbstractTestContracts):
             self.ether_token.deposit(value=collateral_token_count, sender=keys[buyer])
             self.ether_token.approve(event_address, collateral_token_count, sender=keys[buyer])
             with self.gas_counter() as gc:
-                event.buyAllOutcomes(collateral_token_count, sender=keys[buyer])
-            gas_costs.append(gc.gas_cost())
-        self.assertEqual([117594L, 161822L, 206050L, 250278L, 294506L, 338734L, 382962L, 427190L, 471418L,
-                515646L, 559874L, 604102L], gas_costs)
-
+                event.buyAllOutcomes(collateral_token_count/2, sender=keys[buyer])
+            gas_costs_1.append(gc.gas_cost())
+            with self.gas_counter() as gc:
+                event.buyAllOutcomes(collateral_token_count/2, sender=keys[buyer])
+            gas_costs_2.append(gc.gas_cost())
+        self.assertEqual([147594L,191822L,236050L,280278L,324506L,368734L,412962L,457190L,501418L,
+                          545646L,589874L,634102L], gas_costs_1)
+        self.assertEquals([42594L,56822L,71050L,85278L,99506L,113734L,127962L,142190L,156418L,
+                           170646L,184874L,199102L], gas_costs_2)
 
     def test_gas_cost_sell_all_outcomes(self):
         ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
         oracle = self.centralized_oracle_factory.createCentralizedOracle(ipfs_hash)
-        gas_costs = []
+        gas_costs_1 = []
+        gas_costs_2 = []
         collateral_token_count = 10
         buyer = 0
         self.ether_token.deposit(value=collateral_token_count, sender=keys[buyer])
@@ -82,10 +88,15 @@ class TestContracts(AbstractTestContracts):
             self.ether_token.approve(event_address, collateral_token_count, sender=keys[buyer])
             event.buyAllOutcomes(collateral_token_count, sender=keys[buyer])
             with self.gas_counter() as gc:
-                event.sellAllOutcomes(collateral_token_count, sender=keys[buyer])
-            gas_costs.append(gc.gas_cost())
-        self.assertEqual([40957L, 48194L, 55431L, 62668L, 69905L, 77142L, 84379L, 91616L, 98853L,
-                          106090L, 113327L, 120564L], gas_costs)
+                event.sellAllOutcomes(collateral_token_count/2, sender=keys[buyer])
+            gas_costs_1.append(gc.gas_cost())
+            with self.gas_counter() as gc:
+                event.sellAllOutcomes(collateral_token_count/2, sender=keys[buyer])
+            gas_costs_2.append(gc.gas_cost())
+        self.assertEqual([81914L,96388L,110862L,125336L,139810L,154284L,168758L,183232L,197706L,
+                          212180L,226654L,241128L], gas_costs_1)
+        self.assertEqual([33457L,40694L,47931L,55168L,62405L,69642L,76879L,84116L,91353L,
+                          98590L,105827L,113064L], gas_costs_2)
 
     def test_get_outcome_tokens(self):
         ipfs_hash = b'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
