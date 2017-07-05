@@ -12,8 +12,8 @@ let CampaignFactory = artifacts.require('CampaignFactory')
 
 module.exports = function (deployer) {
     deployer.deploy(Math)
+    deployer.link(Math, [EventFactory, UltimateOracleFactory, LMSRMarketMaker, StandardMarketFactory, EtherToken])
 
-    deployer.link(Math, EventFactory)
     deployer.deploy(EventFactory).then(() => {
         deployer.deploy(FutarchyOracleFactory, EventFactory.address)
     })
