@@ -20,8 +20,7 @@
   "author": "Gnosis (https://gnosis.pm)",
   "license": "GPL-3.0",
   "dependencies": {
-    "eslint-config-standard": "^10.2.1",
-    "truffle-hdwallet-provider": "0.0.3"
+    "eslint-config-standard": "^10.2.1"
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
@@ -36,7 +35,8 @@
     "ethereumjs-testrpc": "^4.0.1",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.2",
-    "truffle": "^3.3.0"
+    "truffle": "^3.3.0",
+    "truffle-hdwallet-provider": "0.0.3"
   },
   "repository": {
     "type": "git",
