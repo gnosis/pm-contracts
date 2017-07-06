@@ -40,8 +40,8 @@ class AbstractTestContracts(TestCase):
         self.s.state.block_number = self.HOMESTEAD_BLOCK
         t.gas_limit = 10000000  # To allow estimation of gas costs larger than 4.7M
 
-    def gas_counter(self):
-        return GasCounter(accounts[0], self.s.state)
+    def gas_counter(self, account = accounts[0]):
+        return GasCounter(account, self.s.state)
 
     @staticmethod
     def is_hex(s):
