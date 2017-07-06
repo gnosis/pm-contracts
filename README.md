@@ -38,6 +38,9 @@ npm run compile
 npm run migrate
 ```
 
+Network Artifacts
+-----------------
+
 ### Show the deployed addresses of all contracts on all networks:
 ```bash
 npm run networks
@@ -48,6 +51,18 @@ Command line options for `truffle` can be passed down through NPM by preceding t
 ### Clean network artifacts:
 ```bash
 npm run networks -- --clean
+```
+
+Network artifacts from running migrations will contain addresses of deployed contracts on the Kovan and Rinkeby testnets.
+
+### Extract all network information into `networks.json`
+```bash
+npm run extractnetinfo
+```
+
+### Take network info from `networks.json` and inject it into contract build artifacts. This is done prepublish as well.
+```bash
+npm run injectnetinfo
 ```
 
 Security and Liability

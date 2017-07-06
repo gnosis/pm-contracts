@@ -8,7 +8,9 @@
     "migrate": "truffle migrate",
     "networks": "truffle networks",
     "test": "node scripts/test_local.js",
-    "prepublish": "truffle compile && truffle networks --clean"
+    "injectnetinfo": "node scripts/inject_network_info.js",
+    "extractnetinfo": "node scripts/extract_network_info.js",
+    "prepublish": "truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
   },
   "keywords": [
     "Ethereum",
