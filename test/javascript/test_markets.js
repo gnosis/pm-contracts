@@ -11,8 +11,8 @@ const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const Market = artifacts.require('Market')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
-const Campaign = artifacts.require('Campaign')
-const CampaignFactory = artifacts.require('CampaignFactory')
+// const Campaign = artifacts.require('Campaign')
+// const CampaignFactory = artifacts.require('CampaignFactory')
 
 contract('Market', function (accounts) {
     let centralizedOracleFactory
@@ -20,7 +20,7 @@ contract('Market', function (accounts) {
     let etherToken
     let standardMarketFactory
     let lmsrMarketMaker
-    let campaignFactory
+    // let campaignFactory
     let ipfsHash, centralizedOracle, event
 
     beforeEach(async () => {
@@ -29,7 +29,7 @@ contract('Market', function (accounts) {
         etherToken = await EtherToken.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed()
-        campaignFactory = await CampaignFactory.deployed()
+        // campaignFactory = await CampaignFactory.deployed()
 
         // create event
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
@@ -182,127 +182,127 @@ contract('Market', function (accounts) {
         assert.equal(await outcomeToken.balanceOf(accounts[buyer]), tokenCount)
     })
 
-    it('should be created by a successful campaign', async () => {
-        // Create campaign
-        const feeFactor = 50000  // 5%
-        const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
-        const campaign = Campaign.at(getParamFromTxEvent(
-            await campaignFactory.createCampaigns(
-                event.address,
-                standardMarketFactory.address,
-                lmsrMarketMaker.address,
-                feeFactor,
-                funding,
-                deadline), 'campaign'))
-        assert.equal(await campaign.stage(), 0)
-
-        // Fund campaign
-        const backer1 = 2
-        let amount = 7.5e17
-
-        await etherToken.deposit({ value: amount, from: accounts[backer1] })
-        await etherToken.approve(campaign.address, amount, { from: accounts[backer1] })
-        await campaign.fund(amount, { from: accounts[backer1] })
-        assert.equal((await campaign.stage()).valueOf(), 0)
-
-        const backer2 = 3
-        amount = 2.5e17
-
-        await etherToken.deposit({ value: amount, from: accounts[backer2] })
-        await etherToken.approve(campaign.address, amount, { from: accounts[backer2] })
-        campaign.fund(amount, { from: accounts[backer2] })
-        assert.equal(await campaign.stage(), 1)
-
-        // Create market
-        const market = Market.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
-
-        // Trade
-        const buyer = 4
-        const outcome = 0
-        const tokenCount = 1e15
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
-
-        const fee = await market.calcMarketFee(outcomeTokenCost)
-        assert.equal(fee.valueOf(), outcomeTokenCost.mul(.05).floor().valueOf())
-
-        const cost = outcomeTokenCost.add(fee)
-
-        await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal((await etherToken.balanceOf(accounts[buyer])).valueOf(), cost.valueOf())
-
-        await etherToken.approve(market.address, cost, { from: accounts[buyer] })
-        assert.equal(getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost').valueOf()
-        , cost.valueOf())
-
-        // Set outcome
-        await centralizedOracle.setOutcome(1)
-        await event.setOutcome()
-
-        // Withdraw fees
-        await campaign.closeMarket()
-        const finalBalance = await campaign.finalBalance()
-
-        assert.isAbove(finalBalance, funding)
-
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.withdrawFees({ from: accounts[backer1] }),
-                'fees'
-            ).valueOf(), finalBalance.mul(.75).floor().valueOf())
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.withdrawFees({ from: accounts[backer2] }),
-                'fees'
-            ).valueOf(), finalBalance.mul(.25).floor().valueOf())
-
-        // Withdraw works only once
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.withdrawFees({ from: accounts[backer1] }),
-                'fees'
-            ).valueOf(), 0)
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.withdrawFees({ from: accounts[backer2] }),
-                'fees'
-            ).valueOf(), 0)
-    })
-
-    it('should not be created by an unsuccessful campaign', async () => {
-        // Create campaign
-        const feeFactor = 50000  // 5%
-        const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
-        const campaign = Campaign.at(getParamFromTxEvent(
-            await campaignFactory.createCampaigns(
-                event.address,
-                standardMarketFactory.address,
-                lmsrMarketMaker.address,
-                feeFactor,
-                funding,
-                deadline), 'campaign'))
-        assert.equal(await campaign.stage(), 0)
-
-        // Fund campaign
-        const backer1 = 8
-        const amount = 7.5e17
-
-        await etherToken.deposit({ value: amount, from: accounts[backer1] })
-        await etherToken.approve(campaign.address, amount, { from: accounts[backer1] })
-        await campaign.fund(amount, { from: accounts[backer1] })
-        assert.equal((await campaign.stage()).valueOf(), 0)
-
-        // Deadline passes
-        await wait(61)
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.refund({ from: accounts[backer1] }), 'refund'),
-            amount)
-        assert.equal(
-            getParamFromTxEvent(
-                await campaign.refund({ from: accounts[backer1] }), 'refund'),
-            0)
-    })
+    // it('should be created by a successful campaign', async () => {
+    //     // Create campaign
+    //     const feeFactor = 50000  // 5%
+    //     const funding = 1e18
+    //     const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+    //     const campaign = Campaign.at(getParamFromTxEvent(
+    //         await campaignFactory.createCampaigns(
+    //             event.address,
+    //             standardMarketFactory.address,
+    //             lmsrMarketMaker.address,
+    //             feeFactor,
+    //             funding,
+    //             deadline), 'campaign'))
+    //     assert.equal(await campaign.stage(), 0)
+    //
+    //     // Fund campaign
+    //     const backer1 = 2
+    //     let amount = 7.5e17
+    //
+    //     await etherToken.deposit({ value: amount, from: accounts[backer1] })
+    //     await etherToken.approve(campaign.address, amount, { from: accounts[backer1] })
+    //     await campaign.fund(amount, { from: accounts[backer1] })
+    //     assert.equal((await campaign.stage()).valueOf(), 0)
+    //
+    //     const backer2 = 3
+    //     amount = 2.5e17
+    //
+    //     await etherToken.deposit({ value: amount, from: accounts[backer2] })
+    //     await etherToken.approve(campaign.address, amount, { from: accounts[backer2] })
+    //     campaign.fund(amount, { from: accounts[backer2] })
+    //     assert.equal(await campaign.stage(), 1)
+    //
+    //     // Create market
+    //     const market = Market.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
+    //
+    //     // Trade
+    //     const buyer = 4
+    //     const outcome = 0
+    //     const tokenCount = 1e15
+    //     const outcomeTokenCost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
+    //
+    //     const fee = await market.calcMarketFee(outcomeTokenCost)
+    //     assert.equal(fee.valueOf(), outcomeTokenCost.mul(.05).floor().valueOf())
+    //
+    //     const cost = outcomeTokenCost.add(fee)
+    //
+    //     await etherToken.deposit({ value: cost, from: accounts[buyer] })
+    //     assert.equal((await etherToken.balanceOf(accounts[buyer])).valueOf(), cost.valueOf())
+    //
+    //     await etherToken.approve(market.address, cost, { from: accounts[buyer] })
+    //     assert.equal(getParamFromTxEvent(
+    //         await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost').valueOf()
+    //     , cost.valueOf())
+    //
+    //     // Set outcome
+    //     await centralizedOracle.setOutcome(1)
+    //     await event.setOutcome()
+    //
+    //     // Withdraw fees
+    //     await campaign.closeMarket()
+    //     const finalBalance = await campaign.finalBalance()
+    //
+    //     assert.isAbove(finalBalance, funding)
+    //
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.withdrawFees({ from: accounts[backer1] }),
+    //             'fees'
+    //         ).valueOf(), finalBalance.mul(.75).floor().valueOf())
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.withdrawFees({ from: accounts[backer2] }),
+    //             'fees'
+    //         ).valueOf(), finalBalance.mul(.25).floor().valueOf())
+    //
+    //     // Withdraw works only once
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.withdrawFees({ from: accounts[backer1] }),
+    //             'fees'
+    //         ).valueOf(), 0)
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.withdrawFees({ from: accounts[backer2] }),
+    //             'fees'
+    //         ).valueOf(), 0)
+    // })
+    //
+    // it('should not be created by an unsuccessful campaign', async () => {
+    //     // Create campaign
+    //     const feeFactor = 50000  // 5%
+    //     const funding = 1e18
+    //     const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+    //     const campaign = Campaign.at(getParamFromTxEvent(
+    //         await campaignFactory.createCampaigns(
+    //             event.address,
+    //             standardMarketFactory.address,
+    //             lmsrMarketMaker.address,
+    //             feeFactor,
+    //             funding,
+    //             deadline), 'campaign'))
+    //     assert.equal(await campaign.stage(), 0)
+    //
+    //     // Fund campaign
+    //     const backer1 = 8
+    //     const amount = 7.5e17
+    //
+    //     await etherToken.deposit({ value: amount, from: accounts[backer1] })
+    //     await etherToken.approve(campaign.address, amount, { from: accounts[backer1] })
+    //     await campaign.fund(amount, { from: accounts[backer1] })
+    //     assert.equal((await campaign.stage()).valueOf(), 0)
+    //
+    //     // Deadline passes
+    //     await wait(61)
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.refund({ from: accounts[backer1] }), 'refund'),
+    //         amount)
+    //     assert.equal(
+    //         getParamFromTxEvent(
+    //             await campaign.refund({ from: accounts[backer1] }), 'refund'),
+    //         0)
+    // })
 })
