@@ -4,6 +4,9 @@ module.exports = {
     "parserOptions": {
         "sourceType": "script"
     },
+    "rules": {
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    },
     "env": {
         "node": true,
         "mocha": true,

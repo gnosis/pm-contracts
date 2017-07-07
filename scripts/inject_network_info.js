@@ -8,7 +8,7 @@ const contractNetworksMap = JSON.parse(fs.readFileSync('networks.json'))
 
 _.toPairs(contractNetworksMap)
     .map(([name, networks]) => [path.join(dir, name + '.json'), networks])
-    .filter(([file, networks]) => {
+    .filter(([file, _networks]) => {
         if(!fs.existsSync(file))
             throw new Error(`missing build artifact ${file}; make sure contracts are compiled`)
         return true

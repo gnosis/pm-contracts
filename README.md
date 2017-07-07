@@ -17,11 +17,16 @@ Install
 npm install
 ```
 
-Test
+Testing and Linting
 -------------
 ### Run all tests (requires Node version >=7 for `async/await`, and will automatically run TestRPC in the background):
 ```bash
 npm test
+```
+
+### Lint the JS
+```bash
+npm run lint
 ```
 
 Compile and Deploy

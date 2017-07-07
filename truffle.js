@@ -1,5 +1,4 @@
 const HDWalletProvider = require("truffle-hdwallet-provider")
-const fs = require("fs")
 
 //address info for acct used to deploy contracts on kovan
 //address: 0x00200eB02C014831EBa45978415c30cf7110b329
