@@ -1,14 +1,16 @@
 {
   "name": "@gnosis.pm/gnosis-core-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
-    "test": "node test_local.js",
-    "prepublish": "truffle compile && truffle networks --clean"
+    "test": "node scripts/test_local.js",
+    "injectnetinfo": "node scripts/inject_network_info.js",
+    "extractnetinfo": "node scripts/extract_network_info.js",
+    "prepublish": "eslint . && truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
   },
   "keywords": [
     "Ethereum",
@@ -19,24 +21,20 @@
   ],
   "author": "Gnosis (https://gnosis.pm)",
   "license": "GPL-3.0",
-  "dependencies": {
-    "eslint-config-standard": "^10.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
     "babel-eslint": "^7.2.3",
     "decimal.js": "^7.2.1",
     "eslint": "^4.1.1",
     "eslint-plugin-babel": "^4.1.1",
-    "eslint-plugin-import": "^2.6.0",
-    "eslint-plugin-node": "^5.1.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
     "ethereumjs-testrpc": "^4.0.1",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.2",
     "truffle": "^3.3.0",
-    "truffle-hdwallet-provider": "0.0.3"
+    "truffle-config": "^1.0.0",
+    "truffle-expect": "0.0.3",
+    "xhr2": "^0.1.4"
   },
   "repository": {
     "type": "git",
