@@ -1,1 +1,3 @@
 test/python/
+requirements.txt
+.travis.yml
