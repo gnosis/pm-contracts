@@ -1,6 +1,8 @@
 Gnosis Smart Contracts
 ======================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/gnosis-contracts.svg)](https://greenkeeper.io/)
+
 [![Logo](assets/logo.png)](https://gnosis.pm/)
 
 [![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
