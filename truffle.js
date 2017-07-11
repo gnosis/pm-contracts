@@ -11,8 +11,9 @@ module.exports = {
             port: 8555,
             gas: 0xfffffffffff,
             gasPrice: 0x01,
-            before_timeout: 0,
-            test_timeout: 0
+            mocha: {
+                enableTimeouts: false
+            }
         },
         kovan: {
             host: "localhost",
