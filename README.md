@@ -98,3 +98,4 @@ Contributors
 - Alan Lu ([cag](https://github.com/cag))
 - Roland Kofler ([rolandkofler](https://github.com/rolandkofler))
 - Collin Chin ([collinc97](https://github.com/collinc97))
+- Christopher Gewecke ([cgewecke](https://github.com/cgewecke))
