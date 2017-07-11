@@ -5,6 +5,8 @@ Gnosis Smart Contracts
 
 [![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
 
+[![Codecov badge](https://codecov.io/gh/gnosis/gnosis-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/gnosis-contracts/)
+
 [![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/gnosis-contracts.svg)](https://greenkeeper.io/)
 
 [![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
