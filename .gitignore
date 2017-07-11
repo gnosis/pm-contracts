@@ -129,3 +129,12 @@ src/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Coverage stuff #
+##################
+
+allFiredEvents
+coverage.json
+coverage/
+coverageEnv/
+scTopics
