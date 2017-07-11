@@ -10,10 +10,7 @@ module.exports = {
             network_id: "*",
             port: 8555,
             gas: 0xfffffffffff,
-            gasPrice: 0x01,
-            mocha: {
-                enableTimeouts: false
-            }
+            gasPrice: 0x01
         },
         kovan: {
             host: "localhost",
@@ -25,5 +22,8 @@ module.exports = {
             port: 8545,
             network_id: "4"
         },
+    },
+    mocha: {
+        enableTimeouts: false
     }
 }
