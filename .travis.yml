@@ -4,6 +4,11 @@ language: node_js
 node_js:
 - 'node'
 - '7'
+install:
+- npm install -g codecov
+script:
+- npm run coverage
+- codecov
 before_deploy:
 - npm-prepublish --verbose --lax
 deploy:
