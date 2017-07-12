@@ -1,7 +1,15 @@
+sudo: false
+dist: trusty
 language: node_js
 node_js:
 - 'node'
 - '7'
+install:
+- npm install -g codecov
+- npm install
+script:
+- npm run coverage
+- codecov
 before_deploy:
 - npm-prepublish --verbose --lax
 deploy:
@@ -12,4 +20,4 @@ deploy:
     all_branches: true
     tags: true
     node: '7'
-    repo: gnosis/gnosis-contracts
+    repo: gnosis/gnosis.js
