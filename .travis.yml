@@ -4,12 +4,13 @@ language: node_js
 node_js:
 - 'node'
 - '7'
-install:
-- npm install -g codecov
-- npm install
+before_install:
+- npm install -g npm codecov greenkeeper-lockfile@1
+before_script: greenkeeper-lockfile-update
 script:
 - npm run coverage
 - codecov
+after_script: greenkeeper-lockfile-upload
 before_deploy:
 - npm-prepublish --verbose --lax
 deploy:
@@ -20,4 +21,4 @@ deploy:
     all_branches: true
     tags: true
     node: '7'
-    repo: gnosis/gnosis.js
+    repo: gnosis/gnosis-contracts
