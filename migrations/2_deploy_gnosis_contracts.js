@@ -14,10 +14,6 @@ module.exports = function (deployer) {
     deployer.deploy(Math)
     deployer.link(Math, [EventFactory, UltimateOracleFactory, LMSRMarketMaker, StandardMarketFactory, EtherToken])
 
-    deployer.deploy(EventFactory).then(() => {
-        deployer.deploy(FutarchyOracleFactory, EventFactory.address)
-    })
-
     deployer.deploy(CentralizedOracleFactory)
     deployer.deploy(MajorityOracleFactory)
     deployer.deploy(DifficultyOracleFactory)
@@ -36,4 +32,8 @@ module.exports = function (deployer) {
 
     deployer.link(Math, CampaignFactory)
     deployer.deploy(CampaignFactory)
+
+    deployer.deploy(EventFactory).then(() => {
+        deployer.deploy(FutarchyOracleFactory, EventFactory.address)
+    })
 }
