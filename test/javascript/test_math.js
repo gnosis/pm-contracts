@@ -18,7 +18,7 @@ contract('Math', function () {
 
         for(let x of [1, ONE, MAX_VALUE, randrange(1, MAX_VALUE)].concat(randnums(1, MAX_VALUE, 10))) {
             let X = Decimal(x.valueOf()).div(ONE)
-            let actual = Decimal((await mathLib.ln(x)).div(ONE.valueOf()).valueOf())
+            let actual = Decimal((await mathLib.ln(x.valueOf())).div(ONE.valueOf()).valueOf())
             let expected = X.ln()
             assert(
                 isClose(actual, expected),
@@ -32,7 +32,7 @@ contract('Math', function () {
         const MIN_POWER = Decimal(1).div(ONE).ln().mul(ONE).floor()
         for(let x of [MAX_SVALUE.neg(), MIN_POWER, 0, MAX_POWER].concat(randnums(MAX_SVALUE.neg(), MAX_POWER, 10))) {
             let X = Decimal(x.valueOf()).div(ONE)
-            let actual = Decimal((await mathLib.exp(x)).div(ONE.valueOf()).valueOf())
+            let actual = Decimal((await mathLib.exp(x.valueOf())).valueOf()).div(ONE)
             let expected = X.exp()
             assert(
                 isClose(actual, expected),
