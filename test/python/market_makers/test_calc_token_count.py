@@ -12,9 +12,9 @@ class TestContracts(AbstractTestContracts):
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.market_factory = self.create_contract('Markets/StandardMarketFactory.sol', libraries={'Math': self.math})
         self.lmsr = self.create_contract('MarketMakers/LMSRMarketMaker.sol', libraries={'Math': self.math})
-        self.token_abi = self.create_abi('Tokens/AbstractToken.sol')
+        self.token_abi = self.create_abi('Tokens/Token.sol')
         self.market_abi = self.create_abi('Markets/StandardMarket.sol')
-        self.event_abi = self.create_abi('Events/AbstractEvent.sol')
+        self.event_abi = self.create_abi('Events/Event.sol')
 
     @staticmethod
     def calc_cost(funding, net_outcome_tokens_sold, outcome, outcome_token_count):

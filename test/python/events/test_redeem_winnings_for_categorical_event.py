@@ -10,7 +10,7 @@ class TestContracts(AbstractTestContracts):
         self.centralized_oracle_factory = self.create_contract('Oracles/CentralizedOracleFactory.sol')
         self.ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
         self.event_abi = self.create_abi('Events/CategoricalEvent.sol')
-        self.token_abi = self.create_abi('Tokens/AbstractToken.sol')
+        self.token_abi = self.create_abi('Tokens/Token.sol')
         self.oracle_abi = self.create_abi('Oracles/CentralizedOracle.sol')
 
     def test(self):

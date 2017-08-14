@@ -13,9 +13,9 @@ class TestContracts(AbstractTestContracts):
         self.futarchy_factory = self.create_contract('Oracles/FutarchyOracleFactory.sol', libraries={'Math': self.math}, params=[self.event_factory])
         self.lmsr = self.create_contract('MarketMakers/LMSRMarketMaker.sol', libraries={'Math': self.math})
         self.ether_token = self.create_contract('Tokens/EtherToken.sol', libraries={'Math': self.math})
-        self.token_abi = self.create_abi('Tokens/AbstractToken.sol')
+        self.token_abi = self.create_abi('Tokens/Token.sol')
         self.market_abi = self.create_abi('Markets/StandardMarket.sol')
-        self.event_abi = self.create_abi('Events/AbstractEvent.sol')
+        self.event_abi = self.create_abi('Events/Event.sol')
         self.oracle_abi = self.create_abi('Oracles/CentralizedOracle.sol')
         self.futarchy_abi = self.create_abi('Oracles/FutarchyOracle.sol')
 
