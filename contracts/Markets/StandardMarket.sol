@@ -150,7 +150,7 @@ contract StandardMarket is Market {
         // Subtract outcome token count from market maker net balance
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
-        OutcomeTokenSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, profit, fees);
+        OutcomeTokenSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, outcomeTokenProfit, fees);
     }
 
     /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
