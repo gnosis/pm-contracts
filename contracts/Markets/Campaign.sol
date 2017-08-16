@@ -27,7 +27,7 @@ contract Campaign {
      *  Storage
      */
     Event public eventContract;
-    MarketFactory public marketFactory;
+    StandardMarketFactory public marketFactory;
     MarketMaker public marketMaker;
     Market public market;
     uint24 public fee;
@@ -72,7 +72,7 @@ contract Campaign {
     /// @param _deadline Campaign deadline
     function Campaign(
         Event _eventContract,
-        MarketFactory _marketFactory,
+        StandardMarketFactory _marketFactory,
         MarketMaker _marketMaker,
         uint24 _fee,
         uint _funding,

@@ -18,7 +18,7 @@ contract StandardMarket is Market {
     /*
      *  Modifiers
      */
-    modifier isCreator () {
+    modifier isCreator() {
         // Only creator is allowed to proceed
         require(msg.sender == creator);
         _;
