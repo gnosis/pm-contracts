@@ -117,8 +117,8 @@ contract('Market', function (accounts) {
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost'
-        ), cost.valueOf())
+            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+        ), outcomeTokenCost.valueOf())
 
         const outcomeToken = Token.at(await event.outcomeTokens(outcome))
         assert.equal(await outcomeToken.balanceOf(accounts[buyer]), tokenCount)
@@ -131,8 +131,8 @@ contract('Market', function (accounts) {
 
         await outcomeToken.approve(market.address, tokenCount, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.sell(outcome, tokenCount, profit, { from: accounts[buyer] }), 'profit'
-        ), profit.valueOf())
+            await market.sell(outcome, tokenCount, profit, { from: accounts[buyer] }), 'outcomeTokenProfit'
+        ).valueOf(), outcomeTokenProfit.valueOf())
 
         assert.equal(await outcomeToken.balanceOf(accounts[buyer]), 0)
         assert.equal(await etherToken.balanceOf(accounts[buyer]), profit.valueOf())
@@ -233,8 +233,8 @@ contract('Market', function (accounts) {
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost').valueOf()
-        , cost.valueOf())
+            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost').valueOf()
+        , outcomeTokenCost.valueOf())
 
         // Set outcome
         await centralizedOracle.setOutcome(1)
