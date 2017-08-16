@@ -148,6 +148,13 @@ contract('Oracle', function (accounts) {
         await etherToken.approve(ultimateOracle.address, 100, { from: accounts[sender1] })
         await ultimateOracle.challengeOutcome(2)
 
+        // Sender 1 tries to increase their bid but can't
+        await etherToken.deposit({value: 50, from: accounts[sender1]})
+        await etherToken.approve(ultimateOracle.address, 50, { from: accounts[sender1] })
+        await utils.assertRejects(
+            ultimateOracle.voteForOutcome(2, 50, { from: accounts[sender1] }),
+            'increase leading vote after challenge')
+
         // Sender 2 overbids sender 1
         const sender2 = 1
         await etherToken.deposit({value: 150, from: accounts[sender2]})
