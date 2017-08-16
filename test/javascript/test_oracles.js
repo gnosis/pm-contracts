@@ -58,6 +58,7 @@ contract('Oracle', function (accounts) {
         fee = 500000 // 5%
         deadline = 100 // 100s
         funding = 10**18 // 1 ETH
+        startDate = 0
     })
 
     it('should test centralized oracle', async () => {
@@ -107,7 +108,7 @@ contract('Oracle', function (accounts) {
         // assert.isAbove(await difficultyOracle.getOutcome(), 0)
     })
 
-    it('should test futarchy oracle', async () => {
+    it.only('should test futarchy oracle', async () => {
         // Create Oracles
         const centralizedOracle = utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
@@ -117,7 +118,7 @@ contract('Oracle', function (accounts) {
         const futarchyOracle = utils.getParamFromTxEvent(
             await futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,
-                lmsrMarketMaker.address, fee, deadline),
+                lmsrMarketMaker.address, fee, deadline, startDate),
             'futarchyOracle', FutarchyOracle
         )
         const creator = 0

@@ -55,6 +55,7 @@ contract FutarchyOracle is Oracle {
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @param _deadline Decision deadline
+    /// @param startDate Start date for price logging
     function FutarchyOracle(
         address _creator,
         EventFactory eventFactory,
@@ -66,7 +67,9 @@ contract FutarchyOracle is Oracle {
         StandardMarketWithPriceLoggerFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
-        uint _deadline
+        uint _deadline,
+        uint startDate
+
     )
         public
     {
@@ -82,7 +85,7 @@ contract FutarchyOracle is Oracle {
                 lowerBound,
                 upperBound
             );
-            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, 0));
+            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, startDate));
         }
         creator = _creator;
         deadline = _deadline;

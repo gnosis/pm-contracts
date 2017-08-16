@@ -19,7 +19,8 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketMaker marketMaker,
         uint24 fee,
-        uint deadline
+        uint deadline,
+        uint startDate
     );
 
     /*
@@ -51,6 +52,7 @@ contract FutarchyOracleFactory {
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @param deadline Decision deadline
+    /// @param startDate Start date for price logging
     /// @return Oracle contract
     function createFutarchyOracle(
         Token collateralToken,
@@ -60,7 +62,8 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketMaker marketMaker,
         uint24 fee,
-        uint deadline
+        uint deadline,
+        uint startDate
     )
         public
         returns (FutarchyOracle futarchyOracle)
@@ -76,7 +79,8 @@ contract FutarchyOracleFactory {
             marketFactory,
             marketMaker,
             fee,
-            deadline
+            deadline,
+            startDate
         );
         FutarchyOracleCreation(
             msg.sender,
@@ -88,7 +92,8 @@ contract FutarchyOracleFactory {
             upperBound,
             marketMaker,
             fee,
-            deadline
+            deadline,
+            startDate
         );
     }
 }
