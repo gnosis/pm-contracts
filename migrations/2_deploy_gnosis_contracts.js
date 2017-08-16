@@ -8,6 +8,7 @@ let FutarchyOracleFactory = artifacts.require('FutarchyOracleFactory')
 let UltimateOracleFactory = artifacts.require('UltimateOracleFactory')
 let LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 let StandardMarketFactory = artifacts.require('StandardMarketFactory')
+let StandardMarketWithPriceLoggerFactory = artifacts.require('StandardMarketWithPriceLoggerFactory')
 let CampaignFactory = artifacts.require('CampaignFactory')
 
 module.exports = function (deployer) {
@@ -33,7 +34,10 @@ module.exports = function (deployer) {
     deployer.link(Math, CampaignFactory)
     deployer.deploy(CampaignFactory)
 
-    deployer.deploy(EventFactory).then(() => {
-        deployer.deploy(FutarchyOracleFactory, EventFactory.address)
-    })
+    deployer.link(Math, StandardMarketWithPriceLoggerFactory)
+    deployer.deploy(StandardMarketWithPriceLoggerFactory).then(() =>
+        deployer.deploy(EventFactory).then(() =>
+            deployer.deploy(FutarchyOracleFactory, EventFactory.address, StandardMarketWithPriceLoggerFactory.address)
+        )
+    )
 }

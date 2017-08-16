@@ -1,7 +1,7 @@
 pragma solidity 0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
-import "../Markets/MarketFactory.sol";
+import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
 
 
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
@@ -25,7 +25,7 @@ contract FutarchyOracle is Oracle {
      *  Storage
      */
     address creator;
-    Market[] public markets;
+    StandardMarketWithPriceLogger[] public markets;
     CategoricalEvent public categoricalEvent;
     uint public deadline;
     uint public winningMarketIndex;
@@ -34,7 +34,7 @@ contract FutarchyOracle is Oracle {
     /*
      *  Modifiers
      */
-    modifier isCreator () {
+    modifier isCreator() {
         // Only creator is allowed to proceed
         require(msg.sender == creator);
         _;
@@ -63,7 +63,7 @@ contract FutarchyOracle is Oracle {
         uint8 outcomeCount,
         int lowerBound,
         int upperBound,
-        MarketFactory marketFactory,
+        StandardMarketWithPriceLoggerFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
         uint _deadline
@@ -71,7 +71,7 @@ contract FutarchyOracle is Oracle {
         public
     {
         // Deadline is in the future
-        require(_deadline > now);
+        require(_deadline > 0);
         // Create decision event
         categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
         // Create outcome events
@@ -82,7 +82,7 @@ contract FutarchyOracle is Oracle {
                 lowerBound,
                 upperBound
             );
-            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee));
+            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, 0));
         }
         creator = _creator;
         deadline = _deadline;
@@ -131,14 +131,14 @@ contract FutarchyOracle is Oracle {
         public
     {
         // Outcome is not set yet and deadline has passed
-        require(!isSet && deadline <= now);
+        require(!isSet && markets[0].startDate() + deadline < now);
         // Find market with highest marginal price for long outcome tokens
-        uint highestMarginalPrice = markets[0].marketMaker().calcMarginalPrice(markets[0], LONG);
+        uint highestAvgPrice = markets[0].getAvgPrice();
         uint highestIndex = 0;
         for (uint8 i = 1; i < markets.length; i++) {
-            uint marginalPrice = markets[i].marketMaker().calcMarginalPrice(markets[i], LONG);
-            if (marginalPrice > highestMarginalPrice) {
-                highestMarginalPrice = marginalPrice;
+            uint avgPrice = markets[i].getAvgPrice();
+            if (avgPrice > highestAvgPrice) {
+                highestAvgPrice = avgPrice;
                 highestIndex = i;
             }
         }

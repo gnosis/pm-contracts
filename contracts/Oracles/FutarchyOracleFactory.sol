@@ -17,7 +17,6 @@ contract FutarchyOracleFactory {
         uint8 outcomeCount,
         int lowerBound,
         int upperBound,
-        MarketFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
         uint deadline
@@ -27,17 +26,19 @@ contract FutarchyOracleFactory {
      *  Storage
      */
     EventFactory eventFactory;
+    StandardMarketWithPriceLoggerFactory marketFactory;
 
     /*
      *  Public functions
      */
     /// @dev Constructor sets event factory contract
     /// @param _eventFactory Event factory contract
-    function FutarchyOracleFactory(EventFactory _eventFactory)
+    function FutarchyOracleFactory(EventFactory _eventFactory, StandardMarketWithPriceLoggerFactory _marketFactory)
         public
     {
-        require(address(_eventFactory) != 0);
+        require(address(_eventFactory) != 0 && address(_marketFactory) != 0);
         eventFactory = _eventFactory;
+        marketFactory = _marketFactory;
     }
 
     /// @dev Creates a new Futarchy oracle contract
@@ -46,7 +47,6 @@ contract FutarchyOracleFactory {
     /// @param outcomeCount Number of event outcomes
     /// @param lowerBound Lower bound for event outcome
     /// @param upperBound Lower bound for event outcome
-    /// @param marketFactory Market factory contract
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @param deadline Decision deadline
@@ -57,7 +57,6 @@ contract FutarchyOracleFactory {
         uint8 outcomeCount,
         int lowerBound,
         int upperBound,
-        MarketFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
         uint deadline
@@ -86,7 +85,6 @@ contract FutarchyOracleFactory {
             outcomeCount,
             lowerBound,
             upperBound,
-            marketFactory,
             marketMaker,
             fee,
             deadline
