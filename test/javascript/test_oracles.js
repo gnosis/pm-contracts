@@ -108,7 +108,7 @@ contract('Oracle', function (accounts) {
         // assert.isAbove(await difficultyOracle.getOutcome(), 0)
     })
 
-    it('should test futarchy oracle', async () => {
+    it.only('should test futarchy oracle', async () => {
         // Create Oracles
         const centralizedOracle = utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
