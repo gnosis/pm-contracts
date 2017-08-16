@@ -79,7 +79,7 @@ contract('MarketMaker', function(accounts) {
             // Selling tokens
             await outcomeToken.approve(market.address, tokenCount, { from: accounts[trader] })
             assert.equal(getParamFromTxEvent(
-                await market.sell(outcome, tokenCount, profit, { from: accounts[trader] }), 'profit'
+                await market.sell(outcome, tokenCount, profit, { from: accounts[trader] }), 'outcomeTokenProfit'
             ).valueOf(), profit.valueOf())
 
             let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
@@ -146,7 +146,7 @@ contract('MarketMaker', function(accounts) {
                 // Buying tokens
                 await etherToken.approve(market.address, tokenCount, { from: accounts[trader] })
                 assert.equal(getParamFromTxEvent(
-                    await market.buy(outcome, tokenCount, cost, { from: accounts[trader] }), 'cost'
+                    await market.buy(outcome, tokenCount, cost, { from: accounts[trader] }), 'outcomeTokenCost'
                 ).valueOf(), cost.valueOf())
 
                 let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
