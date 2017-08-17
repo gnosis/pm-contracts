@@ -8,7 +8,7 @@ before_install:
 - npm install -g npm codecov greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
 script:
-- npm run coverage
+- travis_wait npm run coverage
 - codecov
 after_script: greenkeeper-lockfile-upload
 before_deploy:
