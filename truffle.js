@@ -24,6 +24,7 @@ module.exports = {
         },
     },
     mocha: {
-        enableTimeouts: false
+        enableTimeouts: false,
+        grep: process.env.TEST_GREP
     }
 }
