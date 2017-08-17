@@ -29,7 +29,7 @@ contract('Oracle', function (accounts) {
     let etherToken
     let ipfsHash, ipfsBytes
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
-    let fee, deadline, funding, startDate, scalarEvent
+    let fee, deadline, funding, startDate
 
     beforeEach(async () => {
         // deployed factory contracts
@@ -166,7 +166,7 @@ contract('Oracle', function (accounts) {
             futarchyOracle.close(),
             'Futarchy oracle cannot be closed if oracle for scalar market is not set')
         await centralizedOracle.setOutcome(-50)
-        scalarEvent = ScalarEvent.at(await market.eventContract())
+        const scalarEvent = ScalarEvent.at(await market.eventContract())
         await scalarEvent.setOutcome()
 
         // Close winning market and transfer collateral tokens to creator
