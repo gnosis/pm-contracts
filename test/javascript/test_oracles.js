@@ -105,6 +105,29 @@ contract('Oracle', function (accounts) {
         // assert.isAbove(await difficultyOracle.getOutcome(), 0)
     })
 
+    it('can create futarchy oracles in the future, but not the past', async () => {
+        // Create Oracles
+        const centralizedOracle = utils.getParamFromTxEvent(
+            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
+            'centralizedOracle', CentralizedOracle
+        )
+
+        let now = web3.eth.getBlock('pending').timestamp
+        utils.getParamFromTxEvent(
+            await futarchyOracleFactory.createFutarchyOracle(
+                etherToken.address, centralizedOracle.address, 2, -100, 100,
+                lmsrMarketMaker.address, fee, deadline, now + 1000),
+            'futarchyOracle', FutarchyOracle
+        )
+
+        now = web3.eth.getBlock('pending').timestamp
+        await utils.assertRejects(
+            futarchyOracleFactory.createFutarchyOracle(
+                etherToken.address, centralizedOracle.address, 2, -100, 100,
+                lmsrMarketMaker.address, fee, deadline, now - 1000),
+            'forged FutarchyOracle with startDate in the past')
+    })
+
     it('should test futarchy oracle', async () => {
         // Create Oracles
         const centralizedOracle = utils.getParamFromTxEvent(
