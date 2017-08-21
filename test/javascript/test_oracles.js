@@ -14,7 +14,6 @@ const UltimateOracleFactory = artifacts.require('UltimateOracleFactory')
 const FutarchyOracle = artifacts.require('FutarchyOracle')
 const FutarchyOracleFactory = artifacts.require('FutarchyOracleFactory')
 const StandardMarketWithPriceLogger = artifacts.require('StandardMarketWithPriceLogger')
-const StandardMarketWithPriceLoggerFactory = artifacts.require('StandardMarketWithPriceLoggerFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
@@ -26,12 +25,11 @@ contract('Oracle', function (accounts) {
     let majorityOracleFactory
     let ultimateOracleFactory
     let futarchyOracleFactory
-    let standardMarketWithPriceLoggerFactory
     let lmsrMarketMaker
     let etherToken
     let ipfsHash, ipfsBytes
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
-    let fee, deadline, funding
+    let fee, deadline, funding, startDate, scalarEvent
 
     beforeEach(async () => {
         // deployed factory contracts
@@ -40,7 +38,6 @@ contract('Oracle', function (accounts) {
         majorityOracleFactory = await MajorityOracleFactory.deployed()
         ultimateOracleFactory = await UltimateOracleFactory.deployed()
         futarchyOracleFactory = await FutarchyOracleFactory.deployed()
-        standardMarketWithPriceLoggerFactory = await StandardMarketWithPriceLoggerFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed()
         etherToken = await EtherToken.deployed()
 
@@ -151,8 +148,8 @@ contract('Oracle', function (accounts) {
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(utils.getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'cost'
-        ), cost.valueOf())
+            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+        ), outcomeTokenCost.valueOf())
 
         // Set outcome of futarchy oracle
         await utils.assertRejects(
