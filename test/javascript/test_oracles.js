@@ -34,7 +34,7 @@ contract('Oracle', function (accounts) {
         ipfsBytes = '0x516d597741504a7a7635435a736e4136323573335866326e656d7459675070486457457a37396f6a576e50626447'
 
         // Ultimate oracle stuff
-        spreadMultiplier = 3
+        spreadMultiplier = 2
         challengePeriod = 200 // 200s
         challengeAmount = 100 // 100wei
         frontRunnerPeriod = 50 // 50s
@@ -132,40 +132,53 @@ contract('Oracle', function (accounts) {
                 spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod),
             'ultimateOracle', UltimateOracle
         )
-        
+
         // Set outcome in central oracle
         await centralizedOracle.setOutcome(1)
         assert.equal(await centralizedOracle.getOutcome(), 1)
-        
+
         // Set outcome in ultimate oracle
         await ultimateOracle.setForwardedOutcome()
         assert.equal(await ultimateOracle.forwardedOutcome(), 1)
         assert.equal(await ultimateOracle.isOutcomeSet(), false)
-        
+
         // Challenge outcome
         const sender1 = 0
         await etherToken.deposit({value: 100, from: accounts[sender1]})
         await etherToken.approve(ultimateOracle.address, 100, { from: accounts[sender1] })
         await ultimateOracle.challengeOutcome(2)
-        
+
+        // Sender 1 tries to increase their bid but can't
+        await etherToken.deposit({value: 50, from: accounts[sender1]})
+        await etherToken.approve(ultimateOracle.address, 50, { from: accounts[sender1] })
+        await ultimateOracle.voteForOutcome(2, 50, { from: accounts[sender1] })
+        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender1], 2), 100)
+
         // Sender 2 overbids sender 1
         const sender2 = 1
-        await etherToken.deposit({value: 200, from: accounts[sender2]})
-        await etherToken.approve(ultimateOracle.address, 200, { from: accounts[sender2] })
-        await ultimateOracle.voteForOutcome(3, 200, { from: accounts[sender2] })
-        
+        await etherToken.deposit({value: 150, from: accounts[sender2]})
+        await etherToken.approve(ultimateOracle.address, 150, { from: accounts[sender2] })
+        await ultimateOracle.voteForOutcome(3, 150, { from: accounts[sender2] })
+        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender2], 3), 150)
+
+        // Sender 2 tries to increase his front runner position by 150 but can only increase it by 50
+        await etherToken.deposit({value: 150, from: accounts[sender2]})
+        await etherToken.approve(ultimateOracle.address, 150, { from: accounts[sender2] })
+        await ultimateOracle.voteForOutcome(3, 150, { from: accounts[sender2] })
+        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender2], 3), 200)
+
         // Trying to withdraw before front runner period ends fails
         await utils.assertRejects(
             ultimateOracle.withdraw({from: accounts[sender2]}),
             'withdrew before front runner period')
-        
+
         // Wait for front runner period to pass
         assert.equal(await ultimateOracle.isOutcomeSet(), false)
         await wait(frontRunnerPeriod + 1)
         assert.equal(await ultimateOracle.isOutcomeSet(), true)
 
         assert.equal(await ultimateOracle.getOutcome(), 3)
-        
+
         // Withdraw winnings
         assert.equal(utils.getParamFromTxEvent(
             await ultimateOracle.withdraw({from: accounts[sender2]}), 'amount'
@@ -185,16 +198,16 @@ contract('Oracle', function (accounts) {
                 spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod),
                 'ultimateOracle', UltimateOracle
         )
-        
+
         // Set outcome in central oracle
         await centralizedOracle.setOutcome(1)
         assert.equal(await centralizedOracle.getOutcome(), 1)
-        
+
         // Set outcome in ultimate oracle
         await ultimateOracle.setForwardedOutcome()
         assert.equal(await ultimateOracle.forwardedOutcome(), 1)
         assert.equal(await ultimateOracle.isOutcomeSet(), false)
-        
+
         // Wait for challenge period to pass
         await wait(challengePeriod + 1)
         assert.equal(await ultimateOracle.isOutcomeSet(), true)
