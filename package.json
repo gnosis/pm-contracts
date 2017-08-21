@@ -8,7 +8,7 @@
     "migrate": "truffle migrate",
     "networks": "truffle networks",
     "test-norpc": "truffle test",
-    "test": "run-with-testrpc 'truffle test'",
+    "test": "run-with-testrpc -l 40000000 'truffle test'",
     "coverage": "solidity-coverage",
     "injectnetinfo": "node scripts/inject_network_info.js",
     "extractnetinfo": "node scripts/extract_network_info.js",
