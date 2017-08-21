@@ -188,7 +188,7 @@ contract('Market', function (accounts) {
         const funding = 1e18
         const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
-            await campaignFactory.createCampaigns(
+            await campaignFactory.createCampaign(
                 event.address,
                 standardMarketFactory.address,
                 lmsrMarketMaker.address,
@@ -276,7 +276,7 @@ contract('Market', function (accounts) {
         const funding = 1e18
         const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
-            await campaignFactory.createCampaigns(
+            await campaignFactory.createCampaign(
                 event.address,
                 standardMarketFactory.address,
                 lmsrMarketMaker.address,
