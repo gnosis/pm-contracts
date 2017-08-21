@@ -107,7 +107,13 @@ contract UltimateOracle is Oracle {
     function voteForOutcome(int _outcome, uint amount)
         public
     {
-        uint maxAmount = (totalAmount - totalOutcomeAmounts[_outcome]).mul(spreadMultiplier).sub(totalOutcomeAmounts[_outcome]);
+        uint maxAmount = (totalAmount - totalOutcomeAmounts[_outcome]).mul(spreadMultiplier);
+
+        if (maxAmount > totalOutcomeAmounts[_outcome])
+            maxAmount -= totalOutcomeAmounts[_outcome];
+        else
+            maxAmount = 0;
+
         if (amount > maxAmount)
             amount = maxAmount;
         // Outcome is challenged and front runner period is not over yet and tokens can be transferred
