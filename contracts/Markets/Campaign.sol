@@ -1,4 +1,4 @@
-pragma solidity 0.4.13;
+pragma solidity 0.4.15;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "../Utils/Math.sol";

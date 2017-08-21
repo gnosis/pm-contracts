@@ -1,4 +1,4 @@
-pragma solidity 0.4.13;
+pragma solidity 0.4.15;
 
 
 /// @title Abstract oracle contract - Functions to be implemented by oracles
