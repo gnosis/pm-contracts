@@ -30,6 +30,12 @@ Testing and Linting
 npm test
 ```
 
+### Run all tests matching a regexp pattern by setting the `TEST_GREP` environment variable
+
+```bash
+TEST_GREP='short selling' npm test
+```
+
 ### Lint the JS
 
 ```bash
