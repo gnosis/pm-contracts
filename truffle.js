@@ -4,14 +4,13 @@ module.exports = {
             host: "localhost",
             port: 8545,
             network_id: "*", // Match any network id
-            gas: 0x2625A00, // 40000000
-            gasPrice: 0x01
+            gas: 40000000
         },
         coverage: {
             host: "localhost",
             network_id: "*",
             port: 8555,
-            gas: 0x2625A00,
+            gas: 0xfffffffffff,
             gasPrice: 0x01
         },
         kovan: {

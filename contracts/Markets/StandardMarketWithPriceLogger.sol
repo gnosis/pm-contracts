@@ -34,7 +34,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
             startDate = now;
         else {
             // The earliest start date is the market creation date
-            require(startDate >= now);
+            require(_startDate >= now);
             startDate = _startDate;
         }
     }
