@@ -5,6 +5,7 @@ let config = {
     hdWalletMnemonic: 'bag path text august check lab grit fatigue antenna stem trouble cluster',
 }
 
+// eslint-disable-next-line no-empty
 try { Object.assign(config, require('./local-config')) } catch(e) { }
 
 module.exports = {
