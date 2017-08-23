@@ -32,6 +32,8 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         public
         StandardMarket(_creator, _eventContract, _marketMaker, _fee)
     {
+        require(eventContract.getOutcomeCount() == 2);
+
         if (_startDate == 0)
             startDate = now;
         else {
@@ -42,7 +44,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
 
         lastTradeDate = startDate;
         // initialize lastTradePrice to assuming uniform probabilities of outcomes
-        lastTradePrice = ONE / eventContract.getOutcomeCount();
+        lastTradePrice = ONE / 2;
     }
 
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
