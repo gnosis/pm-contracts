@@ -27,7 +27,7 @@ contract FutarchyOracle is Oracle {
     address creator;
     StandardMarketWithPriceLogger[] public markets;
     CategoricalEvent public categoricalEvent;
-    uint public deadline;
+    uint public tradingPeriod;
     uint public winningMarketIndex;
     bool public isSet;
 
@@ -54,7 +54,7 @@ contract FutarchyOracle is Oracle {
     /// @param marketFactory Market factory contract
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
-    /// @param _deadline Decision deadline
+    /// @param _tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
     function FutarchyOracle(
         address _creator,
@@ -67,14 +67,14 @@ contract FutarchyOracle is Oracle {
         StandardMarketWithPriceLoggerFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
-        uint _deadline,
+        uint _tradingPeriod,
         uint startDate
 
     )
         public
     {
-        // Deadline is in the future
-        require(_deadline > 0);
+        // trading period is at least a second
+        require(_tradingPeriod > 0);
         // Create decision event
         categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
         // Create outcome events
@@ -88,7 +88,7 @@ contract FutarchyOracle is Oracle {
             markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, startDate));
         }
         creator = _creator;
-        deadline = _deadline;
+        tradingPeriod = _tradingPeriod;
     }
 
     /// @dev Funds all markets with equal amount of funding
@@ -133,8 +133,8 @@ contract FutarchyOracle is Oracle {
     function setOutcome()
         public
     {
-        // Outcome is not set yet and deadline has passed
-        require(!isSet && markets[0].startDate() + deadline < now);
+        // Outcome is not set yet and trading period is over
+        require(!isSet && markets[0].startDate() + tradingPeriod < now);
         // Find market with highest marginal price for long outcome tokens
         uint highestAvgPrice = markets[0].getAvgPrice();
         uint highestIndex = 0;
