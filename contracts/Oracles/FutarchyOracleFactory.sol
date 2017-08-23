@@ -19,7 +19,7 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketMaker marketMaker,
         uint24 fee,
-        uint deadline,
+        uint tradingPeriod,
         uint startDate
     );
 
@@ -51,7 +51,7 @@ contract FutarchyOracleFactory {
     /// @param upperBound Lower bound for event outcome
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
-    /// @param deadline Decision deadline
+    /// @param tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
     /// @return Oracle contract
     function createFutarchyOracle(
@@ -62,7 +62,7 @@ contract FutarchyOracleFactory {
         int upperBound,
         MarketMaker marketMaker,
         uint24 fee,
-        uint deadline,
+        uint tradingPeriod,
         uint startDate
     )
         public
@@ -79,7 +79,7 @@ contract FutarchyOracleFactory {
             marketFactory,
             marketMaker,
             fee,
-            deadline,
+            tradingPeriod,
             startDate
         );
         FutarchyOracleCreation(
@@ -92,7 +92,7 @@ contract FutarchyOracleFactory {
             upperBound,
             marketMaker,
             fee,
-            deadline,
+            tradingPeriod,
             startDate
         );
     }
