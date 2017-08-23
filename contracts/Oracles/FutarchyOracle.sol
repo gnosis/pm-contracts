@@ -1,7 +1,7 @@
 pragma solidity 0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
-import "../Markets/MarketFactory.sol";
+import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
 
 
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
@@ -25,16 +25,16 @@ contract FutarchyOracle is Oracle {
      *  Storage
      */
     address creator;
-    Market[] public markets;
+    StandardMarketWithPriceLogger[] public markets;
     CategoricalEvent public categoricalEvent;
-    uint public deadline;
+    uint public tradingPeriod;
     uint public winningMarketIndex;
     bool public isSet;
 
     /*
      *  Modifiers
      */
-    modifier isCreator () {
+    modifier isCreator() {
         // Only creator is allowed to proceed
         require(msg.sender == creator);
         _;
@@ -54,7 +54,8 @@ contract FutarchyOracle is Oracle {
     /// @param marketFactory Market factory contract
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
-    /// @param _deadline Decision deadline
+    /// @param _tradingPeriod Trading period before decision can be determined
+    /// @param startDate Start date for price logging
     function FutarchyOracle(
         address _creator,
         EventFactory eventFactory,
@@ -63,15 +64,17 @@ contract FutarchyOracle is Oracle {
         uint8 outcomeCount,
         int lowerBound,
         int upperBound,
-        MarketFactory marketFactory,
+        StandardMarketWithPriceLoggerFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
-        uint _deadline
+        uint _tradingPeriod,
+        uint startDate
+
     )
         public
     {
-        // Deadline is in the future
-        require(_deadline > now);
+        // trading period is at least a second
+        require(_tradingPeriod > 0);
         // Create decision event
         categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
         // Create outcome events
@@ -82,10 +85,10 @@ contract FutarchyOracle is Oracle {
                 lowerBound,
                 upperBound
             );
-            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee));
+            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, startDate));
         }
         creator = _creator;
-        deadline = _deadline;
+        tradingPeriod = _tradingPeriod;
     }
 
     /// @dev Funds all markets with equal amount of funding
@@ -130,15 +133,15 @@ contract FutarchyOracle is Oracle {
     function setOutcome()
         public
     {
-        // Outcome is not set yet and deadline has passed
-        require(!isSet && deadline <= now);
+        // Outcome is not set yet and trading period is over
+        require(!isSet && markets[0].startDate() + tradingPeriod < now);
         // Find market with highest marginal price for long outcome tokens
-        uint highestMarginalPrice = markets[0].marketMaker().calcMarginalPrice(markets[0], LONG);
+        uint highestAvgPrice = markets[0].getAvgPrice();
         uint highestIndex = 0;
         for (uint8 i = 1; i < markets.length; i++) {
-            uint marginalPrice = markets[i].marketMaker().calcMarginalPrice(markets[i], LONG);
-            if (marginalPrice > highestMarginalPrice) {
-                highestMarginalPrice = marginalPrice;
+            uint avgPrice = markets[i].getAvgPrice();
+            if (avgPrice > highestAvgPrice) {
+                highestAvgPrice = avgPrice;
                 highestIndex = i;
             }
         }

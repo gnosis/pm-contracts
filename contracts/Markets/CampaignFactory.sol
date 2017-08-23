@@ -9,7 +9,7 @@ contract CampaignFactory {
     /*
      *  Events
      */
-    event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, MarketFactory marketFactory, MarketMaker marketMaker, uint24 fee, uint funding, uint deadline);
+    event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, StandardMarketFactory marketFactory, MarketMaker marketMaker, uint24 fee, uint funding, uint deadline);
 
     /*
      *  Public functions
@@ -22,9 +22,9 @@ contract CampaignFactory {
     /// @param funding Initial funding for market
     /// @param deadline Campaign deadline
     /// @return Market contract
-    function createCampaigns(
+    function createCampaign(
         Event eventContract,
-        MarketFactory marketFactory,
+        StandardMarketFactory marketFactory,
         MarketMaker marketMaker,
         uint24 fee,
         uint funding,
