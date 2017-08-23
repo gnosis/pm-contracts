@@ -7,6 +7,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /*
      *  Constants
      */
+    uint constant ONE = 0x10000000000000000;
     uint8 public constant LONG = 1;
 
     /*
@@ -14,7 +15,8 @@ contract StandardMarketWithPriceLogger is StandardMarket {
      */
     uint public startDate;
     uint public endDate;
-    uint public lastTrade;
+    uint public lastTradeDate;
+    uint public lastTradePrice;
     uint public priceIntegral;
 
     /*
@@ -37,6 +39,10 @@ contract StandardMarketWithPriceLogger is StandardMarket {
             require(_startDate >= now);
             startDate = _startDate;
         }
+
+        lastTradeDate = startDate;
+        // initialize lastTradePrice to assuming uniform probabilities of outcomes
+        lastTradePrice = ONE / eventContract.getOutcomeCount();
     }
 
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
@@ -56,8 +62,9 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         public
         returns (uint cost)
     {
-        logPrice();
+        logPriceBefore();
         cost = super.buy(outcomeTokenIndex, outcomeTokenCount, maxCost);
+        logPriceAfter();
     }
 
     /// @dev Allows to sell outcome tokens to market maker
@@ -69,8 +76,9 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         public
         returns (uint profit)
     {
-        logPrice();
+        logPriceBefore();
         profit = super.sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
+        logPriceAfter();
     }
 
     /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
@@ -83,35 +91,42 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         public
         returns (uint cost)
     {
-        logPrice();
+        logPriceBefore();
         cost = super.shortSell(outcomeTokenIndex, outcomeTokenCount, minProfit);
+        logPriceAfter();
     }
 
     /// @dev Calculates average price for long tokens based on price integral
-    /// @return Average price for long tokens
+    /// @return Average price for long tokens over time
     function getAvgPrice()
         public
         returns (uint)
     {
-        return priceIntegral / (now - startDate);
+        if(endDate > 0)
+            return (priceIntegral + lastTradePrice * (endDate - lastTradeDate)) / (endDate - startDate);
+        return (priceIntegral + lastTradePrice * (now - lastTradeDate)) / (now - startDate);
     }
 
     /*
      *  Private functions
      */
-    /// @dev Adds price integral since the last trade to the total price integral and updates last
-    ///      trade timestamp
-    function logPrice()
+    /// @dev Adds price integral since the last trade to the total price integral
+    function logPriceBefore()
         private
     {
         if (now >= startDate) {
-            // Calculate price of long tokens
-            uint price = marketMaker.calcMarginalPrice(this, LONG);
-            if (lastTrade > 0)
-                priceIntegral += price * (now - lastTrade);
-            else
-                priceIntegral += price * (now - startDate);
-            lastTrade = now;
+            // Accumulate price integral only if logging has begun
+            priceIntegral += lastTradePrice * (now - lastTradeDate);
         }
+    }
+
+    /// @dev Updates last trade timestamp and price
+    function logPriceAfter()
+        private
+    {
+        // Refresh lastTradePrice after every transactions as we don't know if
+        // this will be the last transaction before logging period starts
+        lastTradePrice = marketMaker.calcMarginalPrice(this, LONG);
+        lastTradeDate = now;
     }
 }
