@@ -138,3 +138,8 @@ coverage.json
 coverage/
 coverageEnv/
 scTopics
+
+# Project stuff #
+#################
+
+local-config.js

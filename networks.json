@@ -1,5 +1,204 @@
 {
+  "CampaignFactory": {
+    "3": {
+      "events": {
+        "0x7a9fd19b658538a67209802dd9011d6e3ce04586fe93c87096d2bc40ed850866": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "campaign",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "eventContract",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "funding",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "CampaignCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0x9326454039077bcea0705d6b68c8e9b104094a1c",
+      "updated_at": 1503565634858
+    },
+    "4": {
+      "events": {
+        "0x7a9fd19b658538a67209802dd9011d6e3ce04586fe93c87096d2bc40ed850866": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "campaign",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "eventContract",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "funding",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "CampaignCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
+      },
+      "address": "0xf51b1544362ce80a542b76c49cce564497cf1bd0",
+      "updated_at": 1503566386592
+    },
+    "42": {
+      "events": {
+        "0x7a9fd19b658538a67209802dd9011d6e3ce04586fe93c87096d2bc40ed850866": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "campaign",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "eventContract",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "funding",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "CampaignCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
+      },
+      "address": "0xa7d9194869e416947dc06c6922763c89b912e777",
+      "updated_at": 1503552021418
+    }
+  },
   "CentralizedOracleFactory": {
+    "3": {
+      "events": {
+        "0x33a1926cf5c2f7306ac1685bf19260d678fea874f5f59c00b69fa5e2643ecfd2": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "centralizedOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "ipfsHash",
+              "type": "bytes"
+            }
+          ],
+          "name": "CentralizedOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x0dd253f644e702346ec67839088ae5954d51e76b",
+      "updated_at": 1503565634856
+    },
     "4": {
       "events": {
         "0x33a1926cf5c2f7306ac1685bf19260d678fea874f5f59c00b69fa5e2643ecfd2": {
@@ -26,8 +225,8 @@
         }
       },
       "links": {},
-      "address": "0x1d8d6b851859e4ff5144ffd0c7f9a8951f42f18d",
-      "updated_at": 1499271142589
+      "address": "0xe8d7862d2ad41dd0d4dda98b47523f1238cf2155",
+      "updated_at": 1503566386588
     },
     "42": {
       "events": {
@@ -55,11 +254,187 @@
         }
       },
       "links": {},
-      "address": "0x81dcec0e6edb95e6633ffa06886a04d1e350d992",
-      "updated_at": 1499207793335
+      "address": "0xcb3d9f8a7514fb02314d549006b385061b5a255c",
+      "updated_at": 1503552021416
+    }
+  },
+  "DifficultyOracleFactory": {
+    "3": {
+      "events": {
+        "0x83ecbb7b33dba848fcbd61d437ac02705db443e66f76ce6be0cf3415d07ab17f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "difficultyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "blockNumber",
+              "type": "uint256"
+            }
+          ],
+          "name": "DifficultyOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x4b9d168269dda8630fb4d064dbcbbe90d0286158",
+      "updated_at": 1503565634857
+    },
+    "4": {
+      "events": {
+        "0x83ecbb7b33dba848fcbd61d437ac02705db443e66f76ce6be0cf3415d07ab17f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "difficultyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "blockNumber",
+              "type": "uint256"
+            }
+          ],
+          "name": "DifficultyOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x11bcc6eea4ac6415eed82db3c544e7bdb701129e",
+      "updated_at": 1503566386590
+    },
+    "42": {
+      "events": {
+        "0x83ecbb7b33dba848fcbd61d437ac02705db443e66f76ce6be0cf3415d07ab17f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "difficultyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "blockNumber",
+              "type": "uint256"
+            }
+          ],
+          "name": "DifficultyOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x88b414ba70f43a9e375c675784bf52782e309fa2",
+      "updated_at": 1503552021417
     }
   },
   "EtherToken": {
+    "3": {
+      "events": {
+        "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Deposit",
+          "type": "event"
+        },
+        "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "receiver",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Withdrawal",
+          "type": "event"
+        },
+        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event"
+        },
+        "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "spender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0x5acfa40d828f2d3a88b49ff4da31b868380ce414",
+      "updated_at": 1503565634853
+    },
     "4": {
       "events": {
         "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c": {
@@ -142,10 +517,10 @@
         }
       },
       "links": {
-        "Math": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b"
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
       },
-      "address": "0xb9518c7ff807b7b1b30ea05735237d739e27550d",
-      "updated_at": 1499271142591
+      "address": "0x9326454039077bcea0705d6b68c8e9b104094a1c",
+      "updated_at": 1503566386583
     },
     "42": {
       "events": {
@@ -229,13 +604,91 @@
         }
       },
       "links": {
-        "Math": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc"
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
       },
-      "address": "0x0a8c7932880b4d8d4c7e1b08f89ff34f42f5d34d",
-      "updated_at": 1499207793332
+      "address": "0x1907a19f941dfbf42807ec950e0a32eec194dc55",
+      "updated_at": 1503552021410
     }
   },
   "EventFactory": {
+    "3": {
+      "events": {
+        "0x9732758aee476f5125b50d29cc43e28422f12ec078ba9f5c712f9dbd52796f59": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "categoricalEvent",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "outcomeCount",
+              "type": "uint8"
+            }
+          ],
+          "name": "CategoricalEventCreation",
+          "type": "event"
+        },
+        "0xd613e63983a1538814e1b390fc232d0e20462cf7410924f6b6a5f29ea38e82ed": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "scalarEvent",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "lowerBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "upperBound",
+              "type": "int256"
+            }
+          ],
+          "name": "ScalarEventCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0xf51b1544362ce80a542b76c49cce564497cf1bd0",
+      "updated_at": 1503565634848
+    },
     "4": {
       "events": {
         "0x9732758aee476f5125b50d29cc43e28422f12ec078ba9f5c712f9dbd52796f59": {
@@ -309,10 +762,10 @@
         }
       },
       "links": {
-        "Math": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b"
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
       },
-      "address": "0xaf895ec648b5572ac427268e6371654bc3689080",
-      "updated_at": 1499271142595
+      "address": "0xd5daa4b168352ea239cab95cf68a7d4002a6153d",
+      "updated_at": 1503566386579
     },
     "42": {
       "events": {
@@ -387,59 +840,412 @@
         }
       },
       "links": {
-        "Math": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc"
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
       },
-      "address": "0x4c2a3cec05ffd4c2a476bffd6c317bf497d43bc5",
-      "updated_at": 1499207793329
+      "address": "0xac2ac3c6f65c38a2dea7ebfc6cf6b96f67e9275f",
+      "updated_at": 1503552021416
+    }
+  },
+  "FutarchyOracleFactory": {
+    "3": {
+      "links": {},
+      "events": {
+        "0xb6cae7fe38a26a3ab1db425a9de717942f485b91c2b1cccc5349ecb94b992ecf": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "futarchyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "outcomeCount",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "name": "lowerBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "upperBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "FutarchyOracleCreation",
+          "type": "event"
+        }
+      },
+      "updated_at": 1503565634857
+    },
+    "4": {
+      "links": {},
+      "events": {
+        "0xb6cae7fe38a26a3ab1db425a9de717942f485b91c2b1cccc5349ecb94b992ecf": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "futarchyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "outcomeCount",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "name": "lowerBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "upperBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "FutarchyOracleCreation",
+          "type": "event"
+        }
+      },
+      "updated_at": 1503566386591
+    },
+    "42": {
+      "links": {},
+      "events": {
+        "0xb6cae7fe38a26a3ab1db425a9de717942f485b91c2b1cccc5349ecb94b992ecf": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "futarchyOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "outcomeCount",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "name": "lowerBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "upperBound",
+              "type": "int256"
+            },
+            {
+              "indexed": false,
+              "name": "marketFactory",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            },
+            {
+              "indexed": false,
+              "name": "deadline",
+              "type": "uint256"
+            }
+          ],
+          "name": "FutarchyOracleCreation",
+          "type": "event"
+        }
+      },
+      "updated_at": 1503552021417
     }
   },
   "LMSRMarketMaker": {
+    "3": {
+      "events": {},
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0x679ef161af4bb37b14a6d06d2e2a991d3650005c",
+      "updated_at": 1503565634858
+    },
     "4": {
       "events": {},
       "links": {
-        "Math": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b"
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
       },
-      "address": "0x7c2e1876b8bc73ad3571a9ae07e034cbbd8b4386",
-      "updated_at": 1499271142596
+      "address": "0xcc9a28a40a25be4d9b8c3134aa6fd8b38f817123",
+      "updated_at": 1503566386590
     },
     "42": {
       "events": {},
       "links": {
-        "Math": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc"
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
       },
-      "address": "0x19f7eca6fad8fa20a3e21993346ba8997aee604e",
-      "updated_at": 1499207793336
+      "address": "0x3e842e2da991afdb070c58e1c67ac49fc3d3c6c7",
+      "updated_at": 1503552021417
+    }
+  },
+  "MajorityOracleFactory": {
+    "3": {
+      "events": {
+        "0xdf1eeefc4815bdd1bdf45905c4ce59f6ca50efb4148303c9bbda2bff40301d3d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "majorityOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracles",
+              "type": "address[]"
+            }
+          ],
+          "name": "MajorityOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xe8d7862d2ad41dd0d4dda98b47523f1238cf2155",
+      "updated_at": 1503565634857
+    },
+    "4": {
+      "events": {
+        "0xdf1eeefc4815bdd1bdf45905c4ce59f6ca50efb4148303c9bbda2bff40301d3d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "majorityOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracles",
+              "type": "address[]"
+            }
+          ],
+          "name": "MajorityOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x4b9d168269dda8630fb4d064dbcbbe90d0286158",
+      "updated_at": 1503566386589
+    },
+    "42": {
+      "events": {
+        "0xdf1eeefc4815bdd1bdf45905c4ce59f6ca50efb4148303c9bbda2bff40301d3d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "majorityOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracles",
+              "type": "address[]"
+            }
+          ],
+          "name": "MajorityOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x90f0dd731004ff6c9372389dd57a98b2383260b6",
+      "updated_at": 1503552021416
     }
   },
   "Math": {
+    "3": {
+      "events": {},
+      "links": {},
+      "address": "0xd02599977a57c6905518c47a702aa99d51682602",
+      "updated_at": 1503565634848
+    },
     "4": {
       "events": {},
       "links": {},
-      "address": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b",
-      "updated_at": 1499271142589
+      "address": "0x0dd253f644e702346ec67839088ae5954d51e76b",
+      "updated_at": 1503566386579
     },
     "42": {
       "events": {},
       "links": {},
-      "address": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc",
-      "updated_at": 1499207793335
+      "address": "0x983ada90e921e6c95b10b3302b813c1f7888baa3",
+      "updated_at": 1503552021416
     }
   },
   "Migrations": {
-    "4": {
-      "events": {},
+    "3": {
       "links": {},
-      "address": "0x95d4bd23860a6217c4b4c17d81d8f089b2df8347",
-      "updated_at": 1499271142595
+      "events": {},
+      "updated_at": 1503565634858
+    },
+    "4": {
+      "links": {},
+      "events": {},
+      "updated_at": 1503566386592
     },
     "42": {
-      "events": {},
       "links": {},
-      "address": "0x67b102d3ab8d9d911e72415759ab493dda20d4d6",
-      "updated_at": 1499207793336
+      "events": {},
+      "updated_at": 1503552021419
     }
   },
   "StandardMarketFactory": {
+    "3": {
+      "events": {
+        "0xc9a97f5cb9f16e2d0431bd2aba96bf6fd6169026a7c7172865e5db48de5fb773": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "eventContract",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "marketMaker",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "fee",
+              "type": "uint24"
+            }
+          ],
+          "name": "MarketCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0xcc9a28a40a25be4d9b8c3134aa6fd8b38f817123",
+      "updated_at": 1503565634858
+    },
     "4": {
       "events": {
         "0xc9a97f5cb9f16e2d0431bd2aba96bf6fd6169026a7c7172865e5db48de5fb773": {
@@ -476,10 +1282,10 @@
         }
       },
       "links": {
-        "Math": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b"
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
       },
-      "address": "0xd1acd0a2c697950085ed1c6b3d56d9bdd169b4db",
-      "updated_at": 1499271142596
+      "address": "0x5acfa40d828f2d3a88b49ff4da31b868380ce414",
+      "updated_at": 1503566386591
     },
     "42": {
       "events": {
@@ -517,13 +1323,69 @@
         }
       },
       "links": {
-        "Math": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc"
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
       },
-      "address": "0x6855c73f9ff338afcbc9aec03a2ede77ced4832c",
-      "updated_at": 1499207793336
+      "address": "0x926c0aca85851bbfa2369c419743b55b9e11db8b",
+      "updated_at": 1503552021417
     }
   },
   "UltimateOracleFactory": {
+    "3": {
+      "events": {
+        "0xe6ae2b8211e9721c5dae1d93f70be0ba07bd111608ba4db4317742e1a87fff40": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "creator",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "ultimateOracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "oracle",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "spreadMultiplier",
+              "type": "uint8"
+            },
+            {
+              "indexed": false,
+              "name": "challengePeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "challengeAmount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "name": "frontRunnerPeriod",
+              "type": "uint256"
+            }
+          ],
+          "name": "UltimateOracleCreation",
+          "type": "event"
+        }
+      },
+      "links": {
+        "Math": "0xd02599977a57c6905518c47a702aa99d51682602"
+      },
+      "address": "0x11bcc6eea4ac6415eed82db3c544e7bdb701129e",
+      "updated_at": 1503565634857
+    },
     "4": {
       "events": {
         "0xe6ae2b8211e9721c5dae1d93f70be0ba07bd111608ba4db4317742e1a87fff40": {
@@ -575,10 +1437,10 @@
         }
       },
       "links": {
-        "Math": "0xbb14515de6c9e26c82c5067d02eaa82231029f2b"
+        "Math": "0x0dd253f644e702346ec67839088ae5954d51e76b"
       },
-      "address": "0x8b88b48f99388af5b4c69e661d7554fb6c8b092f",
-      "updated_at": 1499271142596
+      "address": "0x679ef161af4bb37b14a6d06d2e2a991d3650005c",
+      "updated_at": 1503566386591
     },
     "42": {
       "events": {
@@ -631,10 +1493,10 @@
         }
       },
       "links": {
-        "Math": "0x7db54f831aaa06bdf5a9e437cfed1d4ad2cee2cc"
+        "Math": "0x983ada90e921e6c95b10b3302b813c1f7888baa3"
       },
-      "address": "0x900b923d8afb3cb45072940742f5010ec5a85a68",
-      "updated_at": 1499207793336
+      "address": "0x75ce8a967ca8ea61f3651e9c0384659d49d0e936",
+      "updated_at": 1503552021417
     }
   }
 }

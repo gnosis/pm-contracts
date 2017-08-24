@@ -1,3 +1,13 @@
+const HDWalletProvider = require('truffle-hdwallet-provider')
+
+let config = {
+    infuraAccessToken: '',
+    hdWalletMnemonic: 'bag path text august check lab grit fatigue antenna stem trouble cluster',
+}
+
+// eslint-disable-next-line no-empty
+try { Object.assign(config, require('./local-config')) } catch(e) { }
+
 module.exports = {
     networks: {
         development: {
@@ -13,15 +23,18 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
+        ropsten: {
+            network_id: "3",
+            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://ropsten.infura.io/${config.infuraAccessToken}`),
+        },
         kovan: {
-            host: "localhost",
-            port: 8545,
-            network_id: "42"
+            network_id: "42",
+            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://kovan.infura.io/${config.infuraAccessToken}`),
         },
         rinkeby: {
-            host: "localhost",
-            port: 8545,
-            network_id: "4"
+            network_id: "4",
+            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://rinkeby.infura.io/${config.infuraAccessToken}`),
+            gasPrice: 1e11,
         },
     },
     mocha: {
