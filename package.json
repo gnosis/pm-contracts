@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/gnosis-core-contracts",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
