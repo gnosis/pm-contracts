@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/gnosis-core-contracts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
@@ -12,6 +12,7 @@
     "coverage": "solidity-coverage",
     "injectnetinfo": "node scripts/inject_network_info.js",
     "extractnetinfo": "node scripts/extract_network_info.js",
+    "resetnetinfo": "truffle networks --clean && node scripts/inject_network_info.js",
     "prepublish": "eslint . && truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
   },
   "keywords": [
