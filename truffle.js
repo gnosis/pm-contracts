@@ -22,7 +22,7 @@ module.exports = {
             gas: 0xfffffffffff,
             gasPrice: 0x01
         },
-        morden: {
+        ropsten: {
             network_id: "3",
             provider: new HDWalletProvider(config.hdWalletMnemonic, `https://ropsten.infura.io/${config.infuraAccessToken}`),
         },
@@ -33,7 +33,7 @@ module.exports = {
         rinkeby: {
             network_id: "4",
             provider: new HDWalletProvider(config.hdWalletMnemonic, `https://rinkeby.infura.io/${config.infuraAccessToken}`),
-            gas: 4000000
+            gasPrice: 1e11,
         },
     },
     mocha: {
