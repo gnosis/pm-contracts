@@ -91,6 +91,15 @@ Be aware that this will clobber `networks.json`, so be careful with this command
 npm run extractnetinfo
 ```
 
+Gas Measurements
+----------------
+
+### Log gas measurements into `build/gas-stats.json`
+
+```bash
+npm run measuregasstats
+```
+
 Security and Liability
 ----------------------
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
