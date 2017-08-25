@@ -1,6 +1,7 @@
 const _ = require('lodash')
 
-const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent } = require('./utils')
+const utils = require('./utils')
+const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent } = utils
 
 const EventFactory = artifacts.require('EventFactory')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
@@ -11,12 +12,17 @@ const Token = artifacts.require('Token')
 const Market = artifacts.require('Market')
 const Event = artifacts.require('Event')
 
+const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, EtherToken, Token, Market, Event]
+
 contract('MarketMaker', function(accounts) {
     let eventFactory
     let centralizedOracleFactory
     let standardMarketFactory
     let lmsrMarketMaker
     let etherToken
+
+    before(utils.createGasStatCollectorBeforeHook(contracts))
+    after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         eventFactory = await EventFactory.deployed()

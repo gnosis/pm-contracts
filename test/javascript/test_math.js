@@ -1,13 +1,19 @@
 const _ = require('lodash')
 
-const { Decimal, isClose, randrange, randnums, ONE, assertRejects } = require('./utils')
+const utils = require('./utils')
+const { Decimal, isClose, randrange, randnums, ONE, assertRejects } = utils
 
 const MathLib = artifacts.require('Math')
+
+const contracts = [MathLib]
 
 contract('Math', function () {
     const MAX_SVALUE = Decimal(2).pow(255).sub(1)
     const MAX_VALUE = Decimal(2).pow(256).sub(1)
     let mathLib
+
+    before(utils.createGasStatCollectorBeforeHook(contracts))
+    after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         mathLib = await MathLib.deployed()

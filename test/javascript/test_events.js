@@ -7,11 +7,16 @@ const EtherToken = artifacts.require('EtherToken')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 
+const contracts = [Event, EventFactory, Token, EtherToken, CentralizedOracle, CentralizedOracleFactory]
+
 contract('Event', function (accounts) {
     let centralizedOracleFactory
     let eventFactory
     let etherToken
     let ipfsHash, oracle, event
+
+    before(utils.createGasStatCollectorBeforeHook(contracts))
+    after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
