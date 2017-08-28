@@ -1,10 +1,20 @@
 /* eslint-disable no-console */
 
 const { spawnSync } = require('child_process')
-const fs = require('fs');
+const fs = require('fs')
+const path = require('path')
 const _ = require('lodash')
 
-const gasStatsFile = 'build/gas-stats.json'
+const buildFolder = 'build'
+const gasStatsFile = path.join(buildFolder, 'gas-stats.json')
+
+try {
+    fs.mkdirSync(buildFolder)
+} catch(e) {
+    if(e.code !== 'EEXIST') {
+        console.warn(`Could not create ${buildFolder}: ${e}`)
+    }
+}
 
 try {
     fs.unlinkSync(gasStatsFile)
