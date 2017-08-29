@@ -89,11 +89,6 @@ function setupProxiesForGasStats(instance, gasStats) {
 
             fnGasStats.data.push(datum)
 
-            if(fnGasStats.min == null || fnGasStats.min.gasUsed > datum.gasUsed)
-                fnGasStats.min = datum
-            if(fnGasStats.max == null || fnGasStats.max.gasUsed < datum.gasUsed)
-                fnGasStats.max = datum
-
             return result
         }
     })
@@ -149,12 +144,6 @@ function createGasStatCollectorAfterHook(contracts) {
                         const existingFnData = existingContractData[fnName]
                         if(existingFnData != null) {
                             Array.prototype.push.apply(existingFnData.data, fnData.data)
-
-                            if(existingFnData.max.gasCost < fnData.max.gasCost)
-                                existingFnData.max = fnData.max
-                            if(existingFnData.min.gasCost > fnData.min.gasCost)
-                                existingFnData.min = fnData.min
-
                         } else {
                             existingContractData[fnName] = fnData
                         }

@@ -38,7 +38,9 @@ _.forEach(gasStats, (contractData, contractName) => {
     console.log(`Contract: ${contractName}`)
     _.forEach(contractData, (fnData, fnName) => {
         fnData.averageGasUsed = fnData.data.reduce((acc, datum) => acc + datum.gasUsed, 0) / fnData.data.length
-        let sortedData = _.sortBy(fnData.data, 'gasUsed')
+        const sortedData = _.sortBy(fnData.data, 'gasUsed')
+        fnData.min = sortedData[0]
+        fnData.max = sortedData[sortedData.length - 1]
         fnData.median = sortedData[(sortedData.length / 2) | 0]
         console.log(`  ${fnName}:
     min: ${fnData.min.gasUsed}
