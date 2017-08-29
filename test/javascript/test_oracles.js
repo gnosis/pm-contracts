@@ -19,6 +19,8 @@ const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const Token = artifacts.require('Token')
 
+const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, DifficultyOracle, DifficultyOracleFactory, MajorityOracle, MajorityOracleFactory, UltimateOracle, UltimateOracleFactory, FutarchyOracle, FutarchyOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, Token]
+
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
     let difficultyOracleFactory
@@ -30,6 +32,9 @@ contract('Oracle', function (accounts) {
     let ipfsHash, ipfsBytes
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
     let fee, deadline, funding, startDate
+
+    before(utils.createGasStatCollectorBeforeHook(contracts))
+    after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         // deployed factory contracts

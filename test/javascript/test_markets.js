@@ -1,6 +1,7 @@
 const { wait } = require('@digix/tempo')(web3)
 
-const { getParamFromTxEvent, assertRejects } = require('./utils')
+const utils = require('./utils')
+const { getParamFromTxEvent, assertRejects } = utils
 
 const Event = artifacts.require('Event')
 const EventFactory = artifacts.require('EventFactory')
@@ -14,6 +15,8 @@ const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const Campaign = artifacts.require('Campaign')
 const CampaignFactory = artifacts.require('CampaignFactory')
 
+const contracts = [Event, EventFactory, Token, EtherToken, CentralizedOracle, CentralizedOracleFactory, Market, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
+
 contract('Market', function (accounts) {
     let centralizedOracleFactory
     let eventFactory
@@ -22,6 +25,9 @@ contract('Market', function (accounts) {
     let lmsrMarketMaker
     let campaignFactory
     let ipfsHash, centralizedOracle, event
+
+    before(utils.createGasStatCollectorBeforeHook(contracts))
+    after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
