@@ -1,14 +1,4 @@
-const HDWalletProvider = require('truffle-hdwallet-provider')
-
-let config = {
-    infuraAccessToken: '',
-    hdWalletMnemonic: 'bag path text august check lab grit fatigue antenna stem trouble cluster',
-}
-
-// eslint-disable-next-line no-empty
-try { Object.assign(config, require('./local-config')) } catch(e) { }
-
-module.exports = {
+const config = {
     networks: {
         development: {
             host: "localhost",
@@ -24,17 +14,19 @@ module.exports = {
             gasPrice: 0x01
         },
         ropsten: {
-            network_id: "3",
-            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://ropsten.infura.io/${config.infuraAccessToken}`),
+            host: "localhost",
+            port: 8545,
+            network_id: "3"
         },
         kovan: {
-            network_id: "42",
-            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://kovan.infura.io/${config.infuraAccessToken}`),
+            host: "localhost",
+            port: 8545,
+            network_id: "42"
         },
         rinkeby: {
-            network_id: "4",
-            provider: new HDWalletProvider(config.hdWalletMnemonic, `https://rinkeby.infura.io/${config.infuraAccessToken}`),
-            gasPrice: 1e11,
+            host: "localhost",
+            port: 8545,
+            network_id: "4"
         },
     },
     mocha: {
@@ -42,3 +34,14 @@ module.exports = {
         grep: process.env.TEST_GREP
     }
 }
+
+try {
+    const _ = require('lodash')
+    _.merge(config, require('./truffle-local'))
+}
+catch(e) {
+    // eslint-disable-next-line no-console
+    console.warn('Tried processing local config but got error:', e)
+}
+
+module.exports = config

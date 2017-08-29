@@ -40,7 +40,6 @@
     "truffle": "^3.4.9",
     "truffle-config": "^1.0.0",
     "truffle-expect": "0.0.3",
-    "truffle-hdwallet-provider": "0.0.3",
     "xhr2": "^0.1.4"
   },
   "repository": {
