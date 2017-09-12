@@ -28,7 +28,7 @@
   "dependencies": {},
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.0.0",
     "decimal.js": "^7.2.1",
     "eslint": "^4.5.0",
     "eslint-plugin-babel": "^4.1.1",
