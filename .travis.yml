@@ -1,9 +1,8 @@
-sudo: false
-dist: trusty
 language: node_js
 node_js:
 - 'node'
 - '7'
+- '6'
 before_install:
 - npm install -g npm codecov greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
