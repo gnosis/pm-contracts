@@ -29,13 +29,13 @@
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
     "babel-eslint": "^8.0.0",
-    "decimal.js": "^7.2.1",
-    "eslint": "^4.5.0",
+    "decimal.js": "^7.2.4",
+    "eslint": "^4.6.1",
     "eslint-plugin-babel": "^4.1.1",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
-    "run-with-testrpc": "^0.2.0",
-    "solidity-coverage": "^0.2.2",
+    "run-with-testrpc": "^0.2.1",
+    "solidity-coverage": "^0.2.3",
     "truffle": "^3.4.9"
   },
   "repository": {
