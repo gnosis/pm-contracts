@@ -3,30 +3,35 @@ const config = {
         development: {
             host: "localhost",
             port: 8545,
-            network_id: "*", // Match any network id
-            gas: 40000000
+            network_id: "*",
+        },
+        testing: {
+            host: "localhost",
+            port: 8545,
+            network_id: "*",
+            gas: 2e7,
         },
         coverage: {
             host: "localhost",
             network_id: "*",
             port: 8555,
             gas: 0xfffffffffff,
-            gasPrice: 0x01
+            gasPrice: 0x01,
         },
         ropsten: {
             host: "localhost",
             port: 8545,
-            network_id: "3"
+            network_id: "3",
         },
         kovan: {
             host: "localhost",
             port: 8545,
-            network_id: "42"
+            network_id: "42",
         },
         rinkeby: {
             host: "localhost",
             port: 8545,
-            network_id: "4"
+            network_id: "4",
         },
     },
     mocha: {
