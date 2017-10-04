@@ -100,6 +100,17 @@ Gas Measurements
 npm run measuregasstats
 ```
 
+Documentation
+-------------
+
+There is a copy version hosted online at https://gnosis.github.io/gnosis-contracts/
+
+### Build docs with doxity
+
+```bash
+scripts/makedocs.sh
+```
+
 Security and Liability
 ----------------------
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
