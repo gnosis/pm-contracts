@@ -1,7 +1,7 @@
 Gnosis Smart Contracts
 ======================
 
-[![Logo](assets/logo.png)](https://gnosis.pm/)
+[![Logo](https://raw.githubusercontent.com/gnosis/gnosis-contracts/master/assets/logo.png)](https://gnosis.pm/)
 
 [![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
 
