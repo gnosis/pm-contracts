@@ -1,4 +1,4 @@
-/// Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/issues/20
+/// Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
 pragma solidity 0.4.15;
 
 
