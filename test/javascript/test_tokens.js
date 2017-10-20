@@ -1,7 +1,7 @@
 const EtherToken = artifacts.require('EtherToken')
 const HumanFriendlyToken = artifacts.require('HumanFriendlyToken')
 
-contract('HumanFriendlyToken', function (accounts) {
+contract('HumanFriendlyToken', function () {
     let etherToken
 
     before(async () => {
