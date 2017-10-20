@@ -14,7 +14,7 @@
     "extractnetinfo": "node scripts/extract_network_info.js",
     "resetnetinfo": "truffle networks --clean && node scripts/inject_network_info.js",
     "measuregasstats": "node scripts/measure_gas_stats.js",
-    "prepublish": "eslint . && node scripts/measure_gas_stats.js && truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
+    "prepublishOnly": "eslint . && node scripts/measure_gas_stats.js && truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
   },
   "keywords": [
     "Ethereum",
