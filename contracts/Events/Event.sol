@@ -64,7 +64,7 @@ contract Event {
     {
         // Transfer collateral tokens to events contract
         require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
-        // Issue new outcome tokens to sender
+        require(balance[msg.sender]+collateralTokenCount >= balance[msg.sender]);
         balance[msg.sender] += collateralTokenCount;
         OutcomeTokenSetIssuance(msg.sender, collateralTokenCount);
     }
@@ -72,8 +72,8 @@ contract Event {
     function withdrawOutcomeToken(uint i, uint amount) 
         public
     {
-        require(amount <= balance[msg.sender]);
-        require(withdrawn[msg.sender][i] <= amount); 
+        require(amount + withdrawn[msg.sender][i] >= amount); //check overflow
+        require(amount + withdrawn[msg.sender][i] <= balance[msg.sender]);
         outcomeTokens[i].issue(msg.sender, amount);
         withdrawn[msg.sender][i] += amount;
     }
