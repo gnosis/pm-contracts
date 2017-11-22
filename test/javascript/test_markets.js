@@ -34,7 +34,7 @@ contract('Market', function (accounts) {
         eventFactory = await EventFactory.deployed()
         etherToken = await EtherToken.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
-        lmsrMarketMaker = await LMSRMarketMaker.deployed()
+        lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
         campaignFactory = await CampaignFactory.deployed()
 
         // create event
@@ -63,18 +63,18 @@ contract('Market', function (accounts) {
         const funding = 100
 
         await etherToken.deposit({ value: funding, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), funding)
 
         await etherToken.approve(market.address, funding, { from: accounts[buyer] })
         await market.fund(funding, { from: accounts[buyer] })
 
         // Market can only be funded once
         await etherToken.deposit({ value: funding, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), funding)
         await etherToken.approve(market.address, funding, { from: accounts[buyer] })
         await assertRejects(market.fund(funding, { from: accounts[buyer] }), 'market funded twice')
 
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), funding)
 
         // Close market
         await market.close({ from: accounts[buyer] })
@@ -84,7 +84,7 @@ contract('Market', function (accounts) {
 
         // Sell all outcomes
         await event.sellAllOutcomes(funding, { from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), funding * 2)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), funding * 2)
     })
 
     it('should allow buying and selling', async () => {
@@ -101,38 +101,38 @@ contract('Market', function (accounts) {
         const funding = 1e18
 
         await etherToken.deposit({ value: funding, from: accounts[investor] })
-        assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), funding)
 
         await etherToken.approve(market.address, funding, { from: accounts[investor] })
 
         await market.fund(funding, { from: accounts[investor] })
-        assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), 0)
 
         // Buy outcome tokens
         const buyer = 1
         const outcome = 0
         const tokenCount = 1e15
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
+        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
 
-        let fee = await market.calcMarketFee(outcomeTokenCost)
+        let fee = await market.calcMarketFee.call(outcomeTokenCost)
         assert.equal(fee, Math.floor(outcomeTokenCost * 5 / 100))
 
         const cost = fee.add(outcomeTokenCost)
         await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), cost.valueOf())
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost.valueOf())
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
             await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
         ), outcomeTokenCost.valueOf())
 
-        const outcomeToken = Token.at(await event.outcomeTokens(outcome))
-        assert.equal(await outcomeToken.balanceOf(accounts[buyer]), tokenCount)
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), 0)
+        const outcomeToken = Token.at(await event.outcomeTokens.call(outcome))
+        assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), tokenCount)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
         // Sell outcome tokens
-        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit(market.address, outcome, tokenCount)
-        fee = await market.calcMarketFee(outcomeTokenProfit)
+        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
+        fee = await market.calcMarketFee.call(outcomeTokenProfit)
         const profit = outcomeTokenProfit.sub(fee)
 
         await outcomeToken.approve(market.address, tokenCount, { from: accounts[buyer] })
@@ -140,8 +140,8 @@ contract('Market', function (accounts) {
             await market.sell(outcome, tokenCount, profit, { from: accounts[buyer] }), 'outcomeTokenProfit'
         ).valueOf(), outcomeTokenProfit.valueOf())
 
-        assert.equal(await outcomeToken.balanceOf(accounts[buyer]), 0)
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), profit.valueOf())
+        assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), 0)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), profit.valueOf())
     })
 
     it('should allow short selling', async () => {
@@ -158,24 +158,24 @@ contract('Market', function (accounts) {
         const funding = 1e18
 
         await etherToken.deposit({ value: funding, from: accounts[investor] })
-        assert.equal((await etherToken.balanceOf(accounts[investor])).valueOf(), funding)
+        assert.equal((await etherToken.balanceOf.call(accounts[investor])).valueOf(), funding)
 
         await etherToken.approve(market.address, funding, { from: accounts[investor] })
 
         await market.fund(funding, { from: accounts[investor] })
-        assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), 0)
 
         // Short sell outcome tokens
         const buyer = 7
         const outcome = 0
         const oppositeOutcome = 1
         const tokenCount = 1e15
-        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit(market.address, outcome, tokenCount)
-        const fee = await market.calcMarketFee(outcomeTokenProfit)
+        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
+        const fee = await market.calcMarketFee.call(outcomeTokenProfit)
         const cost = fee.add(tokenCount).sub(outcomeTokenProfit)
 
         await etherToken.deposit({ value: tokenCount, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), tokenCount)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), tokenCount)
         await etherToken.approve(market.address, tokenCount, { from: accounts[buyer] })
 
         assert.equal(
@@ -183,9 +183,9 @@ contract('Market', function (accounts) {
                 await market.shortSell(outcome, tokenCount, outcomeTokenProfit - fee, { from: accounts[buyer] }),
                 'cost', null, 'OutcomeTokenShortSale'
             ).valueOf(), cost)
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), tokenCount - cost)
-        const outcomeToken = Token.at(await event.outcomeTokens(oppositeOutcome))
-        assert.equal(await outcomeToken.balanceOf(accounts[buyer]), tokenCount)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), tokenCount - cost)
+        const outcomeToken = Token.at(await event.outcomeTokens.call(oppositeOutcome))
+        assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), tokenCount)
     })
 
     it('should be created by a successful campaign', async () => {
@@ -201,7 +201,7 @@ contract('Market', function (accounts) {
                 feeFactor,
                 funding,
                 deadline), 'campaign'))
-        assert.equal(await campaign.stage(), 0)
+        assert.equal(await campaign.stage.call(), 0)
 
         // Fund campaign
         const backer1 = 2
@@ -218,7 +218,7 @@ contract('Market', function (accounts) {
         await etherToken.deposit({ value: amount, from: accounts[backer2] })
         await etherToken.approve(campaign.address, amount, { from: accounts[backer2] })
         campaign.fund(amount, { from: accounts[backer2] })
-        assert.equal(await campaign.stage(), 1)
+        assert.equal(await campaign.stage.call(), 1)
 
         // Create market
         const market = Market.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
@@ -227,15 +227,15 @@ contract('Market', function (accounts) {
         const buyer = 4
         const outcome = 0
         const tokenCount = 1e15
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
+        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
 
-        const fee = await market.calcMarketFee(outcomeTokenCost)
+        const fee = await market.calcMarketFee.call(outcomeTokenCost)
         assert.equal(fee.valueOf(), outcomeTokenCost.mul(.05).floor().valueOf())
 
         const cost = outcomeTokenCost.add(fee)
 
         await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal((await etherToken.balanceOf(accounts[buyer])).valueOf(), cost.valueOf())
+        assert.equal((await etherToken.balanceOf.call(accounts[buyer])).valueOf(), cost.valueOf())
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
@@ -289,7 +289,7 @@ contract('Market', function (accounts) {
                 feeFactor,
                 funding,
                 deadline), 'campaign'))
-        assert.equal(await campaign.stage(), 0)
+        assert.equal(await campaign.stage.call(), 0)
 
         // Fund campaign
         const backer1 = 8

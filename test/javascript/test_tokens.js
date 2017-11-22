@@ -10,8 +10,8 @@ contract('HumanFriendlyToken', function () {
 
     it('can be used to get ether token metadata', async () => {
         const humanFriendlyToken = await HumanFriendlyToken.at(etherToken.address)
-        assert.equal('Ether Token', await humanFriendlyToken.name())
-        assert.equal('ETH', await humanFriendlyToken.symbol())
-        assert.equal(18, await humanFriendlyToken.decimals())
+        assert.equal('Ether Token', await humanFriendlyToken.name.call())
+        assert.equal('ETH', await humanFriendlyToken.symbol.call())
+        assert.equal(18, await humanFriendlyToken.decimals.call())
     })
 })
