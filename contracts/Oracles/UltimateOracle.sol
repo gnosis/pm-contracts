@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
