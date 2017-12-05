@@ -2,7 +2,7 @@ pragma solidity 0.4.18;
 import "../Tokens/Token.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
-
+import "../Oracles/PriceOracle.sol";
 
 /// @title Event contract - Provide basic functionality required by different event types
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -26,6 +26,11 @@ contract Event {
     int public outcome;
     OutcomeToken[] public outcomeTokens;
 
+    // New variables needed to pay fees
+    uint public feeRecipal=200;
+    address OWLToken;
+    PriceOracle public priceOracle;
+    
     /*
      *  Public functions
      */
@@ -55,10 +60,19 @@ contract Event {
     {
         // Transfer collateral tokens to events contract
         require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
+
+        uint fee=collateralTokenCount/feeRecipal;
+        uint feeInOWL=priceOracle.getTokensValueInUSD(fee, collateralToken.address);
+        uint feeInOWLPayable=Math.min(allowances[msg.sender][this], feeInWIZ);
+        Token(OWLToken).approve(OWLToken, feeInOWLPayable);
+        feeInWIZPayable = OWL(OWLToken).burnOWL(feeInOWLPayable);
+        uint feeLeft = priceOracle.getAmountOfTokensofUSD(feeInOWL-feeInOWLPayable, collateralToken.address);
+        Token(collateralToken.address).approve(IntermediateOfFeeAndAuction, feeLeft);
+        
         // Issue new outcome tokens to sender
         for (uint8 i = 0; i < outcomeTokens.length; i++)
-            outcomeTokens[i].issue(msg.sender, collateralTokenCount);
-        OutcomeTokenSetIssuance(msg.sender, collateralTokenCount);
+            outcomeTokens[i].issue(msg.sender, collateralTokenCount-fee);
+        OutcomeTokenSetIssuance(msg.sender, collateralTokenCount-fee);
     }
 
     /// @dev Sells equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
