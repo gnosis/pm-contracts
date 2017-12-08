@@ -35,7 +35,7 @@
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
     "run-with-testrpc": "^0.3.0",
-    "solidity-coverage": "^0.3.5",
+    "solidity-coverage": "^0.4.3",
     "truffle": "^3.4.11"
   },
   "repository": {
