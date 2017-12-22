@@ -18,6 +18,11 @@ const config = {
             gas: 0xfffffffffff,
             gasPrice: 0x01,
         },
+        mainnet: {
+            host: "localhost",
+            port: 8545,
+            network_id: "1",
+        },
         ropsten: {
             host: "localhost",
             port: 8545,
