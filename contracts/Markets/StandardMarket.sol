@@ -4,8 +4,29 @@ import "../Tokens/Token.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 
+contract StandardMarketProxy is MarketProxy {
+    /*
+     *  Constants
+     */
+    uint24 public constant FEE_RANGE = 1000000; // 100%
 
-/// @title Market factory contract - Allows to create market contracts
+    function StandardMarketProxy(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
+        public
+    {
+        // Validate inputs
+        require(address(_eventContract) != 0 && address(_marketMaker) != 0 && _fee < FEE_RANGE);
+        creator = _creator;
+        createdAtBlock = block.number;
+        eventContract = _eventContract;
+        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
+        fee = _fee;
+        marketMaker = _marketMaker;
+        stage = Market.Stages.MarketCreated;
+    }
+}
+
+
+/// @title Standard market contract - Backed implementation of standard markets
 /// @author Stefan George - <stefan@gnosis.pm>
 contract StandardMarket is Market {
     using Math for *;
