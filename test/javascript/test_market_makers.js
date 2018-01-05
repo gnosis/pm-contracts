@@ -28,7 +28,7 @@ contract('MarketMaker', function(accounts) {
         eventFactory = await EventFactory.deployed()
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
-        lmsrMarketMaker = await LMSRMarketMaker.deployed()
+        lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
         etherToken = await EtherToken.deployed()
     })
 
@@ -56,16 +56,16 @@ contract('MarketMaker', function(accounts) {
         const funding = 1e17
 
         await etherToken.deposit({ value: funding, from: accounts[investor] })
-        assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), funding)
 
         await etherToken.approve(market.address, funding, { from: accounts[investor] })
         await market.fund(funding, { from: accounts[investor] })
-        assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), 0)
 
         // User buys all outcomes
         const trader = 1
         const outcome = 1
-        const outcomeToken = Token.at(await event.outcomeTokens(outcome))
+        const outcomeToken = Token.at(await event.outcomeTokens.call(outcome))
         const tokenCount = 1e18
         const loopCount = 10
 
@@ -74,11 +74,11 @@ contract('MarketMaker', function(accounts) {
         await event.buyAllOutcomes(tokenCount * loopCount, { from: accounts[trader] })
 
         // User sells tokens
-        const buyerBalance = await etherToken.balanceOf(accounts[trader])
+        const buyerBalance = await etherToken.balanceOf.call(accounts[trader])
         let profit
         for(let i of _.range(loopCount)) {
             // Calculate profit for selling tokens
-            profit = await lmsrMarketMaker.calcProfit(market.address, outcome, tokenCount)
+            profit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
             if(profit == 0)
                 break
 
@@ -90,7 +90,7 @@ contract('MarketMaker', function(accounts) {
 
             let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
             let expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
-            let actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
+            let actual = (await lmsrMarketMaker.calcMarginalPrice.call(market.address, outcome)).div(ONE)
             assert(
                 isClose(actual, expected),
                 `Marginal price calculation is off for iteration ${i}:\n` +
@@ -103,7 +103,7 @@ contract('MarketMaker', function(accounts) {
         // Selling of tokens is worth less than 1 Wei
         assert.equal(profit, 0)
         // User's Ether balance increased
-        assert.isAbove(await etherToken.balanceOf(accounts[trader]), buyerBalance)
+        assert.isAbove(await etherToken.balanceOf.call(accounts[trader]), buyerBalance)
     })
 
     it('should move price of an outcome to 1 after participants buy lots of that outcome from market maker', async () => {
@@ -131,11 +131,11 @@ contract('MarketMaker', function(accounts) {
 
             // Fund market
             await etherToken.deposit({ value: funding, from: accounts[investor] })
-            assert.equal(await etherToken.balanceOf(accounts[investor]), funding)
+            assert.equal(await etherToken.balanceOf.call(accounts[investor]), funding)
 
             await etherToken.approve(market.address, funding, { from: accounts[investor] })
             await market.fund(funding, { from: accounts[investor] })
-            assert.equal(await etherToken.balanceOf(accounts[investor]), 0)
+            assert.equal(await etherToken.balanceOf.call(accounts[investor]), 0)
 
             // User buys ether tokens
             const trader = 1
@@ -147,7 +147,7 @@ contract('MarketMaker', function(accounts) {
             let cost
             for(let i of _.range(loopCount)) {
                 // Calculate profit for selling tokens
-                cost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
+                cost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
 
                 // Buying tokens
                 await etherToken.approve(market.address, tokenCount, { from: accounts[trader] })
@@ -157,7 +157,7 @@ contract('MarketMaker', function(accounts) {
 
                 let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
                 let expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
-                let actual = (await lmsrMarketMaker.calcMarginalPrice(market.address, outcome)).div(ONE)
+                let actual = (await lmsrMarketMaker.calcMarginalPrice.call(market.address, outcome)).div(ONE)
                 assert(
                     isClose(actual, expected) || expected.toString() == 'NaN',
                     `Marginal price calculation is off for iteration ${i}:\n` +

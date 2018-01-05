@@ -43,7 +43,7 @@ contract('Oracle', function (accounts) {
         majorityOracleFactory = await MajorityOracleFactory.deployed()
         ultimateOracleFactory = await UltimateOracleFactory.deployed()
         futarchyOracleFactory = await FutarchyOracleFactory.deployed()
-        lmsrMarketMaker = await LMSRMarketMaker.deployed()
+        lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
         etherToken = await EtherToken.deployed()
 
         // ipfs hashes
@@ -74,18 +74,18 @@ contract('Oracle', function (accounts) {
             'centralizedOracle', CentralizedOracle
         )
         // Replace account resolving outcome
-        assert.equal(await centralizedOracle.owner(), accounts[owner1])
+        assert.equal(await centralizedOracle.owner.call(), accounts[owner1])
         await centralizedOracle.replaceOwner(accounts[owner2], {from: accounts[owner1]})
-        assert.equal(await centralizedOracle.owner(), accounts[owner2])
+        assert.equal(await centralizedOracle.owner.call(), accounts[owner2])
 
         // Set outcome
         await utils.assertRejects(centralizedOracle.setOutcome(0, {from: accounts[owner1]}), "owner1 is not the centralized oracle owner")
-        assert.equal(await centralizedOracle.isOutcomeSet(), false)
+        assert.equal(await centralizedOracle.isOutcomeSet.call(), false)
 
         await centralizedOracle.setOutcome(1, {from: accounts[owner2]})
-        assert.equal(await centralizedOracle.isOutcomeSet(), true)
-        assert.equal(await centralizedOracle.getOutcome(), 1)
-        assert.equal(await centralizedOracle.ipfsHash(), ipfsBytes)
+        assert.equal(await centralizedOracle.isOutcomeSet.call(), true)
+        assert.equal(await centralizedOracle.getOutcome.call(), 1)
+        assert.equal(await centralizedOracle.ipfsHash.call(), ipfsBytes)
     })
 
     it('should test difficulty oracle', async () => {
@@ -98,7 +98,7 @@ contract('Oracle', function (accounts) {
 
         // Set outcome
         await utils.assertRejects(difficultyOracle.setOutcome())
-        assert.equal(await difficultyOracle.isOutcomeSet(), false)
+        assert.equal(await difficultyOracle.isOutcomeSet.call(), false)
 
         // TODO: TestRPC difficulty is 0, so these tests won't pass there
 
@@ -106,7 +106,7 @@ contract('Oracle', function (accounts) {
         // await waitUntilBlock(20, targetBlock)
 
         // await difficultyOracle.setOutcome()
-        // assert.equal(await difficultyOracle.isOutcomeSet(), true)
+        // assert.equal(await difficultyOracle.isOutcomeSet.call(), true)
         // assert.isAbove(await difficultyOracle.getOutcome(), 0)
     })
 
@@ -148,7 +148,7 @@ contract('Oracle', function (accounts) {
         )
         const creator = 0
         await etherToken.deposit({ value: funding, from: accounts[creator] })
-        assert.equal(await etherToken.balanceOf(accounts[creator]), funding)
+        assert.equal(await etherToken.balanceOf.call(accounts[creator]), funding)
 
         await etherToken.approve(futarchyOracle.address, funding, { from: accounts[creator] })
         await futarchyOracle.fund(funding, { from: accounts[creator] })
@@ -161,13 +161,13 @@ contract('Oracle', function (accounts) {
         const outcome = 1
         const tokenCount = 1e15
 
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost(market.address, outcome, tokenCount)
-        let marketfee = await market.calcMarketFee(outcomeTokenCost)
+        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+        let marketfee = await market.calcMarketFee.call(outcomeTokenCost)
         const cost = marketfee.add(outcomeTokenCost)
 
         // Buy all outcomes
         await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf(accounts[buyer]), cost.valueOf())
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost.valueOf())
         await etherToken.approve(categoricalEvent.address, cost, { from: accounts[buyer] })
         await categoricalEvent.buyAllOutcomes(cost, { from: accounts[buyer] })
 
@@ -185,8 +185,8 @@ contract('Oracle', function (accounts) {
             'set oracle outcome before deadline')
         await wait(deadline)
         await futarchyOracle.setOutcome()
-        assert.equal(await futarchyOracle.isOutcomeSet(), true)
-        assert.equal(await futarchyOracle.getOutcome(), 1)
+        assert.equal(await futarchyOracle.isOutcomeSet.call(), true)
+        assert.equal(await futarchyOracle.getOutcome.call(), 1)
         await categoricalEvent.setOutcome()
 
         // Set winning outcome for scalar events
@@ -199,7 +199,7 @@ contract('Oracle', function (accounts) {
 
         // Close winning market and transfer collateral tokens to creator
         await futarchyOracle.close({ from: accounts[creator] })
-        assert.isAbove(await etherToken.balanceOf(accounts[creator]), funding)
+        assert.isAbove(await etherToken.balanceOf.call(accounts[creator]), funding)
     })
 
     it('should test majority oracle', async () => {
@@ -215,20 +215,20 @@ contract('Oracle', function (accounts) {
         )
 
         // Majority oracle cannot be resolved yet
-        assert.equal(await majorityOracle.isOutcomeSet(), false)
+        assert.equal(await majorityOracle.isOutcomeSet.call(), false)
 
         // Set outcome in first centralized oracle
         await oracles[0].setOutcome(1, { from: accounts[owners[0]] })
 
         // Majority vote is not reached yet
-        assert.equal(await majorityOracle.isOutcomeSet(), false)
+        assert.equal(await majorityOracle.isOutcomeSet.call(), false)
 
         // Set outcome in second centralized oracle
         await oracles[1].setOutcome(1, { from: accounts[owners[1]] })
 
         // // majority vote is reached
-        assert.equal(await majorityOracle.isOutcomeSet(), true)
-        assert.equal(await majorityOracle.getOutcome(), 1)
+        assert.equal(await majorityOracle.isOutcomeSet.call(), true)
+        assert.equal(await majorityOracle.getOutcome.call(), 1)
     })
 
     // TODO: test signed message oracle
@@ -248,12 +248,12 @@ contract('Oracle', function (accounts) {
 
         // Set outcome in central oracle
         await centralizedOracle.setOutcome(1)
-        assert.equal(await centralizedOracle.getOutcome(), 1)
+        assert.equal(await centralizedOracle.getOutcome.call(), 1)
 
         // Set outcome in ultimate oracle
         await ultimateOracle.setForwardedOutcome()
-        assert.equal(await ultimateOracle.forwardedOutcome(), 1)
-        assert.equal(await ultimateOracle.isOutcomeSet(), false)
+        assert.equal(await ultimateOracle.forwardedOutcome.call(), 1)
+        assert.equal(await ultimateOracle.isOutcomeSet.call(), false)
 
         // Challenge outcome
         const sender1 = 0
@@ -265,20 +265,20 @@ contract('Oracle', function (accounts) {
         await etherToken.deposit({value: 50, from: accounts[sender1]})
         await etherToken.approve(ultimateOracle.address, 50, { from: accounts[sender1] })
         await ultimateOracle.voteForOutcome(2, 50, { from: accounts[sender1] })
-        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender1], 2), 100)
+        assert.equal(await ultimateOracle.outcomeAmounts.call(accounts[sender1], 2), 100)
 
         // Sender 2 overbids sender 1
         const sender2 = 1
         await etherToken.deposit({value: 150, from: accounts[sender2]})
         await etherToken.approve(ultimateOracle.address, 150, { from: accounts[sender2] })
         await ultimateOracle.voteForOutcome(3, 150, { from: accounts[sender2] })
-        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender2], 3), 150)
+        assert.equal(await ultimateOracle.outcomeAmounts.call(accounts[sender2], 3), 150)
 
         // Sender 2 tries to increase his front runner position by 150 but can only increase it by 50
         await etherToken.deposit({value: 150, from: accounts[sender2]})
         await etherToken.approve(ultimateOracle.address, 150, { from: accounts[sender2] })
         await ultimateOracle.voteForOutcome(3, 150, { from: accounts[sender2] })
-        assert.equal(await ultimateOracle.outcomeAmounts(accounts[sender2], 3), 200)
+        assert.equal(await ultimateOracle.outcomeAmounts.call(accounts[sender2], 3), 200)
 
         // Trying to withdraw before front runner period ends fails
         await utils.assertRejects(
@@ -286,11 +286,11 @@ contract('Oracle', function (accounts) {
             'withdrew before front runner period')
 
         // Wait for front runner period to pass
-        assert.equal(await ultimateOracle.isOutcomeSet(), false)
+        assert.equal(await ultimateOracle.isOutcomeSet.call(), false)
         await wait(frontRunnerPeriod + 1)
-        assert.equal(await ultimateOracle.isOutcomeSet(), true)
+        assert.equal(await ultimateOracle.isOutcomeSet.call(), true)
 
-        assert.equal(await ultimateOracle.getOutcome(), 3)
+        assert.equal(await ultimateOracle.getOutcome.call(), 3)
 
         // Withdraw winnings
         assert.equal(utils.getParamFromTxEvent(
@@ -314,16 +314,16 @@ contract('Oracle', function (accounts) {
 
         // Set outcome in central oracle
         await centralizedOracle.setOutcome(1)
-        assert.equal(await centralizedOracle.getOutcome(), 1)
+        assert.equal(await centralizedOracle.getOutcome.call(), 1)
 
         // Set outcome in ultimate oracle
         await ultimateOracle.setForwardedOutcome()
-        assert.equal(await ultimateOracle.forwardedOutcome(), 1)
-        assert.equal(await ultimateOracle.isOutcomeSet(), false)
+        assert.equal(await ultimateOracle.forwardedOutcome.call(), 1)
+        assert.equal(await ultimateOracle.isOutcomeSet.call(), false)
 
         // Wait for challenge period to pass
         await wait(challengePeriod + 1)
-        assert.equal(await ultimateOracle.isOutcomeSet(), true)
-        assert.equal(await ultimateOracle.getOutcome(), 1)
+        assert.equal(await ultimateOracle.isOutcomeSet.call(), true)
+        assert.equal(await ultimateOracle.getOutcome.call(), 1)
     })
 })
