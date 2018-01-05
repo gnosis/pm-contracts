@@ -1,7 +1,21 @@
 pragma solidity ^0.4.15;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
+import "../Utils/C0ffeeProxy.sol";
 
+contract MarketProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    address public creator;
+    uint public createdAtBlock;
+    Event public eventContract;
+    MarketMaker public marketMaker;
+    uint24 public fee;
+    uint public funding;
+    int[] public netOutcomeTokensSold;
+    Market.Stages public stage;
+}
 
 /// @title Abstract market contract - Functions to be implemented by market contracts
 contract Market {
