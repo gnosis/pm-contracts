@@ -1,6 +1,32 @@
 pragma solidity 0.4.15;
 import "../Oracles/Oracle.sol";
+import "../Utils/C0ffeeProxy.sol";
 
+contract SignedMessageOracleProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    address public signer;
+    bytes32 public descriptionHash;
+    uint nonce;
+    bool public isSet;
+    int public outcome;
+
+    /*
+     *  Public functions
+     */
+    /// @dev Constructor sets signer address based on signature
+    /// @param _descriptionHash Hash identifying off chain event description
+    /// @param v Signature parameter
+    /// @param r Signature parameter
+    /// @param s Signature parameter
+    function SignedMessageOracleProxy(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+        public
+    {
+        signer = ecrecover(_descriptionHash, v, r, s);
+        descriptionHash = _descriptionHash;
+    }
+}
 
 /// @title Signed message oracle contract - Allows to set an outcome with a signed message
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -33,18 +59,6 @@ contract SignedMessageOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets signer address based on signature
-    /// @param _descriptionHash Hash identifying off chain event description
-    /// @param v Signature parameter
-    /// @param r Signature parameter
-    /// @param s Signature parameter
-    function SignedMessageOracle(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
-        public
-    {
-        signer = ecrecover(_descriptionHash, v, r, s);
-        descriptionHash = _descriptionHash;
-    }
-
     /// @dev Replaces signer
     /// @param newSigner New signer
     /// @param _nonce Unique nonce to prevent replay attacks

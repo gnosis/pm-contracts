@@ -33,7 +33,7 @@ contract CampaignFactory {
         public
         returns (Campaign campaign)
     {
-        campaign = new Campaign(eventContract, marketFactory, marketMaker, fee, funding, deadline);
+        campaign = Campaign(new CampaignProxy(eventContract, marketFactory, marketMaker, fee, funding, deadline));
         CampaignCreation(msg.sender, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
     }
 }

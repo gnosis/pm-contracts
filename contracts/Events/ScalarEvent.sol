@@ -1,6 +1,58 @@
 pragma solidity 0.4.15;
 import "../Events/Event.sol";
+import "../Utils/C0ffeeProxy.sol";
 
+contract ScalarEventProxy is IceIceProxy {
+    /*
+     *  Events
+     */
+    event OutcomeTokenCreation(OutcomeToken outcomeToken, uint8 index);
+
+    /*
+     *  Storage
+     */
+    Token public collateralToken;
+    Oracle public oracle;
+    bool public isOutcomeSet;
+    int public outcome;
+    OutcomeToken[] public outcomeTokens;
+    int public lowerBound;
+    int public upperBound;
+
+    /*
+     *  Public functions
+     */
+
+    /// @dev Contract constructor validates and sets basic event properties
+    /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
+    /// @param _oracle Oracle contract used to resolve the event
+    /// @param _lowerBound Lower bound for event outcome
+    /// @param _upperBound Lower bound for event outcome
+    function ScalarEventProxy(
+        Token _collateralToken,
+        Oracle _oracle,
+        int _lowerBound,
+        int _upperBound
+    )
+        public
+    {
+        // Validate input
+        require(address(_collateralToken) != 0 && address(_oracle) != 0);
+        collateralToken = _collateralToken;
+        oracle = _oracle;
+        // Create an outcome token for each outcome
+        for (uint8 i = 0; i < 2; i++) {
+            OutcomeToken outcomeToken = new OutcomeToken();
+            outcomeTokens.push(outcomeToken);
+            OutcomeTokenCreation(outcomeToken, i);
+        }
+
+        // Validate bounds
+        require(_upperBound > _lowerBound);
+        lowerBound = _lowerBound;
+        upperBound = _upperBound;
+    }
+}
 
 /// @title Scalar event contract - Scalar events resolve to a number within a range
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -23,26 +75,6 @@ contract ScalarEvent is Event {
     /*
      *  Public functions
      */
-    /// @dev Contract constructor validates and sets basic event properties
-    /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
-    /// @param _oracle Oracle contract used to resolve the event
-    /// @param _lowerBound Lower bound for event outcome
-    /// @param _upperBound Lower bound for event outcome
-    function ScalarEvent(
-        Token _collateralToken,
-        Oracle _oracle,
-        int _lowerBound,
-        int _upperBound
-    )
-        public
-        Event(_collateralToken, _oracle, 2)
-    {
-        // Validate bounds
-        require(_upperBound > _lowerBound);
-        lowerBound = _lowerBound;
-        upperBound = _upperBound;
-    }
-
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
     function redeemWinnings()

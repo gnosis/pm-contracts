@@ -2,6 +2,71 @@ pragma solidity 0.4.15;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "../Utils/Math.sol";
+import "../Utils/C0ffeeProxy.sol";
+
+contract CampaignProxy is C0ffeeProxy {
+     /*
+     *  Constants
+     */
+    uint24 public constant FEE_RANGE = 1000000; // 100%
+
+    /*
+     *  Storage
+     */
+    Event public eventContract;
+    StandardMarketFactory public marketFactory;
+    MarketMaker public marketMaker;
+    Market public market;
+    uint24 public fee;
+    uint public funding;
+    uint public deadline;
+    uint public finalBalance;
+    mapping (address => uint) public contributions;
+    Stages public stage;
+
+    enum Stages {
+        AuctionStarted,
+        AuctionSuccessful,
+        AuctionFailed,
+        MarketCreated,
+        MarketClosed
+    }
+
+    /*
+     *  Public functions
+     */
+    /// @dev Constructor validates and sets campaign properties
+    /// @param _eventContract Event contract
+    /// @param _marketFactory Market factory contract
+    /// @param _marketMaker Market maker contract
+    /// @param _fee Market fee
+    /// @param _funding Initial funding for market
+    /// @param _deadline Campaign deadline
+    function CampaignProxy(
+        Event _eventContract,
+        StandardMarketFactory _marketFactory,
+        MarketMaker _marketMaker,
+        uint24 _fee,
+        uint _funding,
+        uint _deadline
+    )
+        public
+    {
+        // Validate input
+        require(   address(_eventContract) != 0
+                && address(_marketFactory) != 0
+                && address(_marketMaker) != 0
+                && _fee < FEE_RANGE
+                && _funding > 0
+                && now < _deadline);
+        eventContract = _eventContract;
+        marketFactory = _marketFactory;
+        marketMaker = _marketMaker;
+        fee = _fee;
+        funding = _funding;
+        deadline = _deadline;
+    }
+}
 
 
 /// @title Campaign contract - Allows to crowdfund a market
@@ -63,38 +128,6 @@ contract Campaign {
     /*
      *  Public functions
      */
-    /// @dev Constructor validates and sets campaign properties
-    /// @param _eventContract Event contract
-    /// @param _marketFactory Market factory contract
-    /// @param _marketMaker Market maker contract
-    /// @param _fee Market fee
-    /// @param _funding Initial funding for market
-    /// @param _deadline Campaign deadline
-    function Campaign(
-        Event _eventContract,
-        StandardMarketFactory _marketFactory,
-        MarketMaker _marketMaker,
-        uint24 _fee,
-        uint _funding,
-        uint _deadline
-    )
-        public
-    {
-        // Validate input
-        require(   address(_eventContract) != 0
-                && address(_marketFactory) != 0
-                && address(_marketMaker) != 0
-                && _fee < FEE_RANGE
-                && _funding > 0
-                && now < _deadline);
-        eventContract = _eventContract;
-        marketFactory = _marketFactory;
-        marketMaker = _marketMaker;
-        fee = _fee;
-        funding = _funding;
-        deadline = _deadline;
-    }
-
     /// @dev Allows to contribute to required market funding
     /// @param amount Amount of collateral tokens
     function fund(uint amount)

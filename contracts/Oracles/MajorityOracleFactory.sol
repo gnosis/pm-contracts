@@ -21,7 +21,7 @@ contract MajorityOracleFactory {
         public
         returns (MajorityOracle majorityOracle)
     {
-        majorityOracle = new MajorityOracle(oracles);
+        majorityOracle = MajorityOracle(new MajorityOracleProxy(oracles));
         MajorityOracleCreation(msg.sender, majorityOracle, oracles);
     }
 }

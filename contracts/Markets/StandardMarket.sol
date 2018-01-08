@@ -54,25 +54,6 @@ contract StandardMarket is Market {
     /*
      *  Public functions
      */
-    /// @dev Constructor validates and sets market properties
-    /// @param _creator Market creator
-    /// @param _eventContract Event contract
-    /// @param _marketMaker Market maker contract
-    /// @param _fee Market fee
-    function StandardMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
-        public
-    {
-        // Validate inputs
-        require(address(_eventContract) != 0 && address(_marketMaker) != 0 && _fee < FEE_RANGE);
-        creator = _creator;
-        createdAtBlock = block.number;
-        eventContract = _eventContract;
-        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
-        fee = _fee;
-        marketMaker = _marketMaker;
-        stage = Stages.MarketCreated;
-    }
-
     /// @dev Allows to fund the market with collateral tokens converting them into outcome tokens
     /// @param _funding Funding amount
     function fund(uint _funding)

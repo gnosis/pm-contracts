@@ -1,5 +1,27 @@
 pragma solidity 0.4.15;
 import "../Oracles/Oracle.sol";
+import "../Utils/C0ffeeProxy.sol";
+
+contract DifficultyOracleProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    uint public blockNumber;
+    uint public difficulty;
+
+    /*
+     *  Public functions
+     */
+    /// @dev Contract constructor validates and sets target block number
+    /// @param _blockNumber Target block number
+    function DifficultyOracleProxy(uint _blockNumber)
+        public
+    {
+        // Block has to be in the future
+        require(_blockNumber > block.number);
+        blockNumber = _blockNumber;
+    }
+}
 
 
 /// @title Difficulty oracle contract - Oracle to resolve difficulty events at given block
@@ -20,16 +42,6 @@ contract DifficultyOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Contract constructor validates and sets target block number
-    /// @param _blockNumber Target block number
-    function DifficultyOracle(uint _blockNumber)
-        public
-    {
-        // Block has to be in the future
-        require(_blockNumber > block.number);
-        blockNumber = _blockNumber;
-    }
-
     /// @dev Sets difficulty as winning outcome for specified block
     function setOutcome()
         public

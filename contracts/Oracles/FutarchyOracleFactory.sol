@@ -68,7 +68,7 @@ contract FutarchyOracleFactory {
         public
         returns (FutarchyOracle futarchyOracle)
     {
-        futarchyOracle = new FutarchyOracle(
+        futarchyOracle = FutarchyOracle(new FutarchyOracleProxy(
             msg.sender,
             eventFactory,
             collateralToken,
@@ -81,7 +81,7 @@ contract FutarchyOracleFactory {
             fee,
             tradingPeriod,
             startDate
-        );
+        ));
         FutarchyOracleCreation(
             msg.sender,
             futarchyOracle,

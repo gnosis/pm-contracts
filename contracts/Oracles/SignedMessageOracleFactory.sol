@@ -24,7 +24,7 @@ contract SignedMessageOracleFactory {
         public
         returns (SignedMessageOracle signedMessageOracle)
     {
-        signedMessageOracle = new SignedMessageOracle(descriptionHash, v, r, s);
+        signedMessageOracle = SignedMessageOracle(new SignedMessageOracleProxy(descriptionHash, v, r, s));
         address oracle = ecrecover(descriptionHash, v, r, s);
         SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
     }

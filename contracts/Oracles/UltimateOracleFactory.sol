@@ -42,14 +42,14 @@ contract UltimateOracleFactory {
         public
         returns (UltimateOracle ultimateOracle)
     {
-        ultimateOracle = new UltimateOracle(
+        ultimateOracle = UltimateOracle(new UltimateOracleProxy(
             oracle,
             collateralToken,
             spreadMultiplier,
             challengePeriod,
             challengeAmount,
             frontRunnerPeriod
-        );
+        ));
         UltimateOracleCreation(
             msg.sender,
             ultimateOracle,
