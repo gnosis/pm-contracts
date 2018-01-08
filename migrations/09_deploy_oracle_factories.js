@@ -1,19 +1,15 @@
-const Math = artifacts.require('Math')
-const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
-const DifficultyOracleFactory = artifacts.require('DifficultyOracleFactory')
-// const FutarchyOracleFactory = artifacts.require('FutarchyOracleFactory')
-const MajorityOracleFactory = artifacts.require('MajorityOracleFactory')
-const SignedMessageOracleFactory = artifacts.require('SignedMessageOracleFactory')
-const UltimateOracleFactory = artifacts.require('UltimateOracleFactory')
-
 module.exports = function (deployer) {
-    deployer.link(Math, UltimateOracleFactory)
-    deployer.deploy([
-        CentralizedOracleFactory,
-        DifficultyOracleFactory,
-        // FutarchyOracleFactory,
-        MajorityOracleFactory,
-        SignedMessageOracleFactory,
-        UltimateOracleFactory
-    ])
+    [
+        'CentralizedOracle',
+        'DifficultyOracle',
+        'MajorityOracle',
+        'SignedMessageOracle',
+        'UltimateOracle',
+    ].forEach(contractName => {
+        const contract = artifacts.require(contractName)
+        const factory = artifacts.require(contractName + 'Factory')
+        factory._json.unlinked_binary = factory._json.unlinked_binary
+            .replace('c0ffeecafec0ffeecafec0ffeecafec0ffeecafe', contract.address.replace('0x', ''))
+        deployer.deploy(factory)
+    })
 }

@@ -21,7 +21,7 @@ contract DifficultyOracleFactory {
         public
         returns (DifficultyOracle difficultyOracle)
     {
-        difficultyOracle = new DifficultyOracle(blockNumber);
+        difficultyOracle = DifficultyOracle(new DifficultyOracleProxy(blockNumber));
         DifficultyOracleCreation(msg.sender, difficultyOracle, blockNumber);
     }
 }

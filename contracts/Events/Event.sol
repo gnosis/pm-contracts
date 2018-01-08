@@ -29,25 +29,6 @@ contract Event {
     /*
      *  Public functions
      */
-    /// @dev Contract constructor validates and sets basic event properties
-    /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
-    /// @param _oracle Oracle contract used to resolve the event
-    /// @param outcomeCount Number of event outcomes
-    function Event(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
-        public
-    {
-        // Validate input
-        require(address(_collateralToken) != 0 && address(_oracle) != 0 && outcomeCount >= 2);
-        collateralToken = _collateralToken;
-        oracle = _oracle;
-        // Create an outcome token for each outcome
-        for (uint8 i = 0; i < outcomeCount; i++) {
-            OutcomeToken outcomeToken = new OutcomeToken();
-            outcomeTokens.push(outcomeToken);
-            OutcomeTokenCreation(outcomeToken, i);
-        }
-    }
-
     /// @dev Buys equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
     /// @param collateralTokenCount Number of collateral tokens
     function buyAllOutcomes(uint collateralTokenCount)

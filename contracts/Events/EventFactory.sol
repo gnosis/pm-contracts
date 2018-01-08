@@ -39,11 +39,11 @@ contract EventFactory {
         // Event should not exist yet
         require(address(categoricalEvents[eventHash]) == 0);
         // Create event
-        eventContract = new CategoricalEvent(
+        eventContract = CategoricalEvent(new CategoricalEventProxy(
             collateralToken,
             oracle,
             outcomeCount
-        );
+        ));
         categoricalEvents[eventHash] = eventContract;
         CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
     }
@@ -67,12 +67,12 @@ contract EventFactory {
         // Event should not exist yet
         require(address(scalarEvents[eventHash]) == 0);
         // Create event
-        eventContract = new ScalarEvent(
+        eventContract = ScalarEvent(new ScalarEventProxy(
             collateralToken,
             oracle,
             lowerBound,
             upperBound
-        );
+        ));
         scalarEvents[eventHash] = eventContract;
         ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
     }

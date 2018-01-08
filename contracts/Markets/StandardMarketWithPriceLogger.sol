@@ -1,9 +1,7 @@
 pragma solidity ^0.4.15;
 import "../Markets/StandardMarket.sol";
 
-
-contract StandardMarketWithPriceLogger is StandardMarket {
-
+contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
     /*
      *  Constants
      */
@@ -28,9 +26,9 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
-    function StandardMarketWithPriceLogger(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
+    function StandardMarketWithPriceLoggerProxy(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
         public
-        StandardMarket(_creator, _eventContract, _marketMaker, _fee)
+        StandardMarketProxy(_creator, _eventContract, _marketMaker, _fee)
     {
         require(eventContract.getOutcomeCount() == 2);
 
@@ -46,7 +44,28 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         // initialize lastTradePrice to assuming uniform probabilities of outcomes
         lastTradePrice = ONE / 2;
     }
+}
 
+contract StandardMarketWithPriceLogger is StandardMarket {
+
+    /*
+     *  Constants
+     */
+    uint constant ONE = 0x10000000000000000;
+    uint8 public constant LONG = 1;
+
+    /*
+     *  Storage
+     */
+    uint public startDate;
+    uint public endDate;
+    uint public lastTradeDate;
+    uint public lastTradePrice;
+    uint public priceIntegral;
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
     function close()
         public
@@ -102,6 +121,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /// @return Average price for long tokens over time
     function getAvgPrice()
         public
+        constant
         returns (uint)
     {
         if(endDate > 0)

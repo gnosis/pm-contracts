@@ -1,5 +1,27 @@
 pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
+import "../Utils/C0ffeeProxy.sol";
+
+contract CentralizedOracleProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    address public owner;
+    bytes public ipfsHash;
+    bool public isSet;
+    int public outcome;
+
+    /// @dev Constructor sets owner address and IPFS hash
+    /// @param _ipfsHash Hash identifying off chain event description
+    function CentralizedOracleProxy(address _owner, bytes _ipfsHash)
+        public
+    {
+        // Description hash cannot be null
+        require(_ipfsHash.length == 46);
+        owner = _owner;
+        ipfsHash = _ipfsHash;
+    }
+}
 
 
 /// @title Centralized oracle contract - Allows the contract owner to set an outcome
@@ -32,17 +54,6 @@ contract CentralizedOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets owner address and IPFS hash
-    /// @param _ipfsHash Hash identifying off chain event description
-    function CentralizedOracle(address _owner, bytes _ipfsHash)
-        public
-    {
-        // Description hash cannot be null
-        require(_ipfsHash.length == 46);
-        owner = _owner;
-        ipfsHash = _ipfsHash;
-    }
-
     /// @dev Replaces owner
     /// @param newOwner New owner
     function replaceOwner(address newOwner)

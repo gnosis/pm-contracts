@@ -24,7 +24,7 @@ contract StandardMarketWithPriceLoggerFactory {
         public
         returns (StandardMarketWithPriceLogger market)
     {
-        market = new StandardMarketWithPriceLogger(msg.sender, eventContract, marketMaker, fee, startDate);
+        market = StandardMarketWithPriceLogger(new StandardMarketWithPriceLoggerProxy(msg.sender, eventContract, marketMaker, fee, startDate));
         StandardMarketWithPriceLoggerCreation(msg.sender, market, eventContract, marketMaker, fee, startDate);
     }
 }

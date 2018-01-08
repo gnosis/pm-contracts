@@ -23,7 +23,7 @@ contract StandardMarketFactory {
         public
         returns (StandardMarket market)
     {
-        market = StandardMarket(address(new StandardMarketProxy(msg.sender, eventContract, marketMaker, fee)));
+        market = StandardMarket(new StandardMarketProxy(msg.sender, eventContract, marketMaker, fee));
         StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

@@ -2,7 +2,64 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
+import "../Utils/C0ffeeProxy.sol";
 
+
+contract UltimateOracleProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    Oracle public forwardedOracle;
+    Token public collateralToken;
+    uint8 public spreadMultiplier;
+    uint public challengePeriod;
+    uint public challengeAmount;
+    uint public frontRunnerPeriod;
+
+    int public forwardedOutcome;
+    uint public forwardedOutcomeSetTimestamp;
+    int public frontRunner;
+    uint public frontRunnerSetTimestamp;
+
+    uint public totalAmount;
+    mapping (int => uint) public totalOutcomeAmounts;
+    mapping (address => mapping (int => uint)) public outcomeAmounts;
+
+    /*
+     *  Public functions
+     */
+    /// @dev Constructor sets ultimate oracle properties
+    /// @param _forwardedOracle Oracle address
+    /// @param _collateralToken Collateral token address
+    /// @param _spreadMultiplier Defines the spread as a multiple of the money bet on other outcomes
+    /// @param _challengePeriod Time to challenge oracle outcome
+    /// @param _challengeAmount Amount to challenge the outcome
+    /// @param _frontRunnerPeriod Time to overbid the front-runner
+    function UltimateOracleProxy(
+        Oracle _forwardedOracle,
+        Token _collateralToken,
+        uint8 _spreadMultiplier,
+        uint _challengePeriod,
+        uint _challengeAmount,
+        uint _frontRunnerPeriod
+    )
+        public
+    {
+        // Validate inputs
+        require(   address(_forwardedOracle) != 0
+                && address(_collateralToken) != 0
+                && _spreadMultiplier >= 2
+                && _challengePeriod > 0
+                && _challengeAmount > 0
+                && _frontRunnerPeriod > 0);
+        forwardedOracle = _forwardedOracle;
+        collateralToken = _collateralToken;
+        spreadMultiplier = _spreadMultiplier;
+        challengePeriod = _challengePeriod;
+        challengeAmount = _challengeAmount;
+        frontRunnerPeriod = _frontRunnerPeriod;
+    }
+}
 
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -39,38 +96,6 @@ contract UltimateOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets ultimate oracle properties
-    /// @param _forwardedOracle Oracle address
-    /// @param _collateralToken Collateral token address
-    /// @param _spreadMultiplier Defines the spread as a multiple of the money bet on other outcomes
-    /// @param _challengePeriod Time to challenge oracle outcome
-    /// @param _challengeAmount Amount to challenge the outcome
-    /// @param _frontRunnerPeriod Time to overbid the front-runner
-    function UltimateOracle(
-        Oracle _forwardedOracle,
-        Token _collateralToken,
-        uint8 _spreadMultiplier,
-        uint _challengePeriod,
-        uint _challengeAmount,
-        uint _frontRunnerPeriod
-    )
-        public
-    {
-        // Validate inputs
-        require(   address(_forwardedOracle) != 0
-                && address(_collateralToken) != 0
-                && _spreadMultiplier >= 2
-                && _challengePeriod > 0
-                && _challengeAmount > 0
-                && _frontRunnerPeriod > 0);
-        forwardedOracle = _forwardedOracle;
-        collateralToken = _collateralToken;
-        spreadMultiplier = _spreadMultiplier;
-        challengePeriod = _challengePeriod;
-        challengeAmount = _challengeAmount;
-        frontRunnerPeriod = _frontRunnerPeriod;
-    }
-
     /// @dev Allows to set oracle outcome
     function setForwardedOutcome()
         public

@@ -2,7 +2,70 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
+import "../Utils/C0ffeeProxy.sol";
 
+contract FutarchyOracleProxy is C0ffeeProxy {
+    /*
+     *  Storage
+     */
+    address creator;
+    StandardMarketWithPriceLogger[] public markets;
+    CategoricalEvent public categoricalEvent;
+    uint public tradingPeriod;
+    uint public winningMarketIndex;
+    bool public isSet;
+
+    /*
+     *  Public functions
+     */
+    /// @dev Constructor creates events and markets for futarchy oracle
+    /// @param _creator Oracle creator
+    /// @param eventFactory Event factory contract
+    /// @param collateralToken Tokens used as collateral in exchange for outcome tokens
+    /// @param oracle Oracle contract used to resolve the event
+    /// @param outcomeCount Number of event outcomes
+    /// @param lowerBound Lower bound for event outcome
+    /// @param upperBound Lower bound for event outcome
+    /// @param marketFactory Market factory contract
+    /// @param marketMaker Market maker contract
+    /// @param fee Market fee
+    /// @param _tradingPeriod Trading period before decision can be determined
+    /// @param startDate Start date for price logging
+    function FutarchyOracleProxy(
+        address _creator,
+        EventFactory eventFactory,
+        Token collateralToken,
+        Oracle oracle,
+        uint8 outcomeCount,
+        int lowerBound,
+        int upperBound,
+        StandardMarketWithPriceLoggerFactory marketFactory,
+        MarketMaker marketMaker,
+        uint24 fee,
+        uint _tradingPeriod,
+        uint startDate
+
+    )
+        public
+    {
+        // trading period is at least a second
+        require(_tradingPeriod > 0);
+        // Create decision event
+        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, Oracle(this), outcomeCount);
+        // Create outcome events
+        for (uint8 i = 0; i < categoricalEvent.getOutcomeCount(); i++) {
+            ScalarEvent scalarEvent = eventFactory.createScalarEvent(
+                categoricalEvent.outcomeTokens(i),
+                oracle,
+                lowerBound,
+                upperBound
+            );
+            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, startDate));
+        }
+        creator = _creator;
+        tradingPeriod = _tradingPeriod;
+    }
+}
 
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
 /// @author Stefan George - <stefan@gnosis.pm>
@@ -43,54 +106,6 @@ contract FutarchyOracle is Oracle {
     /*
      *  Public functions
      */
-    /// @dev Constructor creates events and markets for futarchy oracle
-    /// @param _creator Oracle creator
-    /// @param eventFactory Event factory contract
-    /// @param collateralToken Tokens used as collateral in exchange for outcome tokens
-    /// @param oracle Oracle contract used to resolve the event
-    /// @param outcomeCount Number of event outcomes
-    /// @param lowerBound Lower bound for event outcome
-    /// @param upperBound Lower bound for event outcome
-    /// @param marketFactory Market factory contract
-    /// @param marketMaker Market maker contract
-    /// @param fee Market fee
-    /// @param _tradingPeriod Trading period before decision can be determined
-    /// @param startDate Start date for price logging
-    function FutarchyOracle(
-        address _creator,
-        EventFactory eventFactory,
-        Token collateralToken,
-        Oracle oracle,
-        uint8 outcomeCount,
-        int lowerBound,
-        int upperBound,
-        StandardMarketWithPriceLoggerFactory marketFactory,
-        MarketMaker marketMaker,
-        uint24 fee,
-        uint _tradingPeriod,
-        uint startDate
-
-    )
-        public
-    {
-        // trading period is at least a second
-        require(_tradingPeriod > 0);
-        // Create decision event
-        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
-        // Create outcome events
-        for (uint8 i = 0; i < categoricalEvent.getOutcomeCount(); i++) {
-            ScalarEvent scalarEvent = eventFactory.createScalarEvent(
-                categoricalEvent.outcomeTokens(i),
-                oracle,
-                lowerBound,
-                upperBound
-            );
-            markets.push(marketFactory.createMarket(scalarEvent, marketMaker, fee, startDate));
-        }
-        creator = _creator;
-        tradingPeriod = _tradingPeriod;
-    }
-
     /// @dev Funds all markets with equal amount of funding
     /// @param funding Amount of funding
     function fund(uint funding)

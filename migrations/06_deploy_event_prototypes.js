@@ -5,7 +5,7 @@ const ScalarEvent = artifacts.require('ScalarEvent')
 module.exports = function (deployer) {
     deployer.link(Math, [CategoricalEvent, ScalarEvent])
     deployer.deploy([
-        [CategoricalEvent, 1, 1, 2],
-        [ScalarEvent, 1, 1, 0, 1],
+        CategoricalEvent,
+        ScalarEvent,
     ])
 }
