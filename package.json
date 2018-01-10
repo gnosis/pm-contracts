@@ -4,6 +4,7 @@
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
+    "develop": "truffle develop",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
