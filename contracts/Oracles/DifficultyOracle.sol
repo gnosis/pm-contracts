@@ -57,7 +57,7 @@ contract DifficultyOracle is Oracle {
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         // Difficulty is always bigger than 0
@@ -68,7 +68,7 @@ contract DifficultyOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         return int(difficulty);

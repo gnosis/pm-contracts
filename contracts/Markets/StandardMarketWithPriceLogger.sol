@@ -121,7 +121,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /// @return Average price for long tokens over time
     function getAvgPrice()
         public
-        constant
+        view
         returns (uint)
     {
         if(endDate > 0)
