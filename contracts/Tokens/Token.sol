@@ -1,5 +1,5 @@
 /// Implements ERC 20 Token standard: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 
 
 /// @title Abstract token contract - Functions to be implemented by token contracts

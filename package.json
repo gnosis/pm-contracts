@@ -36,7 +36,7 @@
     "npm-prepublish": "^1.2.3",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.4.2",
-    "truffle": "^3.4.11"
+    "truffle": "^4.0.4"
   },
   "repository": {
     "type": "git",
