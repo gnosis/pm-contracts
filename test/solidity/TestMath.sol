@@ -5,7 +5,7 @@ import "truffle/DeployedAddresses.sol";
 import "../../contracts/Utils/Math.sol";
 
 contract TestMath {
-    function testMathOverloaded() {
+    function testMathOverloaded() public {
         /* Test Overloaded functions using integers */
 
         //Safe to add int
