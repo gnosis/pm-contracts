@@ -106,7 +106,7 @@ contract StandardMarket is Market {
         atStage(Stages.MarketFunded)
         returns (int netCost)
     {
-        revert();
+        return 0;
     }
 
     /// @dev Calculates fee to be paid to market maker

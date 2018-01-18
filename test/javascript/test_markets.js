@@ -115,7 +115,8 @@ contract('StandardMarket', function (accounts) {
         const buyer = 1
         const outcome = 0
         const tokenCount = 1e15
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+        let outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? tokenCount : 0)
+        const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
 
         let fee = await market.calcMarketFee.call(outcomeTokenCost)
         assert.equal(fee, Math.floor(outcomeTokenCost * 5 / 100))
@@ -134,7 +135,8 @@ contract('StandardMarket', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
         // Sell outcome tokens
-        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
+        outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? -tokenCount : 0)
+        const outcomeTokenProfit = (await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)).neg()
         fee = await market.calcMarketFee.call(outcomeTokenProfit)
         const profit = outcomeTokenProfit.sub(fee)
 
@@ -173,7 +175,8 @@ contract('StandardMarket', function (accounts) {
         const outcome = 0
         const oppositeOutcome = 1
         const tokenCount = 1e15
-        const outcomeTokenProfit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
+        const outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? -tokenCount : 0)
+        const outcomeTokenProfit = (await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)).neg()
         const fee = await market.calcMarketFee.call(outcomeTokenProfit)
         const cost = fee.add(tokenCount).sub(outcomeTokenProfit)
 
@@ -230,7 +233,8 @@ contract('StandardMarket', function (accounts) {
         const buyer = 4
         const outcome = 0
         const tokenCount = 1e15
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+        const outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? tokenCount : 0)
+        const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
 
         const fee = await market.calcMarketFee.call(outcomeTokenCost)
         assert.equal(fee.valueOf(), outcomeTokenCost.mul(.05).floor().valueOf())
