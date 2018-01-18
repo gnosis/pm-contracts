@@ -43,8 +43,13 @@ contract LMSRMarketMaker is MarketMaker {
         // Calculate cost level after balance was updated
         int costLevelAfter = calcCostLevel(logN, netOutcomeTokensSold, funding);
 
-        // Calculate cost as cost level difference
-        netCost = costLevelAfter.sub(costLevelBefore) / int(ONE);
+        // Calculate net cost as cost level difference and use the ceil
+        netCost = costLevelAfter.sub(costLevelBefore);
+        if(netCost / int(ONE) * int(ONE) == netCost) {
+            netCost /= int(ONE);
+        } else {
+            netCost = netCost / int(ONE) + 1;
+        }
     }
 
     /// @dev Returns marginal price of an outcome
