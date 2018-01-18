@@ -75,18 +75,19 @@ contract('MarketMaker', function(accounts) {
 
         // User sells tokens
         const buyerBalance = await etherToken.balanceOf.call(accounts[trader])
-        let profit
+        let profit, outcomeTokenAmounts
         for(let i of _.range(loopCount)) {
             // Calculate profit for selling tokens
-            profit = await lmsrMarketMaker.calcProfit.call(market.address, outcome, tokenCount)
+            outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? -tokenCount : 0)
+            profit = (await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)).neg()
             if(profit == 0)
                 break
 
             // Selling tokens
             await outcomeToken.approve(market.address, tokenCount, { from: accounts[trader] })
             assert.equal(getParamFromTxEvent(
-                await market.sell(outcome, tokenCount, profit, { from: accounts[trader] }), 'outcomeTokenProfit'
-            ).valueOf(), profit.valueOf())
+                await market.trade(outcomeTokenAmounts, profit.neg(), { from: accounts[trader] }), 'outcomeTokenNetCost'
+            ).neg().valueOf(), profit.valueOf())
 
             let netOutcomeTokensSold = await Promise.all(_.range(numOutcomes).map((j) => market.netOutcomeTokensSold(j)))
             let expected = lmsrMarginalPrice(funding, netOutcomeTokensSold, outcome)
@@ -144,10 +145,11 @@ contract('MarketMaker', function(accounts) {
             await etherToken.deposit({ value: tokenCount * loopCount, from: accounts[trader] })
 
             // User buys outcome tokens from market maker
-            let cost
+            let cost, outcomeTokenAmounts
             for(let i of _.range(loopCount)) {
-                // Calculate profit for selling tokens
-                cost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+                // Calculate cost of buying tokens
+                outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? tokenCount : 0)
+                cost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
 
                 // Buying tokens
                 await etherToken.approve(market.address, tokenCount, { from: accounts[trader] })

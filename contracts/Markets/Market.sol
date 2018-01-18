@@ -12,7 +12,7 @@ contract Market {
     event MarketFunding(uint funding);
     event MarketClosing();
     event FeeWithdrawal(uint fees);
-    event OutcomeTokenTrade(address indexed transactor, int[] outcomeTokenAmounts, int outcomeTokenCost, uint marketFees);
+    event OutcomeTokenTrade(address indexed transactor, int[] outcomeTokenAmounts, int outcomeTokenNetCost, uint marketFees);
 
     /*
      *  Storage
