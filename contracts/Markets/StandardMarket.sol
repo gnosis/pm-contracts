@@ -97,91 +97,16 @@ contract StandardMarket is Market {
         FeeWithdrawal(fees);
     }
 
-    /// @dev Allows to buy outcome tokens from market maker
-    /// @param outcomeTokenIndex Index of the outcome token to buy
-    /// @param outcomeTokenCount Amount of outcome tokens to buy
-    /// @param maxCost The maximum cost in collateral tokens to pay for outcome tokens
-    /// @return Cost in collateral tokens
-    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost)
+    /// @dev Allows to trade outcome tokens and collateral with the market maker
+    /// @param outcomeTokenAmounts Amounts of each outcome token to buy or sell. If positive, will buy this amount of outcome token from the market. If negative, will sell this amount back to the market instead.
+    /// @param collateralLimit If positive, this is the limit for the amount of collateral tokens which will sent to the market to conduct the trade. If negative, this is the minimum amount of collateral tokens which will be received from the market for the trade. If zero, there is no limit.
+    /// @return If positive, the amount of collateral sent to the market. If negative, the amount of collateral received from the market. If zero, no collateral was sent or received.
+    function trade(int[] outcomeTokenAmounts, int collateralLimit)
         public
         atStage(Stages.MarketFunded)
-        returns (uint cost)
+        returns (int collateralAmount)
     {
-        // Calculate cost to buy outcome tokens
-        uint outcomeTokenCost = marketMaker.calcCost(this, outcomeTokenIndex, outcomeTokenCount);
-        // Calculate fees charged by market
-        uint fees = calcMarketFee(outcomeTokenCost);
-        cost = outcomeTokenCost.add(fees);
-        // Check cost doesn't exceed max cost
-        require(cost > 0 && cost <= maxCost);
-        // Transfer tokens to markets contract and buy all outcomes
-        require(   eventContract.collateralToken().transferFrom(msg.sender, this, cost)
-                && eventContract.collateralToken().approve(eventContract, outcomeTokenCost));
-        // Buy all outcomes
-        eventContract.buyAllOutcomes(outcomeTokenCost);
-        // Transfer outcome tokens to buyer
-        require(eventContract.outcomeTokens(outcomeTokenIndex).transfer(msg.sender, outcomeTokenCount));
-        // Add outcome token count to market maker net balance
-        require(int(outcomeTokenCount) >= 0);
-        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
-        OutcomeTokenPurchase(msg.sender, outcomeTokenIndex, outcomeTokenCount, outcomeTokenCost, fees);
-    }
-
-    /// @dev Allows to sell outcome tokens to market maker
-    /// @param outcomeTokenIndex Index of the outcome token to sell
-    /// @param outcomeTokenCount Amount of outcome tokens to sell
-    /// @param minProfit The minimum profit in collateral tokens to earn for outcome tokens
-    /// @return Profit in collateral tokens
-    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
-        atStage(Stages.MarketFunded)
-        returns (uint profit)
-    {
-        // Calculate profit for selling outcome tokens
-        uint outcomeTokenProfit = marketMaker.calcProfit(this, outcomeTokenIndex, outcomeTokenCount);
-        // Calculate fee charged by market
-        uint fees = calcMarketFee(outcomeTokenProfit);
-        profit = outcomeTokenProfit.sub(fees);
-        // Check profit is not too low
-        require(profit > 0 && profit >= minProfit);
-        // Transfer outcome tokens to markets contract to sell all outcomes
-        require(eventContract.outcomeTokens(outcomeTokenIndex).transferFrom(msg.sender, this, outcomeTokenCount));
-        // Sell all outcomes
-        eventContract.sellAllOutcomes(outcomeTokenProfit);
-        // Transfer profit to seller
-        require(eventContract.collateralToken().transfer(msg.sender, profit));
-        // Subtract outcome token count from market maker net balance
-        require(int(outcomeTokenCount) >= 0);
-        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
-        OutcomeTokenSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, outcomeTokenProfit, fees);
-    }
-
-    /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
-    ///      shares of all other outcome tokens.
-    /// @param outcomeTokenIndex Index of the outcome token to short sell
-    /// @param outcomeTokenCount Amount of outcome tokens to short sell
-    /// @param minProfit The minimum profit in collateral tokens to earn for short sold outcome tokens
-    /// @return Cost to short sell outcome in collateral tokens
-    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
-        returns (uint cost)
-    {
-        // Buy all outcomes
-        require(   eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
-                && eventContract.collateralToken().approve(eventContract, outcomeTokenCount));
-        eventContract.buyAllOutcomes(outcomeTokenCount);
-        // Short sell selected outcome
-        eventContract.outcomeTokens(outcomeTokenIndex).approve(this, outcomeTokenCount);
-        uint profit = this.sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
-        cost = outcomeTokenCount - profit;
-        // Transfer outcome tokens to buyer
-        uint8 outcomeCount = eventContract.getOutcomeCount();
-        for (uint8 i = 0; i < outcomeCount; i++)
-            if (i != outcomeTokenIndex)
-                require(eventContract.outcomeTokens(i).transfer(msg.sender, outcomeTokenCount));
-        // Send change back to buyer
-        require(eventContract.collateralToken().transfer(msg.sender, profit));
-        OutcomeTokenShortSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, cost);
+        revert();
     }
 
     /// @dev Calculates fee to be paid to market maker
