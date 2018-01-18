@@ -4,6 +4,7 @@
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
+    "develop": "truffle develop",
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
@@ -36,7 +37,7 @@
     "npm-prepublish": "^1.2.3",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.4.2",
-    "truffle": "^3.4.11"
+    "truffle": "^4.0.4"
   },
   "repository": {
     "type": "git",

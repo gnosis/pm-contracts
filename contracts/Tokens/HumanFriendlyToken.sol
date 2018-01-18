@@ -1,6 +1,6 @@
 /// Implements ERC 20 Token standard including extra accessors for human readability.
 /// See: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20-token-standard.md
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Tokens/Token.sol";
 
 
@@ -10,7 +10,7 @@ contract HumanFriendlyToken is Token {
     /*
      *  Public functions
      */
-    function name() public constant returns (string);
-    function symbol() public constant returns (string);
-    function decimals() public constant returns (uint8);
+    function name() public view returns (string);
+    function symbol() public view returns (string);
+    function decimals() public view returns (uint8);
 }

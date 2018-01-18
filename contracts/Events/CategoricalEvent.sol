@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Events/Event.sol";
 
 
@@ -45,7 +45,7 @@ contract CategoricalEvent is Event {
     /// @return Event hash
     function getEventHash()
         public
-        constant
+        view
         returns (bytes32)
     {
         return keccak256(collateralToken, oracle, outcomeTokens.length);

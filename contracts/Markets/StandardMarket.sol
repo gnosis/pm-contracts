@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Markets/Market.sol";
 import "../Tokens/Token.sol";
 import "../Events/Event.sol";
@@ -186,7 +186,7 @@ contract StandardMarket is Market {
     /// @return Fee for trade
     function calcMarketFee(uint outcomeTokenCost)
         public
-        constant
+        view
         returns (uint)
     {
         return outcomeTokenCost * fee / FEE_RANGE;

@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Markets/StandardMarket.sol";
 
 
@@ -102,6 +102,7 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /// @return Average price for long tokens over time
     function getAvgPrice()
         public
+        view
         returns (uint)
     {
         if(endDate > 0)
