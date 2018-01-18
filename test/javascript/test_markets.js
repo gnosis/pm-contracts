@@ -127,7 +127,7 @@ contract('StandardMarket', function (accounts) {
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+            await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost'
         ), outcomeTokenCost.valueOf())
 
         const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(outcome))
@@ -142,8 +142,8 @@ contract('StandardMarket', function (accounts) {
 
         await outcomeToken.approve(market.address, tokenCount, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.sell(outcome, tokenCount, profit, { from: accounts[buyer] }), 'outcomeTokenProfit'
-        ).valueOf(), outcomeTokenProfit.valueOf())
+            await market.trade(outcomeTokenAmounts, -profit, { from: accounts[buyer] }), 'outcomeTokenNetCost'
+        ).neg().valueOf(), outcomeTokenProfit.valueOf())
 
         assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), 0)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), profit.valueOf())
@@ -173,24 +173,24 @@ contract('StandardMarket', function (accounts) {
         // Short sell outcome tokens
         const buyer = 7
         const outcome = 0
-        const oppositeOutcome = 1
+        const differentOutcome = 1
         const tokenCount = 1e15
-        const outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i === outcome ? -tokenCount : 0)
-        const outcomeTokenProfit = (await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)).neg()
-        const fee = await market.calcMarketFee.call(outcomeTokenProfit)
-        const cost = fee.add(tokenCount).sub(outcomeTokenProfit)
+        const outcomeTokenAmounts = Array.from({length: numOutcomes}, (v, i) => i !== outcome ? tokenCount : 0)
+        const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
+        const fee = await market.calcMarketFee.call(outcomeTokenCost)
+        const cost = outcomeTokenCost.add(fee)
 
-        await etherToken.deposit({ value: tokenCount, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), tokenCount)
-        await etherToken.approve(market.address, tokenCount, { from: accounts[buyer] })
+        await etherToken.deposit({ value: cost, from: accounts[buyer] })
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost)
+        await etherToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(
             getParamFromTxEvent(
-                await market.shortSell(outcome, tokenCount, outcomeTokenProfit - fee, { from: accounts[buyer] }),
-                'cost', null, 'OutcomeTokenShortSale'
-            ).valueOf(), cost)
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), tokenCount - cost)
-        const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(oppositeOutcome))
+                await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }),
+                'outcomeTokenNetCost'
+            ).valueOf(), outcomeTokenCost.valueOf())
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
+        const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(differentOutcome))
         assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), tokenCount)
     })
 
@@ -246,7 +246,7 @@ contract('StandardMarket', function (accounts) {
 
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
         assert.equal(getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost').valueOf()
+            await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost').valueOf()
         , outcomeTokenCost.valueOf())
 
         // Set outcome

@@ -178,7 +178,7 @@ contract('Oracle', function (accounts) {
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(utils.getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+            await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost'
         ), outcomeTokenCost.valueOf())
 
         // Set outcome of futarchy oracle
