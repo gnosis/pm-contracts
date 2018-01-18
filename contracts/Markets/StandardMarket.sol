@@ -101,7 +101,7 @@ contract StandardMarket is Market {
     function trade(int[] outcomeTokenAmounts, int collateralLimit)
         public
         atStage(Stages.MarketFunded)
-        returns (int collateralAmount)
+        returns (int netCost)
     {
         revert();
     }
