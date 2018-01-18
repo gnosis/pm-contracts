@@ -73,10 +73,10 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /// @return Cost/profit in collateral tokens
     function trade(int[] outcomeTokenAmounts, int collateralLimit)
         public
-        returns (int collateralAmount)
+        returns (int netCost)
     {
         logPriceBefore();
-        collateralAmount = super.trade(outcomeTokenAmounts, collateralLimit);
+        netCost = super.trade(outcomeTokenAmounts, collateralLimit);
         logPriceAfter();
     }
 
