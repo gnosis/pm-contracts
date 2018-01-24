@@ -99,14 +99,64 @@ contract StandardMarket is Market {
 
     /// @dev Allows to trade outcome tokens and collateral with the market maker
     /// @param outcomeTokenAmounts Amounts of each outcome token to buy or sell. If positive, will buy this amount of outcome token from the market. If negative, will sell this amount back to the market instead.
-    /// @param collateralLimit If positive, this is the limit for the amount of collateral tokens which will sent to the market to conduct the trade. If negative, this is the minimum amount of collateral tokens which will be received from the market for the trade. If zero, there is no limit.
+    /// @param collateralLimit If positive, this is the limit for the amount of collateral tokens which will be sent to the market to conduct the trade. If negative, this is the minimum amount of collateral tokens which will be received from the market for the trade. If zero, there is no limit.
     /// @return If positive, the amount of collateral sent to the market. If negative, the amount of collateral received from the market. If zero, no collateral was sent or received.
     function trade(int[] outcomeTokenAmounts, int collateralLimit)
         public
         atStage(Stages.MarketFunded)
         returns (int netCost)
     {
-        return 0;
+        uint8 outcomeCount = eventContract.getOutcomeCount();
+        require(outcomeTokenAmounts.length == outcomeCount);
+
+        // Calculate net cost for executing trade
+        int outcomeTokenNetCost = marketMaker.calcNetCost(this, outcomeTokenAmounts);
+        int fees;
+        if(outcomeTokenNetCost < 0)
+            fees = int(calcMarketFee(uint(-outcomeTokenNetCost)));
+        else
+            fees = int(calcMarketFee(uint(outcomeTokenNetCost)));
+
+        require(fees >= 0);
+        netCost = outcomeTokenNetCost.add(fees);
+
+        require(
+            (collateralLimit != 0 && netCost <= collateralLimit) ||
+            collateralLimit == 0
+        );
+
+        if(outcomeTokenNetCost > 0) {
+            require(
+                eventContract.collateralToken().transferFrom(msg.sender, this, uint(netCost)) &&
+                eventContract.collateralToken().approve(eventContract, uint(outcomeTokenNetCost))
+            );
+
+            eventContract.buyAllOutcomes(uint(outcomeTokenNetCost));
+        }
+
+        for (uint8 i = 0; i < outcomeCount; i++) {
+            if(outcomeTokenAmounts[i] != 0) {
+                if(outcomeTokenAmounts[i] < 0) {
+                    require(eventContract.outcomeTokens(i).transferFrom(msg.sender, this, uint(-outcomeTokenAmounts[i])));
+                } else {
+                    require(eventContract.outcomeTokens(i).transfer(msg.sender, uint(outcomeTokenAmounts[i])));
+                }
+
+                netOutcomeTokensSold[i] = netOutcomeTokensSold[i].add(outcomeTokenAmounts[i]);
+            }
+        }
+
+        if(outcomeTokenNetCost < 0) {
+            // This is safe since
+            // 0x8000000000000000000000000000000000000000000000000000000000000000 ==
+            // uint(-int(-0x8000000000000000000000000000000000000000000000000000000000000000))
+            eventContract.sellAllOutcomes(uint(-outcomeTokenNetCost));
+            if(netCost < 0) {
+                require(eventContract.collateralToken().transfer(msg.sender, uint(-netCost)));
+            }
+        }
+
+        OutcomeTokenTrade(msg.sender, outcomeTokenAmounts, outcomeTokenNetCost, uint(fees));
     }
 
     /// @dev Calculates fee to be paid to market maker

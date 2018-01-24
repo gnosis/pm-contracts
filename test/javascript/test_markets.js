@@ -181,7 +181,7 @@ contract('StandardMarket', function (accounts) {
         const cost = outcomeTokenCost.add(fee)
 
         await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost.valueOf())
         await etherToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(
