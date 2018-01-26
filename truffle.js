@@ -1,16 +1,7 @@
+const ganache = require("ganache-cli")
+
 const config = {
     networks: {
-        development: {
-            host: "localhost",
-            port: 8545,
-            network_id: "*",
-        },
-        testing: {
-            host: "localhost",
-            port: 8545,
-            network_id: "*",
-            gas: 2e7,
-        },
         coverage: {
             host: "localhost",
             network_id: "*",
@@ -38,6 +29,11 @@ const config = {
             port: 8545,
             network_id: "4",
         },
+        test: {
+            network_id: "*",
+            gas: 2e7,
+            provider: ganache.provider({ gasLimit: 2e7 }),
+        }
     },
     mocha: {
         enableTimeouts: false,

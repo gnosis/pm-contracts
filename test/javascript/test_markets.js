@@ -3,7 +3,7 @@ const { wait } = require('@digix/tempo')(web3)
 const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const utils = require('./utils')
-const { getParamFromTxEvent, assertRejects, Decimal, randrange } = utils
+const { getBlock, getParamFromTxEvent, assertRejects, Decimal, randrange } = utils
 
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')
@@ -198,7 +198,7 @@ contract('StandardMarket', function (accounts) {
         // Create campaign
         const feeFactor = 50000  // 5%
         const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+        const deadline = (await getBlock('latest')).timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaign(
                 event.address,
@@ -287,7 +287,7 @@ contract('StandardMarket', function (accounts) {
         // Create campaign
         const feeFactor = 50000  // 5%
         const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+        const deadline = (await getBlock('latest')).timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaign(
                 event.address,
