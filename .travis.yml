@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+- 'node'
 - '8'
 - '7'
 before_install:
@@ -18,5 +19,5 @@ deploy:
   on:
     all_branches: true
     tags: true
-    node: '7'
+    node: '8'
     repo: gnosis/pm-contracts
