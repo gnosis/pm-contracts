@@ -45,7 +45,9 @@ contract LMSRMarketMaker is MarketMaker {
 
         // Calculate net cost as cost level difference and use the ceil
         netCost = costLevelAfter.sub(costLevelBefore);
-        if(netCost / int(ONE) * int(ONE) == netCost) {
+        // Integer division for negative numbers already uses ceiling,
+        // so only check boundary condition for positive numbers
+        if(netCost <= 0 || netCost / int(ONE) * int(ONE) == netCost) {
             netCost /= int(ONE);
         } else {
             netCost = netCost / int(ONE) + 1;
