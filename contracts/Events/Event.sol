@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 import "../Tokens/Token.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
