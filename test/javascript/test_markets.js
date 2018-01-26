@@ -1,7 +1,7 @@
 const { wait } = require('@digix/tempo')(web3)
 
 const utils = require('./utils')
-const { getParamFromTxEvent, assertRejects } = utils
+const { getBlock, getParamFromTxEvent, assertRejects } = utils
 
 const Event = artifacts.require('Event')
 const EventFactory = artifacts.require('EventFactory')
@@ -196,7 +196,7 @@ contract('Market', function (accounts) {
         // Create campaign
         const feeFactor = 50000  // 5%
         const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+        const deadline = (await getBlock('latest')).timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaign(
                 event.address,
@@ -285,7 +285,7 @@ contract('Market', function (accounts) {
         // Create campaign
         const feeFactor = 50000  // 5%
         const funding = 1e18
-        const deadline = web3.eth.getBlock('latest').timestamp + 60  // in 1h
+        const deadline = (await getBlock('latest')).timestamp + 60  // in 1h
         const campaign = Campaign.at(getParamFromTxEvent(
             await campaignFactory.createCampaign(
                 event.address,

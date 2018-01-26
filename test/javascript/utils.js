@@ -55,6 +55,15 @@ async function assertRejects(q, msg) {
     }
 }
 
+function getBlock(b) {
+    return new Promise((resolve, reject) => {
+        web3.eth.getBlock(b, (err, block) => {
+            if(err) return reject(err)
+            resolve(block)
+        })
+    })
+}
+
 function lmsrMarginalPrice(funding, netOutcomeTokensSold, outcomeIndex) {
     const b = Decimal(funding.valueOf()).div(netOutcomeTokensSold.length).ln()
 
@@ -166,6 +175,7 @@ Object.assign(exports, {
     randnums,
     getParamFromTxEvent,
     assertRejects,
+    getBlock,
     lmsrMarginalPrice,
     createGasStatCollectorBeforeHook,
     createGasStatCollectorAfterHook,
