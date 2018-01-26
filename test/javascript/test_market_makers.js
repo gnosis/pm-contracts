@@ -175,4 +175,64 @@ contract('MarketMaker', function(accounts) {
             assert.equal(cost, tokenCount)
         }
     })
+
+    it('should allow buying and selling outcome tokens in the same transaction', async () => {
+        // Create event
+        const numOutcomes = 4
+        const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        const oracleAddress = getParamFromTxEvent(
+            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
+            'centralizedOracle')
+        const event = getParamFromTxEvent(
+            await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
+            'categoricalEvent', Event)
+
+        // Create market
+        const investor = 5
+
+        const feeFactor = 0  // 0%
+        const market = getParamFromTxEvent(
+            await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
+                { from: accounts[investor] }),
+            'market', Market)
+
+        // Fund market
+        const funding = 1e18
+
+        await etherToken.deposit({ value: funding, from: accounts[investor] })
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), funding)
+
+        await etherToken.approve(market.address, funding, { from: accounts[investor] })
+        await market.fund(funding, { from: accounts[investor] })
+        assert.equal(await etherToken.balanceOf.call(accounts[investor]), 0)
+
+        const trader = 6
+        const initialOutcomeTokenCount = 1e18
+        const initialEtherTokenCount = 10e18
+
+        // User buys all outcomes
+        await etherToken.deposit({ value: initialOutcomeTokenCount + initialEtherTokenCount, from: accounts[trader] })
+        await etherToken.approve(event.address, initialOutcomeTokenCount, { from: accounts[trader] })
+        await event.buyAllOutcomes(initialOutcomeTokenCount, { from: accounts[trader] })
+
+        // User trades with the market
+        const tradeValues = [5e17, -1e18, -1e17, 2e18]
+        const cost = await lmsrMarketMaker.calcNetCost.call(market.address, tradeValues)
+        if(cost.gt(0)) await etherToken.approve(market.address, cost, { from: accounts[trader] })
+
+        const outcomeTokens = await Promise.all(_.range(numOutcomes).map(i => event.outcomeTokens.call(i).then(tokenAddr => Token.at(tokenAddr))))
+        await Promise.all(tradeValues.map((v, i) => [v, i]).filter(([v]) => v < 0).map(([v, i]) =>
+            outcomeTokens[i].approve(market.address, -v, { from: accounts[trader] })))
+
+        assert.equal(getParamFromTxEvent(
+            await market.trade(tradeValues, cost, { from: accounts[trader] }), 'outcomeTokenNetCost'
+        ), cost.valueOf())
+
+        // All state transitions associated with trade have been performed
+        for(let [tradeValue, i] of tradeValues.map((v, i) => [v, i])) {
+            assert.equal(await outcomeTokens[i].balanceOf.call(accounts[trader]), initialOutcomeTokenCount + tradeValue)
+        }
+
+        assert.equal(await etherToken.balanceOf.call(accounts[trader]), initialEtherTokenCount - cost.valueOf())
+    })
 })
