@@ -4,7 +4,5 @@ const FutarchyOracleFactory = artifacts.require('FutarchyOracleFactory')
 const StandardMarketWithPriceLoggerFactory = artifacts.require('StandardMarketWithPriceLoggerFactory')
 
 module.exports = function (deployer) {
-    FutarchyOracleFactory._json.unlinked_binary = FutarchyOracleFactory._json.unlinked_binary
-        .replace('c0ffeecafec0ffeecafec0ffeecafec0ffeecafe', FutarchyOracle.address.replace('0x', ''))
-    deployer.deploy(FutarchyOracleFactory, EventFactory.address, StandardMarketWithPriceLoggerFactory.address)
+    deployer.deploy(FutarchyOracleFactory, FutarchyOracle.address, EventFactory.address, StandardMarketWithPriceLoggerFactory.address)
 }

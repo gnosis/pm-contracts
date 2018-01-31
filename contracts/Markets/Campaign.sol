@@ -2,9 +2,9 @@ pragma solidity ^0.4.15;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "../Utils/Math.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract CampaignProxy is C0ffeeProxy {
+contract CampaignProxy is Proxy {
      /*
      *  Constants
      */
@@ -43,6 +43,7 @@ contract CampaignProxy is C0ffeeProxy {
     /// @param _funding Initial funding for market
     /// @param _deadline Campaign deadline
     function CampaignProxy(
+        address proxied,
         Event _eventContract,
         StandardMarketFactory _marketFactory,
         MarketMaker _marketMaker,
@@ -50,6 +51,7 @@ contract CampaignProxy is C0ffeeProxy {
         uint _funding,
         uint _deadline
     )
+        Proxy(proxied)
         public
     {
         // Validate input
@@ -71,7 +73,7 @@ contract CampaignProxy is C0ffeeProxy {
 
 /// @title Campaign contract - Allows to crowdfund a market
 /// @author Stefan George - <stefan@gnosis.pm>
-contract Campaign {
+contract Campaign is Proxied {
     using Math for *;
 
     /*

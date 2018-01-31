@@ -10,7 +10,8 @@ contract StandardMarketProxy is MarketProxy {
      */
     uint24 public constant FEE_RANGE = 1000000; // 100%
 
-    function StandardMarketProxy(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
+    function StandardMarketProxy(address proxy, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
+        MarketProxy(proxy)
         public
     {
         // Validate inputs

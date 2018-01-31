@@ -12,8 +12,19 @@ contract DifficultyOracleFactory {
     event DifficultyOracleCreation(address indexed creator, DifficultyOracle difficultyOracle, uint blockNumber);
 
     /*
+     *  Storage
+     */
+    DifficultyOracle public difficultyOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    function DifficultyOracleFactory(DifficultyOracle _difficultyOracleMasterCopy)
+        public
+    {
+        difficultyOracleMasterCopy = _difficultyOracleMasterCopy;
+    }
+
     /// @dev Creates a new difficulty oracle contract
     /// @param blockNumber Target block number
     /// @return Oracle contract
@@ -21,7 +32,7 @@ contract DifficultyOracleFactory {
         public
         returns (DifficultyOracle difficultyOracle)
     {
-        difficultyOracle = DifficultyOracle(new DifficultyOracleProxy(blockNumber));
+        difficultyOracle = DifficultyOracle(new DifficultyOracleProxy(difficultyOracleMasterCopy, blockNumber));
         DifficultyOracleCreation(msg.sender, difficultyOracle, blockNumber);
     }
 }

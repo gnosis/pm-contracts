@@ -1,8 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract SignedMessageOracleProxy is C0ffeeProxy {
+contract SignedMessageOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -20,7 +20,8 @@ contract SignedMessageOracleProxy is C0ffeeProxy {
     /// @param v Signature parameter
     /// @param r Signature parameter
     /// @param s Signature parameter
-    function SignedMessageOracleProxy(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+    function SignedMessageOracleProxy(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+        Proxy(proxied)
         public
     {
         signer = ecrecover(_descriptionHash, v, r, s);

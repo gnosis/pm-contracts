@@ -1,9 +1,8 @@
 pragma solidity ^0.4.15;
-
+import "../Utils/Proxy.sol";
 
 /// @title Abstract oracle contract - Functions to be implemented by oracles
-contract Oracle {
-
+contract Oracle is Proxied {
     function isOutcomeSet() public constant returns (bool);
     function getOutcome() public constant returns (int);
 }

@@ -2,10 +2,10 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
 
-contract UltimateOracleProxy is C0ffeeProxy {
+contract UltimateOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -36,6 +36,7 @@ contract UltimateOracleProxy is C0ffeeProxy {
     /// @param _challengeAmount Amount to challenge the outcome
     /// @param _frontRunnerPeriod Time to overbid the front-runner
     function UltimateOracleProxy(
+        address proxied,
         Oracle _forwardedOracle,
         Token _collateralToken,
         uint8 _spreadMultiplier,
@@ -43,6 +44,7 @@ contract UltimateOracleProxy is C0ffeeProxy {
         uint _challengeAmount,
         uint _frontRunnerPeriod
     )
+        Proxy(proxied)
         public
     {
         // Validate inputs

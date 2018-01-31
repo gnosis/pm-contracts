@@ -1,8 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract MajorityOracleProxy is C0ffeeProxy {
+contract MajorityOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -13,7 +13,8 @@ contract MajorityOracleProxy is C0ffeeProxy {
      */
     /// @dev Allows to create an oracle for a majority vote based on other oracles
     /// @param _oracles List of oracles taking part in the majority vote
-    function MajorityOracleProxy(Oracle[] _oracles)
+    function MajorityOracleProxy(address proxied, Oracle[] _oracles)
+        Proxy(proxied)
         public
     {
         // At least 2 oracles should be defined

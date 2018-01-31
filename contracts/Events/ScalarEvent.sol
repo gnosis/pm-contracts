@@ -1,8 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Events/Event.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract ScalarEventProxy is IceIceProxy {
+contract ScalarEventProxy is Proxy {
     /*
      *  Events
      */
@@ -29,11 +29,13 @@ contract ScalarEventProxy is IceIceProxy {
     /// @param _lowerBound Lower bound for event outcome
     /// @param _upperBound Lower bound for event outcome
     function ScalarEventProxy(
+        address proxied,
         Token _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound
     )
+        Proxy(proxied)
         public
     {
         // Validate input

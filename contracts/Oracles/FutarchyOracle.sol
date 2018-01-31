@@ -2,9 +2,9 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract FutarchyOracleProxy is C0ffeeProxy {
+contract FutarchyOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -32,6 +32,7 @@ contract FutarchyOracleProxy is C0ffeeProxy {
     /// @param _tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
     function FutarchyOracleProxy(
+        address proxied,
         address _creator,
         EventFactory eventFactory,
         Token collateralToken,
@@ -44,8 +45,8 @@ contract FutarchyOracleProxy is C0ffeeProxy {
         uint24 fee,
         uint _tradingPeriod,
         uint startDate
-
     )
+        Proxy(proxied)
         public
     {
         // trading period is at least a second

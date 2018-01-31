@@ -1,8 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract CentralizedOracleProxy is C0ffeeProxy {
+contract CentralizedOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -13,8 +13,9 @@ contract CentralizedOracleProxy is C0ffeeProxy {
 
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
-    function CentralizedOracleProxy(address _owner, bytes _ipfsHash)
+    function CentralizedOracleProxy(address proxied, address _owner, bytes _ipfsHash)
         public
+        Proxy(proxied)
     {
         // Description hash cannot be null
         require(_ipfsHash.length == 46);

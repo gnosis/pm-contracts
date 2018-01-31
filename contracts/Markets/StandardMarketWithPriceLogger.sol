@@ -26,9 +26,9 @@ contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
-    function StandardMarketWithPriceLoggerProxy(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
+    function StandardMarketWithPriceLoggerProxy(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
         public
-        StandardMarketProxy(_creator, _eventContract, _marketMaker, _fee)
+        StandardMarketProxy(proxied, _creator, _eventContract, _marketMaker, _fee)
     {
         require(eventContract.getOutcomeCount() == 2);
 

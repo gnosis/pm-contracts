@@ -1,8 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Events/Event.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract CategoricalEventProxy is C0ffeeProxy {
+contract CategoricalEventProxy is Proxy {
     /*
      *  Events
      */
@@ -24,7 +24,8 @@ contract CategoricalEventProxy is C0ffeeProxy {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function CategoricalEventProxy(Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+    function CategoricalEventProxy(address proxied, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+        Proxy(proxied)
         public
     {
         // Validate input
