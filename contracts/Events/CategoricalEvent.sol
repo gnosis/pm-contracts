@@ -24,7 +24,7 @@ contract CategoricalEventProxy is Proxy {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function CategoricalEventProxy(address proxied, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+    function CategoricalEventProxy(address proxied, address outcomeTokenMasterCopy, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
         Proxy(proxied)
         public
     {
@@ -34,7 +34,7 @@ contract CategoricalEventProxy is Proxy {
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < outcomeCount; i++) {
-            OutcomeToken outcomeToken = new OutcomeToken();
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
             outcomeTokens.push(outcomeToken);
             OutcomeTokenCreation(outcomeToken, i);
         }

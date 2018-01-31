@@ -30,6 +30,7 @@ contract ScalarEventProxy is Proxy {
     /// @param _upperBound Lower bound for event outcome
     function ScalarEventProxy(
         address proxied,
+        address outcomeTokenMasterCopy,
         Token _collateralToken,
         Oracle _oracle,
         int _lowerBound,
@@ -44,7 +45,7 @@ contract ScalarEventProxy is Proxy {
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < 2; i++) {
-            OutcomeToken outcomeToken = new OutcomeToken();
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
             outcomeTokens.push(outcomeToken);
             OutcomeTokenCreation(outcomeToken, i);
         }
