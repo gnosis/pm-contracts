@@ -2,11 +2,12 @@ pragma solidity 0.4.15;
 import "../Tokens/Token.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
+import "../Utils/Proxy.sol";
 
 
 /// @title Event contract - Provide basic functionality required by different event types
 /// @author Stefan George - <stefan@gnosis.pm>
-contract Event {
+contract Event is Proxied {
 
     /*
      *  Events

@@ -18,10 +18,19 @@ contract EventFactory {
      */
     mapping (bytes32 => CategoricalEvent) public categoricalEvents;
     mapping (bytes32 => ScalarEvent) public scalarEvents;
+    CategoricalEvent public categoricalEventMasterCopy;
+    ScalarEvent public scalarEventMasterCopy;
 
     /*
      *  Public functions
      */
+    function EventFactory(CategoricalEvent _categoricalEventMasterCopy, ScalarEvent _scalarEventMasterCopy)
+        public
+    {
+        categoricalEventMasterCopy = _categoricalEventMasterCopy;
+        scalarEventMasterCopy = _scalarEventMasterCopy;
+    }
+
     /// @dev Creates a new categorical event and adds it to the event mapping
     /// @param collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param oracle Oracle contract used to resolve the event
@@ -40,6 +49,7 @@ contract EventFactory {
         require(address(categoricalEvents[eventHash]) == 0);
         // Create event
         eventContract = CategoricalEvent(new CategoricalEventProxy(
+            categoricalEventMasterCopy,
             collateralToken,
             oracle,
             outcomeCount
@@ -68,6 +78,7 @@ contract EventFactory {
         require(address(scalarEvents[eventHash]) == 0);
         // Create event
         eventContract = ScalarEvent(new ScalarEventProxy(
+            scalarEventMasterCopy,
             collateralToken,
             oracle,
             lowerBound,

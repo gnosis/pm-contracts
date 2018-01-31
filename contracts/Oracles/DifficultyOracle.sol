@@ -1,8 +1,8 @@
 pragma solidity 0.4.15;
 import "../Oracles/Oracle.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract DifficultyOracleProxy is C0ffeeProxy {
+contract DifficultyOracleProxy is Proxy {
     /*
      *  Storage
      */
@@ -14,7 +14,8 @@ contract DifficultyOracleProxy is C0ffeeProxy {
      */
     /// @dev Contract constructor validates and sets target block number
     /// @param _blockNumber Target block number
-    function DifficultyOracleProxy(uint _blockNumber)
+    function DifficultyOracleProxy(address proxied, uint _blockNumber)
+        Proxy(proxied)
         public
     {
         // Block has to be in the future

@@ -1,9 +1,9 @@
 pragma solidity 0.4.15;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
-import "../Utils/C0ffeeProxy.sol";
+import "../Utils/Proxy.sol";
 
-contract MarketProxy is C0ffeeProxy {
+contract MarketProxy is Proxy {
     /*
      *  Storage
      */
@@ -15,10 +15,12 @@ contract MarketProxy is C0ffeeProxy {
     uint public funding;
     int[] public netOutcomeTokensSold;
     Market.Stages public stage;
+
+    function MarketProxy(address proxied) Proxy(proxied) public {}
 }
 
 /// @title Abstract market contract - Functions to be implemented by market contracts
-contract Market {
+contract Market is Proxied {
 
     /*
      *  Events
