@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Markets/StandardMarket.sol";
 
 contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
@@ -66,6 +66,16 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     /*
      *  Public functions
      */
+    function trade(int[] outcomeTokenAmounts, int collateralLimit)
+        public
+        returns (int netCost)
+    {
+        logPriceBefore();
+        netCost = super.trade(outcomeTokenAmounts, collateralLimit);
+        logPriceAfter();
+    }
+
+
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
     function close()
         public
@@ -74,54 +84,11 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         super.close();
     }
 
-    /// @dev Allows to buy outcome tokens from market maker
-    /// @param outcomeTokenIndex Index of the outcome token to buy
-    /// @param outcomeTokenCount Amount of outcome tokens to buy
-    /// @param maxCost The maximum cost in collateral tokens to pay for outcome tokens
-    /// @return Cost in collateral tokens
-    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost)
-        public
-        returns (uint cost)
-    {
-        logPriceBefore();
-        cost = super.buy(outcomeTokenIndex, outcomeTokenCount, maxCost);
-        logPriceAfter();
-    }
-
-    /// @dev Allows to sell outcome tokens to market maker
-    /// @param outcomeTokenIndex Index of the outcome token to sell
-    /// @param outcomeTokenCount Amount of outcome tokens to sell
-    /// @param minProfit The minimum profit in collateral tokens to earn for outcome tokens
-    /// @return Profit in collateral tokens
-    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
-        returns (uint profit)
-    {
-        logPriceBefore();
-        profit = super.sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
-        logPriceAfter();
-    }
-
-    /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
-    ///      shares of all other outcome tokens.
-    /// @param outcomeTokenIndex Index of the outcome token to short sell
-    /// @param outcomeTokenCount Amount of outcome tokens to short sell
-    /// @param minProfit The minimum profit in collateral tokens to earn for short sold outcome tokens
-    /// @return Cost to short sell outcome in collateral tokens
-    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
-        returns (uint cost)
-    {
-        logPriceBefore();
-        cost = super.shortSell(outcomeTokenIndex, outcomeTokenCount, minProfit);
-        logPriceAfter();
-    }
-
     /// @dev Calculates average price for long tokens based on price integral
     /// @return Average price for long tokens over time
     function getAvgPrice()
         public
-        constant
+        view
         returns (uint)
     {
         if(endDate > 0)

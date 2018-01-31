@@ -32,7 +32,7 @@ function getParamFromTxEvent(transaction, paramName, contractFactory, eventName)
     if(eventName != null) {
         logs = logs.filter((l) => l.event === eventName)
     }
-    assert.equal(logs.length, 1, 'too many logs found!')
+    assert.equal(logs.length, 1, `expected one log but got ${logs.length} logs`)
     let param = logs[0].args[paramName]
     if(contractFactory != null) {
         let contract = contractFactory.at(param)

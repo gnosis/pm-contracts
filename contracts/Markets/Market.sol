@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 import "../Utils/Proxy.sol";
@@ -28,9 +28,7 @@ contract Market is Proxied {
     event MarketFunding(uint funding);
     event MarketClosing();
     event FeeWithdrawal(uint fees);
-    event OutcomeTokenPurchase(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint outcomeTokenCost, uint marketFees);
-    event OutcomeTokenSale(address indexed seller, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint outcomeTokenProfit, uint marketFees);
-    event OutcomeTokenShortSale(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint cost);
+    event OutcomeTokenTrade(address indexed transactor, int[] outcomeTokenAmounts, int outcomeTokenNetCost, uint marketFees);
 
     /*
      *  Storage
@@ -56,8 +54,6 @@ contract Market is Proxied {
     function fund(uint _funding) public;
     function close() public;
     function withdrawFees() public returns (uint);
-    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost) public returns (uint);
-    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function calcMarketFee(uint outcomeTokenCost) public constant returns (uint);
+    function trade(int[] outcomeTokenAmounts, int costLimit) public returns (int);
+    function calcMarketFee(uint outcomeTokenCost) public view returns (uint);
 }

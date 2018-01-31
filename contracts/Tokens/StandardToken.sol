@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
 import "../Utils/Proxy.sol";
@@ -84,7 +84,7 @@ contract StandardToken is Token, Proxied {
     /// @return Remaining allowance for spender
     function allowance(address owner, address spender)
         public
-        constant
+        view
         returns (uint)
     {
         return allowances[owner][spender];
@@ -95,7 +95,7 @@ contract StandardToken is Token, Proxied {
     /// @return Balance of owner
     function balanceOf(address owner)
         public
-        constant
+        view
         returns (uint)
     {
         return balances[owner];
@@ -105,7 +105,7 @@ contract StandardToken is Token, Proxied {
     /// @return Total supply
     function totalSupply()
         public
-        constant
+        view
         returns (uint)
     {
         return totalTokens;

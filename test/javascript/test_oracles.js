@@ -161,7 +161,8 @@ contract('Oracle', function (accounts) {
         const outcome = 1
         const tokenCount = 1e15
 
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+        let outcomeTokenAmounts = Array.from({length: 2}, (v, i) => i === outcome ? tokenCount : 0)
+        const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
         let marketfee = await market.calcMarketFee.call(outcomeTokenCost)
         const cost = marketfee.add(outcomeTokenCost)
 
@@ -176,7 +177,7 @@ contract('Oracle', function (accounts) {
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(utils.getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+            await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost'
         ), outcomeTokenCost.valueOf())
 
         // Set outcome of futarchy oracle

@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
@@ -43,6 +43,7 @@ contract MajorityOracle is Oracle {
     /// @return Outcome
     function getStatusAndOutcome()
         public
+        view
         returns (bool outcomeSet, int outcome)
     {
         uint i;
@@ -80,7 +81,7 @@ contract MajorityOracle is Oracle {
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         var (outcomeSet, ) = getStatusAndOutcome();
@@ -91,7 +92,7 @@ contract MajorityOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         var (, winningOutcome) = getStatusAndOutcome();
