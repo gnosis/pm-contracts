@@ -35,7 +35,6 @@
     "eslint-plugin-babel": "^4.1.1",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
-    "rimraf": "^2.6.2",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.4.2",
     "truffle": "^4.0.4"
