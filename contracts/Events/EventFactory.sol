@@ -20,15 +20,21 @@ contract EventFactory {
     mapping (bytes32 => ScalarEvent) public scalarEvents;
     CategoricalEvent public categoricalEventMasterCopy;
     ScalarEvent public scalarEventMasterCopy;
+    OutcomeToken public outcomeTokenMasterCopy;
 
     /*
      *  Public functions
      */
-    function EventFactory(CategoricalEvent _categoricalEventMasterCopy, ScalarEvent _scalarEventMasterCopy)
+    function EventFactory(
+        CategoricalEvent _categoricalEventMasterCopy,
+        ScalarEvent _scalarEventMasterCopy,
+        OutcomeToken _outcomeTokenMasterCopy
+    )
         public
     {
         categoricalEventMasterCopy = _categoricalEventMasterCopy;
         scalarEventMasterCopy = _scalarEventMasterCopy;
+        outcomeTokenMasterCopy = _outcomeTokenMasterCopy;
     }
 
     /// @dev Creates a new categorical event and adds it to the event mapping
@@ -50,6 +56,7 @@ contract EventFactory {
         // Create event
         eventContract = CategoricalEvent(new CategoricalEventProxy(
             categoricalEventMasterCopy,
+            outcomeTokenMasterCopy,
             collateralToken,
             oracle,
             outcomeCount
@@ -79,6 +86,7 @@ contract EventFactory {
         // Create event
         eventContract = ScalarEvent(new ScalarEventProxy(
             scalarEventMasterCopy,
+            outcomeTokenMasterCopy,
             collateralToken,
             oracle,
             lowerBound,
