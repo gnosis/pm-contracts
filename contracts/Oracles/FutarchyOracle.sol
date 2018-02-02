@@ -4,7 +4,21 @@ import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
 import "../Utils/Proxy.sol";
 
-contract FutarchyOracleProxy is Proxy {
+
+contract FutarchyOracleData {
+
+    /*
+     *  Events
+     */
+    event FutarchyFunding(uint funding);
+    event FutarchyClosing();
+    event OutcomeAssignment(uint winningMarketIndex);
+
+    /*
+     *  Constants
+     */
+    uint8 public constant LONG = 1;
+
     /*
      *  Storage
      */
@@ -16,8 +30,17 @@ contract FutarchyOracleProxy is Proxy {
     bool public isSet;
 
     /*
-     *  Public functions
+     *  Modifiers
      */
+    modifier isCreator() {
+        // Only creator is allowed to proceed
+        require(msg.sender == creator);
+        _;
+    }
+}
+
+contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
+
     /// @dev Constructor creates events and markets for futarchy oracle
     /// @param _creator Oracle creator
     /// @param eventFactory Event factory contract
@@ -70,39 +93,8 @@ contract FutarchyOracleProxy is Proxy {
 
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
 /// @author Stefan George - <stefan@gnosis.pm>
-contract FutarchyOracle is Oracle {
+contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
     using Math for *;
-
-    /*
-     *  Events
-     */
-    event FutarchyFunding(uint funding);
-    event FutarchyClosing();
-    event OutcomeAssignment(uint winningMarketIndex);
-
-    /*
-     *  Constants
-     */
-    uint8 public constant LONG = 1;
-
-    /*
-     *  Storage
-     */
-    address creator;
-    StandardMarketWithPriceLogger[] public markets;
-    CategoricalEvent public categoricalEvent;
-    uint public tradingPeriod;
-    uint public winningMarketIndex;
-    bool public isSet;
-
-    /*
-     *  Modifiers
-     */
-    modifier isCreator() {
-        // Only creator is allowed to proceed
-        require(msg.sender == creator);
-        _;
-    }
 
     /*
      *  Public functions

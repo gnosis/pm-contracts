@@ -2,15 +2,17 @@ pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
-contract MajorityOracleProxy is Proxy {
+
+contract MajorityOracleData {
+
     /*
      *  Storage
      */
     Oracle[] public oracles;
+}
 
-    /*
-     *  Public functions
-     */
+contract MajorityOracleProxy is Proxy, MajorityOracleData {
+
     /// @dev Allows to create an oracle for a majority vote based on other oracles
     /// @param _oracles List of oracles taking part in the majority vote
     function MajorityOracleProxy(address proxied, Oracle[] _oracles)
@@ -28,12 +30,7 @@ contract MajorityOracleProxy is Proxy {
 
 /// @title Majority oracle contract - Allows to resolve an event based on multiple oracles with majority vote
 /// @author Stefan George - <stefan@gnosis.pm>
-contract MajorityOracle is Oracle {
-
-    /*
-     *  Storage
-     */
-    Oracle[] public oracles;
+contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
 
     /*
      *  Public functions

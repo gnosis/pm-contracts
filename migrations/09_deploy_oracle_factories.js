@@ -1,7 +1,6 @@
 module.exports = function (deployer) {
     [
         'CentralizedOracle',
-        'DifficultyOracle',
         'MajorityOracle',
         'SignedMessageOracle',
         'UltimateOracle',
@@ -10,4 +9,5 @@ module.exports = function (deployer) {
         const factory = artifacts.require(contractName + 'Factory')
         deployer.deploy(factory, contract.address)
     })
+    deployer.deploy(artifacts.require('DifficultyOracleFactory'))
 }

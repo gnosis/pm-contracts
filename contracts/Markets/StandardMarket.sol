@@ -4,14 +4,17 @@ import "../Tokens/Token.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 
-contract StandardMarketProxy is MarketProxy {
+
+contract StandardMarketData {
     /*
      *  Constants
      */
     uint24 public constant FEE_RANGE = 1000000; // 100%
+}
 
+contract StandardMarketProxy is Proxy, MarketData, StandardMarketData {
     function StandardMarketProxy(address proxy, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
-        MarketProxy(proxy)
+        Proxy(proxy)
         public
     {
         // Validate inputs
@@ -22,20 +25,14 @@ contract StandardMarketProxy is MarketProxy {
         netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
         fee = _fee;
         marketMaker = _marketMaker;
-        stage = Market.Stages.MarketCreated;
+        stage = Stages.MarketCreated;
     }
 }
 
-
 /// @title Standard market contract - Backed implementation of standard markets
 /// @author Stefan George - <stefan@gnosis.pm>
-contract StandardMarket is Market {
+contract StandardMarket is Proxied, Market, StandardMarketData {
     using Math for *;
-
-    /*
-     *  Constants
-     */
-    uint24 public constant FEE_RANGE = 1000000; // 100%
 
     /*
      *  Modifiers
