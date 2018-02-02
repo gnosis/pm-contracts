@@ -5,15 +5,34 @@ import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 
 
-/// @title Market factory contract - Allows to create market contracts
-/// @author Stefan George - <stefan@gnosis.pm>
-contract StandardMarket is Market {
-    using Math for *;
-
+contract StandardMarketData {
     /*
      *  Constants
      */
     uint24 public constant FEE_RANGE = 1000000; // 100%
+}
+
+contract StandardMarketProxy is Proxy, MarketData, StandardMarketData {
+    function StandardMarketProxy(address proxy, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
+        Proxy(proxy)
+        public
+    {
+        // Validate inputs
+        require(address(_eventContract) != 0 && address(_marketMaker) != 0 && _fee < FEE_RANGE);
+        creator = _creator;
+        createdAtBlock = block.number;
+        eventContract = _eventContract;
+        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
+        fee = _fee;
+        marketMaker = _marketMaker;
+        stage = Stages.MarketCreated;
+    }
+}
+
+/// @title Standard market contract - Backed implementation of standard markets
+/// @author Stefan George - <stefan@gnosis.pm>
+contract StandardMarket is Proxied, Market, StandardMarketData {
+    using Math for *;
 
     /*
      *  Modifiers
@@ -33,25 +52,6 @@ contract StandardMarket is Market {
     /*
      *  Public functions
      */
-    /// @dev Constructor validates and sets market properties
-    /// @param _creator Market creator
-    /// @param _eventContract Event contract
-    /// @param _marketMaker Market maker contract
-    /// @param _fee Market fee
-    function StandardMarket(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee)
-        public
-    {
-        // Validate inputs
-        require(address(_eventContract) != 0 && address(_marketMaker) != 0 && _fee < FEE_RANGE);
-        creator = _creator;
-        createdAtBlock = block.number;
-        eventContract = _eventContract;
-        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
-        fee = _fee;
-        marketMaker = _marketMaker;
-        stage = Stages.MarketCreated;
-    }
-
     /// @dev Allows to fund the market with collateral tokens converting them into outcome tokens
     /// @param _funding Funding amount
     function fund(uint _funding)

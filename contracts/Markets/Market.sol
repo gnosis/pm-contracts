@@ -1,11 +1,10 @@
 pragma solidity 0.4.18;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Abstract market contract - Functions to be implemented by market contracts
-contract Market {
-
+contract MarketData {
     /*
      *  Events
      */
@@ -31,7 +30,10 @@ contract Market {
         MarketFunded,
         MarketClosed
     }
+}
 
+/// @title Abstract market contract - Functions to be implemented by market contracts
+contract Market is MarketData {
     /*
      *  Public functions
      */

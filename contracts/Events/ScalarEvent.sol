@@ -1,11 +1,9 @@
 pragma solidity 0.4.18;
 import "../Events/Event.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Scalar event contract - Scalar events resolve to a number within a range
-/// @author Stefan George - <stefan@gnosis.pm>
-contract ScalarEvent is Event {
-    using Math for *;
+contract ScalarEventData {
 
     /*
      *  Constants
@@ -19,30 +17,52 @@ contract ScalarEvent is Event {
      */
     int public lowerBound;
     int public upperBound;
+}
 
-    /*
-     *  Public functions
-     */
+contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
+
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param _lowerBound Lower bound for event outcome
     /// @param _upperBound Lower bound for event outcome
-    function ScalarEvent(
+    function ScalarEventProxy(
+        address proxied,
+        address outcomeTokenMasterCopy,
         Token _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound
     )
+        Proxy(proxied)
         public
-        Event(_collateralToken, _oracle, 2)
     {
+        // Validate input
+        require(address(_collateralToken) != 0 && address(_oracle) != 0);
+        collateralToken = _collateralToken;
+        oracle = _oracle;
+        // Create an outcome token for each outcome
+        for (uint8 i = 0; i < 2; i++) {
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            outcomeTokens.push(outcomeToken);
+            OutcomeTokenCreation(outcomeToken, i);
+        }
+
         // Validate bounds
         require(_upperBound > _lowerBound);
         lowerBound = _lowerBound;
         upperBound = _upperBound;
     }
+}
 
+/// @title Scalar event contract - Scalar events resolve to a number within a range
+/// @author Stefan George - <stefan@gnosis.pm>
+contract ScalarEvent is Proxied, Event, ScalarEventData {
+    using Math for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
     function redeemWinnings()

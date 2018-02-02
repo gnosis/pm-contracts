@@ -2,12 +2,9 @@ pragma solidity 0.4.18;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "../Utils/Math.sol";
+import "../Utils/Proxy.sol";
 
-
-/// @title Campaign contract - Allows to crowdfund a market
-/// @author Stefan George - <stefan@gnosis.pm>
-contract Campaign {
-    using Math for *;
+contract CampaignData {
 
     /*
      *  Events
@@ -59,10 +56,9 @@ contract Campaign {
             stage = Stages.AuctionFailed;
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract CampaignProxy is Proxy, CampaignData {
     /// @dev Constructor validates and sets campaign properties
     /// @param _eventContract Event contract
     /// @param _marketFactory Market factory contract
@@ -70,7 +66,8 @@ contract Campaign {
     /// @param _fee Market fee
     /// @param _funding Initial funding for market
     /// @param _deadline Campaign deadline
-    function Campaign(
+    function CampaignProxy(
+        address proxied,
         Event _eventContract,
         StandardMarketFactory _marketFactory,
         MarketMaker _marketMaker,
@@ -78,6 +75,7 @@ contract Campaign {
         uint _funding,
         uint _deadline
     )
+        Proxy(proxied)
         public
     {
         // Validate input
@@ -94,7 +92,16 @@ contract Campaign {
         funding = _funding;
         deadline = _deadline;
     }
+}
 
+/// @title Campaign contract - Allows to crowdfund a market
+/// @author Stefan George - <stefan@gnosis.pm>
+contract Campaign is Proxied, CampaignData {
+    using Math for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows to contribute to required market funding
     /// @param amount Amount of collateral tokens
     function fund(uint amount)

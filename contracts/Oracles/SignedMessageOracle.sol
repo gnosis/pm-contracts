@@ -1,10 +1,9 @@
 pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Signed message oracle contract - Allows to set an outcome with a signed message
-/// @author Stefan George - <stefan@gnosis.pm>
-contract SignedMessageOracle is Oracle {
+contract SignedMessageOracleData {
 
     /*
      *  Events
@@ -29,22 +28,31 @@ contract SignedMessageOracle is Oracle {
         require(msg.sender == signer);
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract SignedMessageOracleProxy is Proxy, SignedMessageOracleData {
+
     /// @dev Constructor sets signer address based on signature
     /// @param _descriptionHash Hash identifying off chain event description
     /// @param v Signature parameter
     /// @param r Signature parameter
     /// @param s Signature parameter
-    function SignedMessageOracle(bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+    function SignedMessageOracleProxy(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+        Proxy(proxied)
         public
     {
         signer = ecrecover(_descriptionHash, v, r, s);
         descriptionHash = _descriptionHash;
     }
+}
 
+/// @title Signed message oracle contract - Allows to set an outcome with a signed message
+/// @author Stefan George - <stefan@gnosis.pm>
+contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
+
+    /*
+     *  Public functions
+     */
     /// @dev Replaces signer
     /// @param newSigner New signer
     /// @param _nonce Unique nonce to prevent replay attacks

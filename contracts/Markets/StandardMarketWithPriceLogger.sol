@@ -1,8 +1,7 @@
 pragma solidity 0.4.18;
 import "../Markets/StandardMarket.sol";
 
-
-contract StandardMarketWithPriceLogger is StandardMarket {
+contract StandardMarketWithPriceLoggerData {
 
     /*
      *  Constants
@@ -18,19 +17,19 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     uint public lastTradeDate;
     uint public lastTradePrice;
     uint public priceIntegral;
+}
 
-    /*
-     *  Public functions
-     */
+contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy, StandardMarketWithPriceLoggerData {
+
     /// @dev Constructor validates and sets market properties
     /// @param _creator Market creator
     /// @param _eventContract Event contract
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
-    function StandardMarketWithPriceLogger(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
+    function StandardMarketWithPriceLoggerProxy(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
         public
-        StandardMarket(_creator, _eventContract, _marketMaker, _fee)
+        StandardMarketProxy(proxied, _creator, _eventContract, _marketMaker, _fee)
     {
         require(eventContract.getOutcomeCount() == 2);
 
@@ -46,7 +45,12 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         // initialize lastTradePrice to assuming uniform probabilities of outcomes
         lastTradePrice = ONE / 2;
     }
+}
 
+contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPriceLoggerData {
+    /*
+     *  Public functions
+     */
     function trade(int[] outcomeTokenAmounts, int collateralLimit)
         public
         returns (int netCost)

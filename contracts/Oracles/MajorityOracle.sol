@@ -1,22 +1,22 @@
 pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Majority oracle contract - Allows to resolve an event based on multiple oracles with majority vote
-/// @author Stefan George - <stefan@gnosis.pm>
-contract MajorityOracle is Oracle {
+contract MajorityOracleData {
 
     /*
      *  Storage
      */
     Oracle[] public oracles;
+}
 
-    /*
-     *  Public functions
-     */
+contract MajorityOracleProxy is Proxy, MajorityOracleData {
+
     /// @dev Allows to create an oracle for a majority vote based on other oracles
     /// @param _oracles List of oracles taking part in the majority vote
-    function MajorityOracle(Oracle[] _oracles)
+    function MajorityOracleProxy(address proxied, Oracle[] _oracles)
+        Proxy(proxied)
         public
     {
         // At least 2 oracles should be defined
@@ -26,7 +26,15 @@ contract MajorityOracle is Oracle {
             require(address(_oracles[i]) != 0);
         oracles = _oracles;
     }
+}
 
+/// @title Majority oracle contract - Allows to resolve an event based on multiple oracles with majority vote
+/// @author Stefan George - <stefan@gnosis.pm>
+contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows to registers oracles for a majority vote
     /// @return Is outcome set?
     /// @return Outcome

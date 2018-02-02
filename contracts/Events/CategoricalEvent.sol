@@ -1,29 +1,38 @@
 pragma solidity 0.4.18;
 import "../Events/Event.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Categorical event contract - Categorical events resolve to an outcome from a set of outcomes
-/// @author Stefan George - <stefan@gnosis.pm>
-contract CategoricalEvent is Event {
+contract CategoricalEventProxy is Proxy, EventData {
 
-    /*
-     *  Public functions
-     */
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function CategoricalEvent(
-        Token _collateralToken,
-        Oracle _oracle,
-        uint8 outcomeCount
-    )
+    function CategoricalEventProxy(address proxied, address outcomeTokenMasterCopy, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+        Proxy(proxied)
         public
-        Event(_collateralToken, _oracle, outcomeCount)
     {
-
+        // Validate input
+        require(address(_collateralToken) != 0 && address(_oracle) != 0 && outcomeCount >= 2);
+        collateralToken = _collateralToken;
+        oracle = _oracle;
+        // Create an outcome token for each outcome
+        for (uint8 i = 0; i < outcomeCount; i++) {
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            outcomeTokens.push(outcomeToken);
+            OutcomeTokenCreation(outcomeToken, i);
+        }
     }
+}
 
+/// @title Categorical event contract - Categorical events resolve to an outcome from a set of outcomes
+/// @author Stefan George - <stefan@gnosis.pm>
+contract CategoricalEvent is Proxied, Event {
+
+    /*
+     *  Public functions
+     */
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
     function redeemWinnings()

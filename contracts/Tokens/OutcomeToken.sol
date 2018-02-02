@@ -2,10 +2,7 @@ pragma solidity 0.4.18;
 import "../Tokens/StandardToken.sol";
 
 
-/// @title Outcome token contract - Issuing and revoking outcome tokens
-/// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is StandardToken {
-    using Math for *;
+contract OutcomeTokenData {
 
     /*
      *  Events
@@ -26,17 +23,28 @@ contract OutcomeToken is StandardToken {
         require(msg.sender == eventContract);
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract OutcomeTokenProxy is Proxy, StandardTokenData, OutcomeTokenData {
+
     /// @dev Constructor sets events contract address
-    function OutcomeToken()
+    function OutcomeTokenProxy(address proxied)
+        Proxy(proxied)
         public
     {
         eventContract = msg.sender;
     }
-    
+}
+
+
+/// @title Outcome token contract - Issuing and revoking outcome tokens
+/// @author Stefan George - <stefan@gnosis.pm>
+contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
+    using Math for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Events contract issues new tokens for address. Returns success
     /// @param _for Address of receiver
     /// @param outcomeTokenCount Number of tokens to issue

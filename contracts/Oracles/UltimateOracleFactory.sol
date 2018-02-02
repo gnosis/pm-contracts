@@ -21,8 +21,19 @@ contract UltimateOracleFactory {
     );
 
     /*
+     *  Storage
+     */
+    UltimateOracle public ultimateOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    function UltimateOracleFactory(UltimateOracle _ultimateOracleMasterCopy)
+        public
+    {
+        ultimateOracleMasterCopy = _ultimateOracleMasterCopy;
+    }
+
     /// @dev Creates a new ultimate Oracle contract
     /// @param oracle Oracle address
     /// @param collateralToken Collateral token address
@@ -42,14 +53,15 @@ contract UltimateOracleFactory {
         public
         returns (UltimateOracle ultimateOracle)
     {
-        ultimateOracle = new UltimateOracle(
+        ultimateOracle = UltimateOracle(new UltimateOracleProxy(
+            ultimateOracleMasterCopy,
             oracle,
             collateralToken,
             spreadMultiplier,
             challengePeriod,
             challengeAmount,
             frontRunnerPeriod
-        );
+        ));
         UltimateOracleCreation(
             msg.sender,
             ultimateOracle,

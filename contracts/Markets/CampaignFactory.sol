@@ -12,8 +12,19 @@ contract CampaignFactory {
     event CampaignCreation(address indexed creator, Campaign campaign, Event eventContract, StandardMarketFactory marketFactory, MarketMaker marketMaker, uint24 fee, uint funding, uint deadline);
 
     /*
+     *  Storage
+     */
+    Campaign public campaignMasterCopy;
+
+    /*
      *  Public functions
      */
+    function CampaignFactory(Campaign _campaignMasterCopy)
+        public
+    {
+        campaignMasterCopy = _campaignMasterCopy;
+    }
+
     /// @dev Creates a new campaign contract
     /// @param eventContract Event contract
     /// @param marketFactory Market factory contract
@@ -33,7 +44,8 @@ contract CampaignFactory {
         public
         returns (Campaign campaign)
     {
-        campaign = new Campaign(eventContract, marketFactory, marketMaker, fee, funding, deadline);
+        campaign = Campaign(new CampaignProxy(
+            campaignMasterCopy, eventContract, marketFactory, marketMaker, fee, funding, deadline));
         CampaignCreation(msg.sender, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
     }
 }

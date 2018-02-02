@@ -1,11 +1,10 @@
 pragma solidity 0.4.18;
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Standard token contract with overflow protection
-contract StandardToken is Token {
-    using Math for *;
+contract StandardTokenData {
 
     /*
      *  Storage
@@ -13,6 +12,11 @@ contract StandardToken is Token {
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowances;
     uint totalTokens;
+}
+
+/// @title Standard token contract with overflow protection
+contract StandardToken is Token, StandardTokenData {
+    using Math for *;
 
     /*
      *  Public functions

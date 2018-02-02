@@ -12,8 +12,19 @@ contract CentralizedOracleFactory {
     event CentralizedOracleCreation(address indexed creator, CentralizedOracle centralizedOracle, bytes ipfsHash);
 
     /*
+     *  Storage
+     */
+    CentralizedOracle public centralizedOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    function CentralizedOracleFactory(CentralizedOracle _centralizedOracleMasterCopy)
+        public
+    {
+        centralizedOracleMasterCopy = _centralizedOracleMasterCopy;
+    }
+
     /// @dev Creates a new centralized oracle contract
     /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
@@ -21,7 +32,7 @@ contract CentralizedOracleFactory {
         public
         returns (CentralizedOracle centralizedOracle)
     {
-        centralizedOracle = new CentralizedOracle(msg.sender, ipfsHash);
+        centralizedOracle = CentralizedOracle(new CentralizedOracleProxy(centralizedOracleMasterCopy, msg.sender, ipfsHash));
         CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
     }
 }

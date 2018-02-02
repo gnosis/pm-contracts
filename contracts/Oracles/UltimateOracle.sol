@@ -2,12 +2,10 @@ pragma solidity 0.4.18;
 import "../Oracles/Oracle.sol";
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
+import "../Utils/Proxy.sol";
 
 
-/// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
-/// @author Stefan George - <stefan@gnosis.pm>
-contract UltimateOracle is Oracle {
-    using Math for *;
+contract UltimateOracleData {
 
     /*
      *  Events
@@ -35,10 +33,10 @@ contract UltimateOracle is Oracle {
     uint public totalAmount;
     mapping (int => uint) public totalOutcomeAmounts;
     mapping (address => mapping (int => uint)) public outcomeAmounts;
+}
 
-    /*
-     *  Public functions
-     */
+contract UltimateOracleProxy is Proxy, UltimateOracleData {
+
     /// @dev Constructor sets ultimate oracle properties
     /// @param _forwardedOracle Oracle address
     /// @param _collateralToken Collateral token address
@@ -46,7 +44,8 @@ contract UltimateOracle is Oracle {
     /// @param _challengePeriod Time to challenge oracle outcome
     /// @param _challengeAmount Amount to challenge the outcome
     /// @param _frontRunnerPeriod Time to overbid the front-runner
-    function UltimateOracle(
+    function UltimateOracleProxy(
+        address proxied,
         Oracle _forwardedOracle,
         Token _collateralToken,
         uint8 _spreadMultiplier,
@@ -54,6 +53,7 @@ contract UltimateOracle is Oracle {
         uint _challengeAmount,
         uint _frontRunnerPeriod
     )
+        Proxy(proxied)
         public
     {
         // Validate inputs
@@ -70,7 +70,16 @@ contract UltimateOracle is Oracle {
         challengeAmount = _challengeAmount;
         frontRunnerPeriod = _frontRunnerPeriod;
     }
+}
 
+/// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
+/// @author Stefan George - <stefan@gnosis.pm>
+contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
+    using Math for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows to set oracle outcome
     function setForwardedOutcome()
         public
