@@ -1,5 +1,3 @@
-const ganache = require("ganache-cli")
-
 const config = {
     networks: {
         coverage: {

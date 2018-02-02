@@ -32,7 +32,6 @@
     "decimal.js": "^8.0.0",
     "eslint": "^4.11.0",
     "eslint-plugin-babel": "^4.1.1",
-    "ganache-cli": "^6.0.3",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
     "solidity-coverage": "^0.4.2",
