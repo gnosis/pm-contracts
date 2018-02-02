@@ -1,5 +1,5 @@
 const utils = require('./utils')
-
+const { getBlock } = utils
 const { wait } = require('@digix/tempo')(web3)
 
 const EtherToken = artifacts.require('EtherToken')
@@ -90,7 +90,7 @@ contract('Oracle', function (accounts) {
 
     it('should test difficulty oracle', async () => {
         // Create difficulty oracle
-        const targetBlock = (await web3.eth.getBlock('latest')).number + 100
+        const targetBlock = (await getBlock('latest')).number + 100
         const difficultyOracle = utils.getParamFromTxEvent(
             await difficultyOracleFactory.createDifficultyOracle(targetBlock),
             'difficultyOracle', DifficultyOracle
@@ -117,7 +117,7 @@ contract('Oracle', function (accounts) {
             'centralizedOracle', CentralizedOracle
         )
 
-        let now = web3.eth.getBlock('pending').timestamp
+        let now = (await getBlock('pending')).timestamp
         utils.getParamFromTxEvent(
             await futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,
@@ -125,7 +125,7 @@ contract('Oracle', function (accounts) {
             'futarchyOracle', FutarchyOracle
         )
 
-        now = web3.eth.getBlock('pending').timestamp
+        now = (await getBlock('pending')).timestamp
         await utils.assertRejects(
             futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,

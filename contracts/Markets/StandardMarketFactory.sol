@@ -1,4 +1,4 @@
-pragma solidity 0.4.18;
+pragma solidity ^0.4.18;
 import "../Markets/StandardMarket.sol";
 
 
@@ -19,7 +19,7 @@ contract StandardMarketFactory {
     /*
      *  Public functions
      */
-    function StandardMarketFactory(StandardMarket _standardMarketMasterCopy) {
+    function StandardMarketFactory(StandardMarket _standardMarketMasterCopy) public {
         standardMarketMasterCopy = _standardMarketMasterCopy;
     }
 

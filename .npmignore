@@ -10,3 +10,8 @@ coverage.json
 coverage/
 coverageEnv/
 scTopics
+
+# Project stuff #
+#################
+
+truffle-local.js
