@@ -1,7 +1,8 @@
 pragma solidity ^0.4.15;
 import "../Markets/StandardMarket.sol";
 
-contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
+contract StandardMarketWithPriceLoggerData {
+
     /*
      *  Constants
      */
@@ -16,10 +17,10 @@ contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
     uint public lastTradeDate;
     uint public lastTradePrice;
     uint public priceIntegral;
+}
 
-    /*
-     *  Public functions
-     */
+contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy, StandardMarketWithPriceLoggerData {
+
     /// @dev Constructor validates and sets market properties
     /// @param _creator Market creator
     /// @param _eventContract Event contract
@@ -46,23 +47,7 @@ contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy {
     }
 }
 
-contract StandardMarketWithPriceLogger is StandardMarket {
-
-    /*
-     *  Constants
-     */
-    uint constant ONE = 0x10000000000000000;
-    uint8 public constant LONG = 1;
-
-    /*
-     *  Storage
-     */
-    uint public startDate;
-    uint public endDate;
-    uint public lastTradeDate;
-    uint public lastTradePrice;
-    uint public priceIntegral;
-
+contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPriceLoggerData {
     /*
      *  Public functions
      */

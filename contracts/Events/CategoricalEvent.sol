@@ -2,24 +2,9 @@ pragma solidity ^0.4.15;
 import "../Events/Event.sol";
 import "../Utils/Proxy.sol";
 
-contract CategoricalEventProxy is Proxy {
-    /*
-     *  Events
-     */
-    event OutcomeTokenCreation(OutcomeToken outcomeToken, uint8 index);
 
-    /*
-     *  Storage
-     */
-    Token public collateralToken;
-    Oracle public oracle;
-    bool public isOutcomeSet;
-    int public outcome;
-    OutcomeToken[] public outcomeTokens;
+contract CategoricalEventProxy is Proxy, EventData {
 
-    /*
-     *  Public functions
-     */
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
@@ -43,7 +28,7 @@ contract CategoricalEventProxy is Proxy {
 
 /// @title Categorical event contract - Categorical events resolve to an outcome from a set of outcomes
 /// @author Stefan George - <stefan@gnosis.pm>
-contract CategoricalEvent is Event {
+contract CategoricalEvent is Proxied, Event {
 
     /*
      *  Public functions

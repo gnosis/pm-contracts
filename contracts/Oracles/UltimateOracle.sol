@@ -5,7 +5,16 @@ import "../Utils/Math.sol";
 import "../Utils/Proxy.sol";
 
 
-contract UltimateOracleProxy is Proxy {
+contract UltimateOracleData {
+
+    /*
+     *  Events
+     */
+    event ForwardedOracleOutcomeAssignment(int outcome);
+    event OutcomeChallenge(address indexed sender, int outcome);
+    event OutcomeVote(address indexed sender, int outcome, uint amount);
+    event Withdrawal(address indexed sender, uint amount);
+
     /*
      *  Storage
      */
@@ -24,10 +33,10 @@ contract UltimateOracleProxy is Proxy {
     uint public totalAmount;
     mapping (int => uint) public totalOutcomeAmounts;
     mapping (address => mapping (int => uint)) public outcomeAmounts;
+}
 
-    /*
-     *  Public functions
-     */
+contract UltimateOracleProxy is Proxy, UltimateOracleData {
+
     /// @dev Constructor sets ultimate oracle properties
     /// @param _forwardedOracle Oracle address
     /// @param _collateralToken Collateral token address
@@ -65,35 +74,8 @@ contract UltimateOracleProxy is Proxy {
 
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
 /// @author Stefan George - <stefan@gnosis.pm>
-contract UltimateOracle is Oracle {
+contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
     using Math for *;
-
-    /*
-     *  Events
-     */
-    event ForwardedOracleOutcomeAssignment(int outcome);
-    event OutcomeChallenge(address indexed sender, int outcome);
-    event OutcomeVote(address indexed sender, int outcome, uint amount);
-    event Withdrawal(address indexed sender, uint amount);
-
-    /*
-     *  Storage
-     */
-    Oracle public forwardedOracle;
-    Token public collateralToken;
-    uint8 public spreadMultiplier;
-    uint public challengePeriod;
-    uint public challengeAmount;
-    uint public frontRunnerPeriod;
-
-    int public forwardedOutcome;
-    uint public forwardedOutcomeSetTimestamp;
-    int public frontRunner;
-    uint public frontRunnerSetTimestamp;
-
-    uint public totalAmount;
-    mapping (int => uint) public totalOutcomeAmounts;
-    mapping (address => mapping (int => uint)) public outcomeAmounts;
 
     /*
      *  Public functions

@@ -1,6 +1,5 @@
 const Math = artifacts.require('Math')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
-const DifficultyOracle = artifacts.require('DifficultyOracle')
 const FutarchyOracle = artifacts.require('FutarchyOracle')
 const MajorityOracle = artifacts.require('MajorityOracle')
 const SignedMessageOracle = artifacts.require('SignedMessageOracle')
@@ -12,7 +11,6 @@ module.exports = function (deployer) {
     deployer.link(Math, UltimateOracle)
     deployer.deploy([
         CentralizedOracle,
-        DifficultyOracle,
         FutarchyOracle,
         MajorityOracle,
         SignedMessageOracle,

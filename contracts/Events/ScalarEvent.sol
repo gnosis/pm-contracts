@@ -2,26 +2,24 @@ pragma solidity ^0.4.15;
 import "../Events/Event.sol";
 import "../Utils/Proxy.sol";
 
-contract ScalarEventProxy is Proxy {
+
+contract ScalarEventData {
+
     /*
-     *  Events
+     *  Constants
      */
-    event OutcomeTokenCreation(OutcomeToken outcomeToken, uint8 index);
+    uint8 public constant SHORT = 0;
+    uint8 public constant LONG = 1;
+    uint24 public constant OUTCOME_RANGE = 1000000;
 
     /*
      *  Storage
      */
-    Token public collateralToken;
-    Oracle public oracle;
-    bool public isOutcomeSet;
-    int public outcome;
-    OutcomeToken[] public outcomeTokens;
     int public lowerBound;
     int public upperBound;
+}
 
-    /*
-     *  Public functions
-     */
+contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
 
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
@@ -59,21 +57,8 @@ contract ScalarEventProxy is Proxy {
 
 /// @title Scalar event contract - Scalar events resolve to a number within a range
 /// @author Stefan George - <stefan@gnosis.pm>
-contract ScalarEvent is Event {
+contract ScalarEvent is Proxied, Event, ScalarEventData {
     using Math for *;
-
-    /*
-     *  Constants
-     */
-    uint8 public constant SHORT = 0;
-    uint8 public constant LONG = 1;
-    uint24 public constant OUTCOME_RANGE = 1000000;
-
-    /*
-     *  Storage
-     */
-    int public lowerBound;
-    int public upperBound;
 
     /*
      *  Public functions

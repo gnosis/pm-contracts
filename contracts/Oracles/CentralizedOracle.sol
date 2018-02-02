@@ -2,32 +2,8 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
-contract CentralizedOracleProxy is Proxy {
-    /*
-     *  Storage
-     */
-    address public owner;
-    bytes public ipfsHash;
-    bool public isSet;
-    int public outcome;
 
-    /// @dev Constructor sets owner address and IPFS hash
-    /// @param _ipfsHash Hash identifying off chain event description
-    function CentralizedOracleProxy(address proxied, address _owner, bytes _ipfsHash)
-        public
-        Proxy(proxied)
-    {
-        // Description hash cannot be null
-        require(_ipfsHash.length == 46);
-        owner = _owner;
-        ipfsHash = _ipfsHash;
-    }
-}
-
-
-/// @title Centralized oracle contract - Allows the contract owner to set an outcome
-/// @author Stefan George - <stefan@gnosis.pm>
-contract CentralizedOracle is Oracle {
+contract CentralizedOracleData {
 
     /*
      *  Events
@@ -51,6 +27,26 @@ contract CentralizedOracle is Oracle {
         require(msg.sender == owner);
         _;
     }
+}
+
+contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
+
+    /// @dev Constructor sets owner address and IPFS hash
+    /// @param _ipfsHash Hash identifying off chain event description
+    function CentralizedOracleProxy(address proxied, address _owner, bytes _ipfsHash)
+        public
+        Proxy(proxied)
+    {
+        // Description hash cannot be null
+        require(_ipfsHash.length == 46);
+        owner = _owner;
+        ipfsHash = _ipfsHash;
+    }
+}
+
+/// @title Centralized oracle contract - Allows the contract owner to set an outcome
+/// @author Stefan George - <stefan@gnosis.pm>
+contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
 
     /*
      *  Public functions

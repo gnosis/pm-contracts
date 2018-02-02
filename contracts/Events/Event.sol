@@ -5,9 +5,7 @@ import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
 
-/// @title Event contract - Provide basic functionality required by different event types
-/// @author Stefan George - <stefan@gnosis.pm>
-contract Event is Proxied {
+contract EventData {
 
     /*
      *  Events
@@ -26,6 +24,11 @@ contract Event is Proxied {
     bool public isOutcomeSet;
     int public outcome;
     OutcomeToken[] public outcomeTokens;
+}
+
+/// @title Event contract - Provide basic functionality required by different event types
+/// @author Stefan George - <stefan@gnosis.pm>
+contract Event is EventData {
 
     /*
      *  Public functions

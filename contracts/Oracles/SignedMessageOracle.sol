@@ -2,36 +2,8 @@ pragma solidity ^0.4.15;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
-contract SignedMessageOracleProxy is Proxy {
-    /*
-     *  Storage
-     */
-    address public signer;
-    bytes32 public descriptionHash;
-    uint nonce;
-    bool public isSet;
-    int public outcome;
 
-    /*
-     *  Public functions
-     */
-    /// @dev Constructor sets signer address based on signature
-    /// @param _descriptionHash Hash identifying off chain event description
-    /// @param v Signature parameter
-    /// @param r Signature parameter
-    /// @param s Signature parameter
-    function SignedMessageOracleProxy(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
-        Proxy(proxied)
-        public
-    {
-        signer = ecrecover(_descriptionHash, v, r, s);
-        descriptionHash = _descriptionHash;
-    }
-}
-
-/// @title Signed message oracle contract - Allows to set an outcome with a signed message
-/// @author Stefan George - <stefan@gnosis.pm>
-contract SignedMessageOracle is Oracle {
+contract SignedMessageOracleData {
 
     /*
      *  Events
@@ -56,6 +28,27 @@ contract SignedMessageOracle is Oracle {
         require(msg.sender == signer);
         _;
     }
+}
+
+contract SignedMessageOracleProxy is Proxy, SignedMessageOracleData {
+
+    /// @dev Constructor sets signer address based on signature
+    /// @param _descriptionHash Hash identifying off chain event description
+    /// @param v Signature parameter
+    /// @param r Signature parameter
+    /// @param s Signature parameter
+    function SignedMessageOracleProxy(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+        Proxy(proxied)
+        public
+    {
+        signer = ecrecover(_descriptionHash, v, r, s);
+        descriptionHash = _descriptionHash;
+    }
+}
+
+/// @title Signed message oracle contract - Allows to set an outcome with a signed message
+/// @author Stefan George - <stefan@gnosis.pm>
+contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
 
     /*
      *  Public functions

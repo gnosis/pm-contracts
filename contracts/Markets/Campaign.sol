@@ -4,77 +4,7 @@ import "../Markets/StandardMarketFactory.sol";
 import "../Utils/Math.sol";
 import "../Utils/Proxy.sol";
 
-contract CampaignProxy is Proxy {
-     /*
-     *  Constants
-     */
-    uint24 public constant FEE_RANGE = 1000000; // 100%
-
-    /*
-     *  Storage
-     */
-    Event public eventContract;
-    StandardMarketFactory public marketFactory;
-    MarketMaker public marketMaker;
-    Market public market;
-    uint24 public fee;
-    uint public funding;
-    uint public deadline;
-    uint public finalBalance;
-    mapping (address => uint) public contributions;
-    Stages public stage;
-
-    enum Stages {
-        AuctionStarted,
-        AuctionSuccessful,
-        AuctionFailed,
-        MarketCreated,
-        MarketClosed
-    }
-
-    /*
-     *  Public functions
-     */
-    /// @dev Constructor validates and sets campaign properties
-    /// @param _eventContract Event contract
-    /// @param _marketFactory Market factory contract
-    /// @param _marketMaker Market maker contract
-    /// @param _fee Market fee
-    /// @param _funding Initial funding for market
-    /// @param _deadline Campaign deadline
-    function CampaignProxy(
-        address proxied,
-        Event _eventContract,
-        StandardMarketFactory _marketFactory,
-        MarketMaker _marketMaker,
-        uint24 _fee,
-        uint _funding,
-        uint _deadline
-    )
-        Proxy(proxied)
-        public
-    {
-        // Validate input
-        require(   address(_eventContract) != 0
-                && address(_marketFactory) != 0
-                && address(_marketMaker) != 0
-                && _fee < FEE_RANGE
-                && _funding > 0
-                && now < _deadline);
-        eventContract = _eventContract;
-        marketFactory = _marketFactory;
-        marketMaker = _marketMaker;
-        fee = _fee;
-        funding = _funding;
-        deadline = _deadline;
-    }
-}
-
-
-/// @title Campaign contract - Allows to crowdfund a market
-/// @author Stefan George - <stefan@gnosis.pm>
-contract Campaign is Proxied {
-    using Math for *;
+contract CampaignData {
 
     /*
      *  Events
@@ -126,6 +56,48 @@ contract Campaign is Proxied {
             stage = Stages.AuctionFailed;
         _;
     }
+}
+
+contract CampaignProxy is Proxy, CampaignData {
+    /// @dev Constructor validates and sets campaign properties
+    /// @param _eventContract Event contract
+    /// @param _marketFactory Market factory contract
+    /// @param _marketMaker Market maker contract
+    /// @param _fee Market fee
+    /// @param _funding Initial funding for market
+    /// @param _deadline Campaign deadline
+    function CampaignProxy(
+        address proxied,
+        Event _eventContract,
+        StandardMarketFactory _marketFactory,
+        MarketMaker _marketMaker,
+        uint24 _fee,
+        uint _funding,
+        uint _deadline
+    )
+        Proxy(proxied)
+        public
+    {
+        // Validate input
+        require(   address(_eventContract) != 0
+                && address(_marketFactory) != 0
+                && address(_marketMaker) != 0
+                && _fee < FEE_RANGE
+                && _funding > 0
+                && now < _deadline);
+        eventContract = _eventContract;
+        marketFactory = _marketFactory;
+        marketMaker = _marketMaker;
+        fee = _fee;
+        funding = _funding;
+        deadline = _deadline;
+    }
+}
+
+/// @title Campaign contract - Allows to crowdfund a market
+/// @author Stefan George - <stefan@gnosis.pm>
+contract Campaign is Proxied, CampaignData {
+    using Math for *;
 
     /*
      *  Public functions

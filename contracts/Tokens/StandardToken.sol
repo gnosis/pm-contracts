@@ -3,27 +3,20 @@ import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
 import "../Utils/Proxy.sol";
 
-contract StandardTokenProxy is Proxy {
+
+contract StandardTokenData {
+
     /*
      *  Storage
      */
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowances;
     uint totalTokens;
-
-    function StandardTokenProxy(address proxied) Proxy(proxied) {}
 }
 
 /// @title Standard token contract with overflow protection
-contract StandardToken is Token, Proxied {
+contract StandardToken is Token, StandardTokenData {
     using Math for *;
-
-    /*
-     *  Storage
-     */
-    mapping (address => uint) balances;
-    mapping (address => mapping (address => uint)) allowances;
-    uint totalTokens;
 
     /*
      *  Public functions
