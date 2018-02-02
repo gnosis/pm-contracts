@@ -29,11 +29,6 @@ const config = {
             port: 8545,
             network_id: "4",
         },
-        test: {
-            network_id: "*",
-            gas: 2e7,
-            provider: ganache.provider({ gasLimit: 2e7 }),
-        }
     },
     mocha: {
         enableTimeouts: false,
