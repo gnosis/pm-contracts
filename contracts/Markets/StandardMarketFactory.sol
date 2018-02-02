@@ -19,7 +19,7 @@ contract StandardMarketFactory {
     /*
      *  Public functions
      */
-    function StandardMarketFactory(StandardMarket _standardMarketMasterCopy) {
+    function StandardMarketFactory(StandardMarket _standardMarketMasterCopy) public {
         standardMarketMasterCopy = _standardMarketMasterCopy;
     }
 
