@@ -68,14 +68,16 @@ function lmsrMarginalPrice(funding, netOutcomeTokensSold, outcomeIndex) {
 
 function setupProxiesForGasStats(instance, gasStats) {
     new Set(instance.abi
-        .filter(({ type, constant }) => type === 'function' && !constant)
+        .filter(({ type }) => type === 'function')
     ).forEach(({ name: fnName, outputs: fnOutputs }) => {
-        const originalFn = instance[fnName]
-        instance[fnName] = async function () {
+        const wrapFn = (originalFn, estimateGas) => async function () {
             const result = await originalFn.apply(this, arguments)
+
             const datum = {
                 args: Array.from(arguments).slice(0, fnOutputs.length),
-                gasUsed: result.receipt.gasUsed,
+                gasUsed: _.has(result, 'receipt') ?
+                    result.receipt.gasUsed :
+                    await estimateGas.apply(this, arguments),
             }
 
             let fnGasStats = gasStats[fnName]
@@ -91,6 +93,9 @@ function setupProxiesForGasStats(instance, gasStats) {
 
             return result
         }
+        const original = instance[fnName]
+        instance[fnName] = wrapFn(original, original.estimateGas)
+        instance[fnName].call = wrapFn(original.call, original.estimateGas)
     })
 }
 
