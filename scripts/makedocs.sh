@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-npm i @digix/doxity
-node_modules/.bin/doxity init
-sed -i -e 's/linkPrefix = .*/linkPrefix = "\/gnosis-contracts"/' scripts/doxity/config.toml
-node_modules/.bin/doxity build
-rm -r .doxityrc scripts/doxity/
-npm un @digix/doxity
+rm -r docs
+mkdir -p docs/docs
+find contracts -name '*.sol' ! -name 'Migrations.sol' -type f -exec bash -c './node_modules/.bin/solmd {} --dest docs/docs/`basename {} .sol`.md' \;
