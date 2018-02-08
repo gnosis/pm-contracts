@@ -36,6 +36,7 @@
     "npm-prepublish": "^1.2.3",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.4.2",
+    "solmd": "github:cag/solmd",
     "truffle": "^3.4.11"
   },
   "repository": {
