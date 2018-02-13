@@ -34,13 +34,13 @@
           </ul>
         {% endif %}
 
-        <label for="contracts">Contracts</label>
-        <nav><select id="contracts" name="contracts" style="max-width: 100%" onchange="if(this.value) window.location = this.value">
-          <option value="" selected>Please choose</option>
+        <nav><select style="max-width: 100%" onchange="if(this.value) window.location = this.value">
+          <option value="" selected>-- Select page --</option>
+          <option value="{{ "/" | relative_url }}">README</option>
           {% for page in site.pages %}
             {% if page.url contains '/docs/' %}
               {% assign components = page.url | split: '/' %}
-              <option value="{{ page.url }}">{{ components.last }}</option>
+              <option value="{{ page.url | relative_url }}">{{ components.last }}</option>
             {% endif %}
           {% endfor %}
         </select></nav>
