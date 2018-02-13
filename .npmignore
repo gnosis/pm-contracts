@@ -10,3 +10,12 @@ coverage.json
 coverage/
 coverageEnv/
 scTopics
+
+# Project stuff #
+#################
+
+truffle-local.js
+
+Gemfile
+Gemfile.lock
+_site/
