@@ -1,5 +1,5 @@
 pragma solidity ^0.4.18;
-import "../Utils/Math.sol";
+import "@gnosis.pm/util-contracts/contracts/Math.sol";
 import "../MarketMakers/MarketMaker.sol";
 
 

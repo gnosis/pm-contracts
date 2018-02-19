@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Token.sol";
 import "../Markets/Market.sol";
-import "../Tokens/Token.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 

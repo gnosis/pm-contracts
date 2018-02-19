@@ -1,5 +1,10 @@
 pragma solidity ^0.4.2;
 
+// HACK: by importing these contracts, artifacts for them will be generated in build/
+// so they can be part of the package ultimately
+import "@gnosis.pm/util-contracts/contracts/HumanFriendlyToken.sol";
+import "@gnosis.pm/util-contracts/contracts/EtherToken.sol";
+
 contract Migrations {
     address public owner;
     uint public last_completed_migration;

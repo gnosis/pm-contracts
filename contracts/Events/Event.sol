@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
-import "../Tokens/Token.sol";
-import "../Tokens/OutcomeToken.sol";
+import "@gnosis.pm/util-contracts/contracts/Token.sol";
+import "@gnosis.pm/util-contracts/contracts/OutcomeToken.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Oracles/Oracle.sol";
-import "../Utils/Proxy.sol";
 
 
 contract EventData {

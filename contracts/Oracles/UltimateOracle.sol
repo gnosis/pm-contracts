@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Token.sol";
+import "@gnosis.pm/util-contracts/contracts/Math.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Oracles/Oracle.sol";
-import "../Tokens/Token.sol";
-import "../Utils/Math.sol";
-import "../Utils/Proxy.sol";
 
 
 contract UltimateOracleData {
