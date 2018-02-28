@@ -3,21 +3,21 @@ const { wait } = require('@digix/tempo')(web3)
 const utils = require('./utils')
 const { getParamFromTxEvent, assertRejects } = utils
 
-const Event = artifacts.require('Event')
+const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')
-const Token = artifacts.require('Token')
+const OutcomeToken = artifacts.require('OutcomeToken')
 const EtherToken = artifacts.require('EtherToken')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
-const Market = artifacts.require('Market')
+const StandardMarket = artifacts.require('StandardMarket')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const Campaign = artifacts.require('Campaign')
 const CampaignFactory = artifacts.require('CampaignFactory')
 
-const contracts = [Event, EventFactory, Token, EtherToken, CentralizedOracle, CentralizedOracleFactory, Market, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
+const contracts = [CategoricalEvent, EventFactory, OutcomeToken, EtherToken, CentralizedOracle, CentralizedOracleFactory, StandardMarket, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
 
-contract('Market', function (accounts) {
+contract('StandardMarket', function (accounts) {
     let centralizedOracleFactory
     let eventFactory
     let etherToken
@@ -45,7 +45,7 @@ contract('Market', function (accounts) {
         )
         event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle.address, 2),
-            'categoricalEvent', Event
+            'categoricalEvent', CategoricalEvent
         )
     })
 
@@ -56,7 +56,7 @@ contract('Market', function (accounts) {
         const feeFactor = 0
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[buyer] }),
-            'market', Market
+            'market', StandardMarket
         )
 
         // Fund market
@@ -68,7 +68,7 @@ contract('Market', function (accounts) {
         await etherToken.approve(market.address, funding, { from: accounts[buyer] })
         await market.fund(funding, { from: accounts[buyer] })
 
-        // Market can only be funded once
+        // StandardMarket can only be funded once
         await etherToken.deposit({ value: funding, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), funding)
         await etherToken.approve(market.address, funding, { from: accounts[buyer] })
@@ -79,7 +79,7 @@ contract('Market', function (accounts) {
         // Close market
         await market.close({ from: accounts[buyer] })
 
-        // Market can only be closed once
+        // StandardMarket can only be closed once
         await assertRejects(market.close({ from: accounts[buyer] }), 'market closed twice')
 
         // Sell all outcomes
@@ -94,7 +94,7 @@ contract('Market', function (accounts) {
         const feeFactor = 50000  // 5%
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[investor] }),
-            'market', Market
+            'market', StandardMarket
         )
 
         // Fund market
@@ -126,7 +126,7 @@ contract('Market', function (accounts) {
             await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
         ), outcomeTokenCost.valueOf())
 
-        const outcomeToken = Token.at(await event.outcomeTokens.call(outcome))
+        const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(outcome))
         assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), tokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
@@ -151,7 +151,7 @@ contract('Market', function (accounts) {
         const feeFactor = 50000  // 5%
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[investor] }),
-            'market', Market
+            'market', StandardMarket
         )
 
         // Fund market
@@ -184,7 +184,7 @@ contract('Market', function (accounts) {
                 'cost', null, 'OutcomeTokenShortSale'
             ).valueOf(), cost)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), tokenCount - cost)
-        const outcomeToken = Token.at(await event.outcomeTokens.call(oppositeOutcome))
+        const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(oppositeOutcome))
         assert.equal(await outcomeToken.balanceOf.call(accounts[buyer]), tokenCount)
     })
 
@@ -221,7 +221,7 @@ contract('Market', function (accounts) {
         assert.equal(await campaign.stage.call(), 1)
 
         // Create market
-        const market = Market.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
+        const market = StandardMarket.at(getParamFromTxEvent(await campaign.createMarket(), 'market'))
 
         // Trade
         const buyer = 4
