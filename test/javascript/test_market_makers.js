@@ -185,7 +185,7 @@ contract('MarketMaker', function(accounts) {
             'centralizedOracle')
         const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
-            'categoricalEvent', Event)
+            'categoricalEvent', CategoricalEvent)
 
         // Create market
         const investor = 5
@@ -194,7 +194,7 @@ contract('MarketMaker', function(accounts) {
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
                 { from: accounts[investor] }),
-            'market', Market)
+            'market', StandardMarket)
 
         // Fund market
         const funding = 1e18
@@ -220,7 +220,7 @@ contract('MarketMaker', function(accounts) {
         const cost = await lmsrMarketMaker.calcNetCost.call(market.address, tradeValues)
         if(cost.gt(0)) await etherToken.approve(market.address, cost, { from: accounts[trader] })
 
-        const outcomeTokens = await Promise.all(_.range(numOutcomes).map(i => event.outcomeTokens.call(i).then(tokenAddr => Token.at(tokenAddr))))
+        const outcomeTokens = await Promise.all(_.range(numOutcomes).map(i => event.outcomeTokens.call(i).then(tokenAddr => OutcomeToken.at(tokenAddr))))
         await Promise.all(tradeValues.map((v, i) => [v, i]).filter(([v]) => v < 0).map(([v, i]) =>
             outcomeTokens[i].approve(market.address, -v, { from: accounts[trader] })))
 
