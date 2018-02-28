@@ -39,12 +39,13 @@ contract('Event', function (accounts) {
     it('should buy and sell all outcomes', async () => {
         // Buy all outcomes
         const buyer = 0
-        const collateralTokenCount = 10
+        const collateralTokenCount = 1e19
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(event.address, collateralTokenCount, { from: accounts[buyer] })
-        await event.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
+        for(let i = 0; i < 10; i++)
+            await event.buyAllOutcomes(collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(event.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
@@ -64,12 +65,13 @@ contract('Event', function (accounts) {
     it('should buy and verify outcomes', async () => {
         // Buy all outcomes
         const buyer = 1
-        const collateralTokenCount = 10
+        const collateralTokenCount = 1e18
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(event.address, collateralTokenCount, { from: accounts[buyer] })
-        await event.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
+        for(let i = 0; i < 10; i++)
+            await event.buyAllOutcomes(collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(event.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
