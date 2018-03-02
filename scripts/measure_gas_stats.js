@@ -39,7 +39,9 @@ const inheritanceMap = [
     ['Oracle', ['CentralizedOracle', 'DifficultyOracle', 'FutarchyOracle', 'MajorityOracle', 'SignedMessageOracle', 'UltimateOracle']],
     ['StandardToken', ['EtherToken', 'OutcomeToken']],
     ['Token', ['StandardToken']],
-].forEach(([parent, children]) => {
+]
+
+inheritanceMap.forEach(([parent, children]) => {
     const childrenData = children.map(name => gasStats[name]).filter(data => data)
     if(childrenData.length === 0) return
     if(!gasStats[parent])
