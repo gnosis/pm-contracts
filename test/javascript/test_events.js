@@ -1,13 +1,14 @@
 const utils = require('./utils')
 
-const Event = artifacts.require('Event')
+const CategoricalEvent = artifacts.require('CategoricalEvent')
+const ScalarEvent = artifacts.require('ScalarEvent')
 const EventFactory = artifacts.require('EventFactory')
-const Token = artifacts.require('Token')
+const OutcomeToken = artifacts.require('OutcomeToken')
 const EtherToken = artifacts.require('EtherToken')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 
-const contracts = [Event, EventFactory, Token, EtherToken, CentralizedOracle, CentralizedOracleFactory]
+const contracts = [CategoricalEvent, ScalarEvent, EventFactory, OutcomeToken, EtherToken, CentralizedOracle, CentralizedOracleFactory]
 
 contract('Event', function (accounts) {
     let centralizedOracleFactory
@@ -31,24 +32,25 @@ contract('Event', function (accounts) {
         )
         event = utils.getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracle.address, 2),
-            'categoricalEvent', Event
+            'categoricalEvent', CategoricalEvent
         )
     })
 
     it('should buy and sell all outcomes', async () => {
         // Buy all outcomes
         const buyer = 0
-        const collateralTokenCount = 10
+        const collateralTokenCount = 1e19
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(event.address, collateralTokenCount, { from: accounts[buyer] })
-        await event.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
+        for(let i = 0; i < 10; i++)
+            await event.buyAllOutcomes(collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(event.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = Token.at(await event.outcomeTokens.call(0))
-        const outcomeToken2 = Token.at(await event.outcomeTokens.call(1))
+        const outcomeToken1 = OutcomeToken.at(await event.outcomeTokens.call(0))
+        const outcomeToken2 = OutcomeToken.at(await event.outcomeTokens.call(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -63,17 +65,18 @@ contract('Event', function (accounts) {
     it('should buy and verify outcomes', async () => {
         // Buy all outcomes
         const buyer = 1
-        const collateralTokenCount = 10
+        const collateralTokenCount = 1e18
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(event.address, collateralTokenCount, { from: accounts[buyer] })
-        await event.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
+        for(let i = 0; i < 10; i++)
+            await event.buyAllOutcomes(collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(event.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = Token.at(await event.outcomeTokens.call(0))
-        const outcomeToken2 = Token.at(await event.outcomeTokens.call(1))
+        const outcomeToken1 = OutcomeToken.at(await event.outcomeTokens.call(0))
+        const outcomeToken2 = OutcomeToken.at(await event.outcomeTokens.call(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -99,8 +102,8 @@ contract('Event', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(event.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = Token.at(await event.outcomeTokens.call(0))
-        const outcomeToken2 = Token.at(await event.outcomeTokens.call(1))
+        const outcomeToken1 = OutcomeToken.at(await event.outcomeTokens.call(0))
+        const outcomeToken2 = OutcomeToken.at(await event.outcomeTokens.call(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -126,7 +129,7 @@ contract('Event', function (accounts) {
     it('should buy, set, and redeem outcomes for scalar event', async () => {
         const scalarEvent = utils.getParamFromTxEvent(
             await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100),
-            'scalarEvent', Event
+            'scalarEvent', ScalarEvent
         )
         // Buy all outcomes
         const buyer = 3
@@ -139,8 +142,8 @@ contract('Event', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(scalarEvent.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = Token.at(await scalarEvent.outcomeTokens(0))
-        const outcomeToken2 = Token.at(await scalarEvent.outcomeTokens(1))
+        const outcomeToken1 = OutcomeToken.at(await scalarEvent.outcomeTokens(0))
+        const outcomeToken2 = OutcomeToken.at(await scalarEvent.outcomeTokens(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
