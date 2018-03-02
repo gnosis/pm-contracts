@@ -30,6 +30,25 @@ spawnSync('npm', ['test'], { stdio: 'inherit', env: newEnv })
 
 const gasStats = JSON.parse(fs.readFileSync(gasStatsFile))
 
+// make sure this is toposorted
+const inheritanceMap = [
+    ['Event', ['CategoricalEvent', 'ScalarEvent']],
+    ['StandardMarket', ['StandardMarketWithPriceLogger']],
+    ['Market', ['StandardMarket']],
+    ['MarketMaker', ['LMSRMarketMaker']],
+    ['Oracle', ['CentralizedOracle', 'DifficultyOracle', 'FutarchyOracle', 'MajorityOracle', 'SignedMessageOracle', 'UltimateOracle']],
+    ['StandardToken', ['EtherToken', 'OutcomeToken']],
+    ['Token', ['StandardToken']],
+].forEach(([parent, children]) => {
+    const childrenData = children.map(name => gasStats[name]).filter(data => data)
+    if(childrenData.length === 0) return
+    if(!gasStats[parent])
+        gasStats[parent] = {}
+
+    _.mergeWith(gasStats[parent], ...childrenData, (objValue, srcValue) =>
+        _.isArray(objValue) ? objValue.concat(srcValue) : undefined)
+})
+
 console.log('-- Gas stats --')
 
 _.forEach(gasStats, (contractData, contractName) => {

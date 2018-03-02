@@ -8,11 +8,11 @@ const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const EtherToken = artifacts.require('EtherToken')
-const Token = artifacts.require('Token')
-const Market = artifacts.require('Market')
-const Event = artifacts.require('Event')
+const OutcomeToken = artifacts.require('OutcomeToken')
+const StandardMarket = artifacts.require('StandardMarket')
+const CategoricalEvent = artifacts.require('CategoricalEvent')
 
-const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, EtherToken, Token, Market, Event]
+const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, EtherToken, OutcomeToken, StandardMarket, CategoricalEvent]
 
 contract('MarketMaker', function(accounts) {
     let eventFactory
@@ -41,7 +41,7 @@ contract('MarketMaker', function(accounts) {
             'centralizedOracle')
         const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
-            'categoricalEvent', Event)
+            'categoricalEvent', CategoricalEvent)
 
         // Create market
         const investor = 0
@@ -50,7 +50,7 @@ contract('MarketMaker', function(accounts) {
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
                 { from: accounts[investor] }),
-            'market', Market)
+            'market', StandardMarket)
 
         // Fund market
         const funding = 1e17
@@ -65,7 +65,7 @@ contract('MarketMaker', function(accounts) {
         // User buys all outcomes
         const trader = 1
         const outcome = 1
-        const outcomeToken = Token.at(await event.outcomeTokens.call(outcome))
+        const outcomeToken = OutcomeToken.at(await event.outcomeTokens.call(outcome))
         const tokenCount = 1e18
         const loopCount = 10
 
@@ -121,14 +121,14 @@ contract('MarketMaker', function(accounts) {
                 'centralizedOracle')
             const event = getParamFromTxEvent(
                 await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
-                'categoricalEvent', Event)
+                'categoricalEvent', CategoricalEvent)
 
             // Create market
             const feeFactor = 0  // 0%
             const market = getParamFromTxEvent(
                 await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
                     { from: accounts[investor] }),
-                'market', Market)
+                'market', StandardMarket)
 
             // Fund market
             await etherToken.deposit({ value: funding, from: accounts[investor] })
@@ -184,7 +184,7 @@ contract('MarketMaker', function(accounts) {
             'centralizedOracle')
         const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
-            'categoricalEvent', Event)
+            'categoricalEvent', CategoricalEvent)
 
         // Create market
         const investor = 5
@@ -193,7 +193,7 @@ contract('MarketMaker', function(accounts) {
         const market = getParamFromTxEvent(
             await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor,
                 { from: accounts[investor] }),
-            'market', Market)
+            'market', StandardMarket)
 
         // Fund market
         const funding = 1e18
@@ -219,7 +219,7 @@ contract('MarketMaker', function(accounts) {
         const cost = await lmsrMarketMaker.calcNetCost.call(market.address, tradeValues)
         if(cost.gt(0)) await etherToken.approve(market.address, cost, { from: accounts[trader] })
 
-        const outcomeTokens = await Promise.all(_.range(numOutcomes).map(i => event.outcomeTokens.call(i).then(tokenAddr => Token.at(tokenAddr))))
+        const outcomeTokens = await Promise.all(_.range(numOutcomes).map(i => event.outcomeTokens.call(i).then(tokenAddr => OutcomeToken.at(tokenAddr))))
         await Promise.all(tradeValues.map((v, i) => [v, i]).filter(([v]) => v < 0).map(([v, i]) =>
             outcomeTokens[i].approve(market.address, -v, { from: accounts[trader] })))
 

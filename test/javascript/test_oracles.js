@@ -17,9 +17,9 @@ const StandardMarketWithPriceLogger = artifacts.require('StandardMarketWithPrice
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
-const Token = artifacts.require('Token')
+const OutcomeToken = artifacts.require('OutcomeToken')
 
-const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, DifficultyOracle, DifficultyOracleFactory, MajorityOracle, MajorityOracleFactory, UltimateOracle, UltimateOracleFactory, FutarchyOracle, FutarchyOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, Token]
+const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, DifficultyOracle, DifficultyOracleFactory, MajorityOracle, MajorityOracleFactory, UltimateOracle, UltimateOracleFactory, FutarchyOracle, FutarchyOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, OutcomeToken]
 
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
@@ -173,7 +173,7 @@ contract('Oracle', function (accounts) {
         await categoricalEvent.buyAllOutcomes(cost, { from: accounts[buyer] })
 
         // Buy long tokens from market 1
-        const collateralToken = Token.at(await categoricalEvent.outcomeTokens(1))
+        const collateralToken = OutcomeToken.at(await categoricalEvent.outcomeTokens(1))
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(utils.getParamFromTxEvent(
