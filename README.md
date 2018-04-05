@@ -105,7 +105,9 @@ Documentation
 
 There is a copy version hosted online at https://gnosis.github.io/gnosis-contracts/
 
-### Build docs with doxity
+### Build docs for readthedocs
+
+Requires [pango](http://www.pango.org/) installed:
 
 ```bash
 scripts/makedocs.sh
