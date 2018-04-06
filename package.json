@@ -29,7 +29,7 @@
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
     "babel-eslint": "^8.0.2",
-    "decimal.js": "^8.0.0",
+    "decimal.js": "^10.0.0",
     "eslint": "^4.11.0",
     "eslint-plugin-babel": "^4.1.1",
     "lodash": "^4.17.4",
