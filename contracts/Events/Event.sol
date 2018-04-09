@@ -25,7 +25,8 @@ contract Event {
     bool public isOutcomeSet;
     int public outcome;
     OutcomeToken[] public outcomeTokens;
-
+    mapping (address => uint) balance;
+    mapping (address => uint[]) withdrawn;
     /*
      *  Public functions
      */
@@ -48,6 +49,14 @@ contract Event {
         }
     }
 
+    function addOutcome()
+        public
+    {
+        OutcomeToken outcomeToken = new OutcomeToken();
+        outcomeTokens.push(outcomeToken);
+        OutcomeTokenCreation(outcomeToken, getOutcomeCount());
+    }
+
     /// @dev Buys equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
     /// @param collateralTokenCount Number of collateral tokens
     function buyAllOutcomes(uint collateralTokenCount)
@@ -55,10 +64,18 @@ contract Event {
     {
         // Transfer collateral tokens to events contract
         require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
-        // Issue new outcome tokens to sender
-        for (uint8 i = 0; i < outcomeTokens.length; i++)
-            outcomeTokens[i].issue(msg.sender, collateralTokenCount);
+        require(balance[msg.sender]+collateralTokenCount >= balance[msg.sender]);
+        balance[msg.sender] += collateralTokenCount;
         OutcomeTokenSetIssuance(msg.sender, collateralTokenCount);
+    }
+
+    function withdrawOutcomeToken(uint i, uint amount) 
+        public
+    {
+        require(amount + withdrawn[msg.sender][i] >= amount); //check overflow
+        require(amount + withdrawn[msg.sender][i] <= balance[msg.sender]);
+        outcomeTokens[i].issue(msg.sender, amount);
+        withdrawn[msg.sender][i] += amount;
     }
 
     /// @dev Sells equal number of tokens of all outcomes, exchanging collateral tokens and sets of outcome tokens 1:1
