@@ -1,18 +1,18 @@
 Gnosis Smart Contracts
 ======================
 
-[![Logo](https://raw.githubusercontent.com/gnosis/gnosis-contracts/master/assets/logo.png)](https://gnosis.pm/)
+[![Logo](https://raw.githubusercontent.com/gnosis/pm-contracts/master/assets/logo.png)](https://gnosis.pm/)
 
-[![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
+[![Build Status](https://travis-ci.org/gnosis/pm-contracts.svg?branch=master)](https://travis-ci.org/gnosis/pm-contracts)
 
-[![Codecov badge](https://codecov.io/gh/gnosis/gnosis-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/gnosis-contracts/)
+[![Codecov badge](https://codecov.io/gh/gnosis/pm-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/pm-contracts/)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/gnosis-contracts.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/pm-contracts.svg)](https://greenkeeper.io/)
 
 [![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
 
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
-To interact with those contracts have a look at (https://github.com/gnosis/gnosis.js/).
+To interact with those contracts have a look at (https://github.com/gnosis/pm-js/).
 
 Install
 -------
@@ -103,7 +103,7 @@ npm run measuregasstats
 Documentation
 -------------
 
-There is a copy version hosted online at https://gnosis.github.io/gnosis-contracts/
+There is a copy version hosted online at https://gnosis.github.io/pm-contracts/
 
 ### Build docs for readthedocs
 

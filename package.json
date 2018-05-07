@@ -1,5 +1,5 @@
 {
-  "name": "@gnosis.pm/gnosis-core-contracts",
+  "name": "@gnosis.pm/pm-contracts",
   "version": "1.0.3",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
@@ -41,10 +41,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/gnosis-contracts.git"
+    "url": "git+https://github.com/gnosis/pm-contracts.git"
   },
   "bugs": {
-    "url": "https://github.com/gnosis/gnosis-contracts/issues"
+    "url": "https://github.com/gnosis/pm-contracts/issues"
   },
-  "homepage": "https://github.com/gnosis/gnosis-contracts#readme"
+  "homepage": "https://github.com/gnosis/pm-contracts#readme"
 }
