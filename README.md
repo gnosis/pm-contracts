@@ -1,5 +1,5 @@
-Gnosis Smart Contracts
-======================
+Gnosis Prediction Market Contracts
+==================================
 
 [![Logo](https://raw.githubusercontent.com/gnosis/pm-contracts/master/assets/logo.png)](https://gnosis.pm/)
 
@@ -103,7 +103,7 @@ npm run measuregasstats
 Documentation
 -------------
 
-There is a copy version hosted online at https://gnosis.github.io/pm-contracts/
+There is a copy version hosted online at https://gnosis-pm-contracts.readthedocs.io/en/latest/
 
 ### Build docs for readthedocs
 
