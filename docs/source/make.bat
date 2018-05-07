@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=.
 set BUILDDIR=_build
-set SPHINXPROJ=gnosis-contracts
+set SPHINXPROJ=pm-contracts
 
 if "%1" == "" goto help
 

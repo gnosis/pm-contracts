@@ -19,4 +19,4 @@ deploy:
     all_branches: true
     tags: true
     node: '7'
-    repo: gnosis/gnosis-contracts
+    repo: gnosis/pm-contracts

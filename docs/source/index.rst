@@ -70,7 +70,7 @@ Log gas measurements into `build/gas-stats.json`:
 Documentation
 -------------
 
-There is a copy version hosted online at https://gnosis.github.io/gnosis-contracts/
+There is a copy version hosted online at https://gnosis.github.io/pm-contracts/
 
 Build docs with doxity:
 
