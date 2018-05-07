@@ -1,36 +1,37 @@
+-  `UltimateOracle <#ultimateoracle>`__
+
+   -  `Accessors <#ultimateoracle-accessors>`__
+   -  `Events <#ultimateoracle-events>`__
+
+      -  `ForwardedOracleOutcomeAssignment(\ *int256*
+         ``outcome``) <#forwardedoracleoutcomeassignmentint256-outcome>`__
+      -  `OutcomeChallenge(\ *address* indexed ``sender``, *int256*
+         ``outcome``) <#outcomechallengeaddress-indexed-sender-int256-outcome>`__
+      -  `OutcomeVote(\ *address* indexed ``sender``, *int256*
+         ``outcome``, *uint256*
+         ``amount``) <#outcomevoteaddress-indexed-sender-int256-outcome-uint256-amount>`__
+      -  `Withdrawal(\ *address* indexed ``sender``, *uint256*
+         ``amount``) <#withdrawaladdress-indexed-sender-uint256-amount>`__
+
+   -  `Functions <#ultimateoracle-functions>`__
+
+      -  `isFrontRunnerPeriodOver() <#isfrontrunnerperiodover>`__
+      -  `withdraw() <#withdraw>`__
+      -  `isChallengePeriodOver() <#ischallengeperiodover>`__
+      -  `setForwardedOutcome() <#setforwardedoutcome>`__
+      -  `getOutcome() <#getoutcome>`__
+      -  `isChallenged() <#ischallenged>`__
+      -  `challengeOutcome(\ *int256*
+         ``_outcome``) <#challengeoutcomeint256-_outcome>`__
+      -  `isOutcomeSet() <#isoutcomeset>`__
+      -  `voteForOutcome(\ *int256* ``_outcome``, *uint256*
+         ``amount``) <#voteforoutcomeint256-_outcome-uint256-amount>`__
+
 UltimateOracle
 ==============
 
--  `UltimateOracle <#ultimateoracle>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `ForwardedOracleOutcomeAssignment <#forwardedoracleoutcomeassignment-int256-outcome>`__\ (*int256*
-         ``outcome``)
-      -  `OutcomeChallenge <#outcomechallenge-address-indexed-sender-int256-outcome>`__\ (*address*
-         indexed ``sender``, *int256* ``outcome``)
-      -  `OutcomeVote <#outcomevote-address-indexed-sender-int256-outcome-uint256-amount>`__\ (*address*
-         indexed ``sender``, *int256* ``outcome``, *uint256* ``amount``)
-      -  `Withdrawal <#withdrawal-address-indexed-sender-uint256-amount>`__\ (*address*
-         indexed ``sender``, *uint256* ``amount``)
-
-   -  `Functions <#functions>`__
-
-      -  `isFrontRunnerPeriodOver <#isfrontrunnerperiodover>`__\ ()
-      -  `withdraw <#withdraw>`__\ ()
-      -  `isChallengePeriodOver <#ischallengeperiodover>`__\ ()
-      -  `setForwardedOutcome <#setforwardedoutcome>`__\ ()
-      -  `getOutcome <#getoutcome>`__\ ()
-      -  `isChallenged <#ischallenged>`__\ ()
-      -  `challengeOutcome <#challengeoutcome-int256-_outcome>`__\ (*int256*
-         ``_outcome``)
-      -  `isOutcomeSet <#isoutcomeset>`__\ ()
-      -  `voteForOutcome <#voteforoutcome-int256-_outcome-uint256-amount>`__\ (*int256*
-         ``_outcome``, *uint256* ``amount``)
-
 Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
-----------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: UltimateOracle(\ *address* ``_forwardedOracle``,
@@ -39,8 +40,8 @@ Ultimate oracle contract - Allows to swap oracle result for ultimate oracle resu
    *uint256* ``_frontRunnerPeriod``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+UltimateOracle Accessors
+------------------------
 
 -  *address* forwardedOracle() ``061a85c7``
 -  *uint256* frontRunnerPeriod() ``0853f7eb``
@@ -56,8 +57,8 @@ Accessors
 -  *uint8* spreadMultiplier() ``d84d2a47``
 -  *uint256* challengePeriod() ``f3f480d9``
 
-Events
-------
+UltimateOracle Events
+---------------------
 
 ForwardedOracleOutcomeAssignment(\ *int256* ``outcome``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,8 +84,8 @@ Withdrawal(\ *address* indexed ``sender``, *uint256* ``amount``)
 **Signature hash**:
 ``7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65``
 
-Functions
----------
+UltimateOracle Functions
+------------------------
 
 isFrontRunnerPeriodOver()
 ~~~~~~~~~~~~~~~~~~~~~~~~~

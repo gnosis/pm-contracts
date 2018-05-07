@@ -1,32 +1,32 @@
+-  `CampaignFactory <#campaignfactory>`__
+
+   -  `Events <#campaignfactory-events>`__
+
+      -  `CampaignCreation(\ *address* indexed ``creator``, *address*
+         ``campaign``, *address* ``eventContract``, *address*
+         ``marketFactory``, *address* ``marketMaker``, *uint24* ``fee``,
+         *uint256* ``funding``, *uint256*
+         ``deadline``) <#campaigncreationaddress-indexed-creator-address-campaign-address-eventcontract-address-marketfactory-address-marketmaker-uint24-fee-uint256-funding-uint256-deadline>`__
+
+   -  `Functions <#campaignfactory-functions>`__
+
+      -  `createCampaign(\ *address* ``eventContract``, *address*
+         ``marketFactory``, *address* ``marketMaker``, *uint24* ``fee``,
+         *uint256* ``funding``, *uint256*
+         ``deadline``) <#createcampaignaddress-eventcontract-address-marketfactory-address-marketmaker-uint24-fee-uint256-funding-uint256-deadline>`__
+
 CampaignFactory
 ===============
 
--  `CampaignFactory <#campaignfactory>`__
-
-   -  `Events <#events>`__
-
-      -  `CampaignCreation <#campaigncreation-address-indexed-creator-address-campaign-address-eventcontract-address-marketfactory-address-marketmaker-uint24-fee-uint256-funding-uint256-deadline>`__\ (*address*
-         indexed ``creator``, *address* ``campaign``, *address*
-         ``eventContract``, *address* ``marketFactory``, *address*
-         ``marketMaker``, *uint24* ``fee``, *uint256* ``funding``,
-         *uint256* ``deadline``)
-
-   -  `Functions <#functions>`__
-
-      -  `createCampaign <#createcampaign-address-eventcontract-address-marketfactory-address-marketmaker-uint24-fee-uint256-funding-uint256-deadline>`__\ (*address*
-         ``eventContract``, *address* ``marketFactory``, *address*
-         ``marketMaker``, *uint24* ``fee``, *uint256* ``funding``,
-         *uint256* ``deadline``)
-
 Campaign factory contract - Allows to create campaign contracts
----------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: CampaignFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+CampaignFactory Events
+----------------------
 
 CampaignCreation(\ *address* indexed ``creator``, *address* ``campaign``, *address* ``eventContract``, *address* ``marketFactory``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``funding``, *uint256* ``deadline``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,8 +34,8 @@ CampaignCreation(\ *address* indexed ``creator``, *address* ``campaign``, *addre
 **Signature hash**:
 ``7a9fd19b658538a67209802dd9011d6e3ce04586fe93c87096d2bc40ed850866``
 
-Functions
----------
+CampaignFactory Functions
+-------------------------
 
 createCampaign(\ *address* ``eventContract``, *address* ``marketFactory``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``funding``, *uint256* ``deadline``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

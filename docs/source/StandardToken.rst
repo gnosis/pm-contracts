@@ -1,38 +1,38 @@
+-  `StandardToken <#standardtoken>`__
+
+   -  `Events <#standardtoken-events>`__
+
+      -  `Transfer(\ *address* indexed ``from``, *address* indexed
+         ``to``, *uint256*
+         ``value``) <#transferaddress-indexed-from-address-indexed-to-uint256-value>`__
+      -  `Approval(\ *address* indexed ``owner``, *address* indexed
+         ``spender``, *uint256*
+         ``value``) <#approvaladdress-indexed-owner-address-indexed-spender-uint256-value>`__
+
+   -  `Functions <#standardtoken-functions>`__
+
+      -  `approve(\ *address* ``spender``, *uint256*
+         ``value``) <#approveaddress-spender-uint256-value>`__
+      -  `totalSupply() <#totalsupply>`__
+      -  `transferFrom(\ *address* ``from``, *address* ``to``, *uint256*
+         ``value``) <#transferfromaddress-from-address-to-uint256-value>`__
+      -  `balanceOf(\ *address* ``owner``) <#balanceofaddress-owner>`__
+      -  `transfer(\ *address* ``to``, *uint256*
+         ``value``) <#transferaddress-to-uint256-value>`__
+      -  `allowance(\ *address* ``owner``, *address*
+         ``spender``) <#allowanceaddress-owner-address-spender>`__
+
 StandardToken
 =============
 
--  `StandardToken <#standardtoken>`__
-
-   -  `Events <#events>`__
-
-      -  `Transfer <#transfer-address-indexed-from-address-indexed-to-uint256-value>`__\ (*address*
-         indexed ``from``, *address* indexed ``to``, *uint256*
-         ``value``)
-      -  `Approval <#approval-address-indexed-owner-address-indexed-spender-uint256-value>`__\ (*address*
-         indexed ``owner``, *address* indexed ``spender``, *uint256*
-         ``value``)
-
-   -  `Functions <#functions>`__
-
-      -  `approve <#approve-address-spender-uint256-value>`__\ (*address*
-         ``spender``, *uint256* ``value``)
-      -  `totalSupply <#totalsupply>`__\ ()
-      -  `transferFrom <#transferfrom-address-from-address-to-uint256-value>`__\ (*address*
-         ``from``, *address* ``to``, *uint256* ``value``)
-      -  `balanceOf <#balanceof-address-owner>`__\ (*address* ``owner``)
-      -  `transfer <#transfer-address-to-uint256-value>`__\ (*address*
-         ``to``, *uint256* ``value``)
-      -  `allowance <#allowance-address-owner-address-spender>`__\ (*address*
-         ``owner``, *address* ``spender``)
-
 Standard token contract with overflow protection
-------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Constructor**: StandardToken()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+StandardToken Events
+--------------------
 
 Transfer(\ *address* indexed ``from``, *address* indexed ``to``, *uint256* ``value``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,8 +46,8 @@ Approval(\ *address* indexed ``owner``, *address* indexed ``spender``, *uint256*
 **Signature hash**:
 ``8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925``
 
-Functions
----------
+StandardToken Functions
+-----------------------
 
 approve(\ *address* ``spender``, *uint256* ``value``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

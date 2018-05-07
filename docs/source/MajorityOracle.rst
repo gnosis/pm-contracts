@@ -1,29 +1,29 @@
+-  `MajorityOracle <#majorityoracle>`__
+
+   -  `Accessors <#majorityoracle-accessors>`__
+   -  `Functions <#majorityoracle-functions>`__
+
+      -  `getStatusAndOutcome() <#getstatusandoutcome>`__
+      -  `getOutcome() <#getoutcome>`__
+      -  `isOutcomeSet() <#isoutcomeset>`__
+
 MajorityOracle
 ==============
 
--  `MajorityOracle <#majorityoracle>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Functions <#functions>`__
-
-      -  `getStatusAndOutcome <#getstatusandoutcome>`__\ ()
-      -  `getOutcome <#getoutcome>`__\ ()
-      -  `isOutcomeSet <#isoutcomeset>`__\ ()
-
 Majority oracle contract - Allows to resolve an event based on multiple oracles with majority vote
---------------------------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: MajorityOracle(\ *address[]* ``_oracles``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+MajorityOracle Accessors
+------------------------
 
 -  *address* oracles(\ *uint256*) ``5b69a7d8``
 
-Functions
----------
+MajorityOracle Functions
+------------------------
 
 getStatusAndOutcome()
 ~~~~~~~~~~~~~~~~~~~~~

@@ -1,28 +1,28 @@
+-  `MajorityOracleFactory <#majorityoraclefactory>`__
+
+   -  `Events <#majorityoraclefactory-events>`__
+
+      -  `MajorityOracleCreation(\ *address* indexed ``creator``,
+         *address* ``majorityOracle``, *address[]*
+         ``oracles``) <#majorityoraclecreationaddress-indexed-creator-address-majorityoracle-address-oracles>`__
+
+   -  `Functions <#majorityoraclefactory-functions>`__
+
+      -  `createMajorityOracle(\ *address[]*
+         ``oracles``) <#createmajorityoracleaddress-oracles>`__
+
 MajorityOracleFactory
 =====================
 
--  `MajorityOracleFactory <#majorityoraclefactory>`__
-
-   -  `Events <#events>`__
-
-      -  `MajorityOracleCreation <#majorityoraclecreation-address-indexed-creator-address-majorityoracle-address-oracles>`__\ (*address*
-         indexed ``creator``, *address* ``majorityOracle``, *address[]*
-         ``oracles``)
-
-   -  `Functions <#functions>`__
-
-      -  `createMajorityOracle <#createmajorityoracle-address-oracles>`__\ (*address[]*
-         ``oracles``)
-
 Majority oracle factory contract - Allows to create majority oracle contracts
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: MajorityOracleFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+MajorityOracleFactory Events
+----------------------------
 
 MajorityOracleCreation(\ *address* indexed ``creator``, *address* ``majorityOracle``, *address[]* ``oracles``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,8 +30,8 @@ MajorityOracleCreation(\ *address* indexed ``creator``, *address* ``majorityOrac
 **Signature hash**:
 ``df1eeefc4815bdd1bdf45905c4ce59f6ca50efb4148303c9bbda2bff40301d3d``
 
-Functions
----------
+MajorityOracleFactory Functions
+-------------------------------
 
 createMajorityOracle(\ *address[]* ``oracles``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,28 +1,28 @@
+-  `CentralizedOracleFactory <#centralizedoraclefactory>`__
+
+   -  `Events <#centralizedoraclefactory-events>`__
+
+      -  `CentralizedOracleCreation(\ *address* indexed ``creator``,
+         *address* ``centralizedOracle``, *bytes*
+         ``ipfsHash``) <#centralizedoraclecreationaddress-indexed-creator-address-centralizedoracle-bytes-ipfshash>`__
+
+   -  `Functions <#centralizedoraclefactory-functions>`__
+
+      -  `createCentralizedOracle(\ *bytes*
+         ``ipfsHash``) <#createcentralizedoraclebytes-ipfshash>`__
+
 CentralizedOracleFactory
 ========================
 
--  `CentralizedOracleFactory <#centralizedoraclefactory>`__
-
-   -  `Events <#events>`__
-
-      -  `CentralizedOracleCreation <#centralizedoraclecreation-address-indexed-creator-address-centralizedoracle-bytes-ipfshash>`__\ (*address*
-         indexed ``creator``, *address* ``centralizedOracle``, *bytes*
-         ``ipfsHash``)
-
-   -  `Functions <#functions>`__
-
-      -  `createCentralizedOracle <#createcentralizedoracle-bytes-ipfshash>`__\ (*bytes*
-         ``ipfsHash``)
-
 Centralized oracle factory contract - Allows to create centralized oracle contracts
------------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: CentralizedOracleFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+CentralizedOracleFactory Events
+-------------------------------
 
 CentralizedOracleCreation(\ *address* indexed ``creator``, *address* ``centralizedOracle``, *bytes* ``ipfsHash``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,8 +30,8 @@ CentralizedOracleCreation(\ *address* indexed ``creator``, *address* ``centraliz
 **Signature hash**:
 ``33a1926cf5c2f7306ac1685bf19260d678fea874f5f59c00b69fa5e2643ecfd2``
 
-Functions
----------
+CentralizedOracleFactory Functions
+----------------------------------
 
 createCentralizedOracle(\ *bytes* ``ipfsHash``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

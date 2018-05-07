@@ -1,30 +1,30 @@
+-  `StandardMarketWithPriceLoggerFactory <#standardmarketwithpriceloggerfactory>`__
+
+   -  `Events <#standardmarketwithpriceloggerfactory-events>`__
+
+      -  `StandardMarketWithPriceLoggerCreation(\ *address* indexed
+         ``creator``, *address* ``market``, *address* ``eventContract``,
+         *address* ``marketMaker``, *uint24* ``fee``, *uint256*
+         ``startDate``) <#standardmarketwithpriceloggercreationaddress-indexed-creator-address-market-address-eventcontract-address-marketmaker-uint24-fee-uint256-startdate>`__
+
+   -  `Functions <#standardmarketwithpriceloggerfactory-functions>`__
+
+      -  `createMarket(\ *address* ``eventContract``, *address*
+         ``marketMaker``, *uint24* ``fee``, *uint256*
+         ``startDate``) <#createmarketaddress-eventcontract-address-marketmaker-uint24-fee-uint256-startdate>`__
+
 StandardMarketWithPriceLoggerFactory
 ====================================
 
--  `StandardMarketWithPriceLoggerFactory <#standardmarketwithpriceloggerfactory>`__
-
-   -  `Events <#events>`__
-
-      -  `StandardMarketWithPriceLoggerCreation <#standardmarketwithpriceloggercreation-address-indexed-creator-address-market-address-eventcontract-address-marketmaker-uint24-fee-uint256-startdate>`__\ (*address*
-         indexed ``creator``, *address* ``market``, *address*
-         ``eventContract``, *address* ``marketMaker``, *uint24* ``fee``,
-         *uint256* ``startDate``)
-
-   -  `Functions <#functions>`__
-
-      -  `createMarket <#createmarket-address-eventcontract-address-marketmaker-uint24-fee-uint256-startdate>`__\ (*address*
-         ``eventContract``, *address* ``marketMaker``, *uint24* ``fee``,
-         *uint256* ``startDate``)
-
 Market factory contract - Allows to create market contracts
------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: StandardMarketWithPriceLoggerFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+StandardMarketWithPriceLoggerFactory Events
+-------------------------------------------
 
 StandardMarketWithPriceLoggerCreation(\ *address* indexed ``creator``, *address* ``market``, *address* ``eventContract``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``startDate``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,8 +32,8 @@ StandardMarketWithPriceLoggerCreation(\ *address* indexed ``creator``, *address*
 **Signature hash**:
 ``969b1ad77db8ae8298dedcdf1f2945322eaf681e1d56fcebfd4c23de996dc484``
 
-Functions
----------
+StandardMarketWithPriceLoggerFactory Functions
+----------------------------------------------
 
 createMarket(\ *address* ``eventContract``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``startDate``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

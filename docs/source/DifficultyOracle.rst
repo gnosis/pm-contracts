@@ -1,35 +1,35 @@
+-  `DifficultyOracle <#difficultyoracle>`__
+
+   -  `Accessors <#difficultyoracle-accessors>`__
+   -  `Events <#difficultyoracle-events>`__
+
+      -  `OutcomeAssignment(\ *uint256*
+         ``difficulty``) <#outcomeassignmentuint256-difficulty>`__
+
+   -  `Functions <#difficultyoracle-functions>`__
+
+      -  `setOutcome() <#setoutcome>`__
+      -  `getOutcome() <#getoutcome>`__
+      -  `isOutcomeSet() <#isoutcomeset>`__
+
 DifficultyOracle
 ================
 
--  `DifficultyOracle <#difficultyoracle>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `OutcomeAssignment <#outcomeassignment-uint256-difficulty>`__\ (*uint256*
-         ``difficulty``)
-
-   -  `Functions <#functions>`__
-
-      -  `setOutcome <#setoutcome>`__\ ()
-      -  `getOutcome <#getoutcome>`__\ ()
-      -  `isOutcomeSet <#isoutcomeset>`__\ ()
-
 Difficulty oracle contract - Oracle to resolve difficulty events at given block
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: DifficultyOracle(\ *uint256* ``_blockNumber``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+DifficultyOracle Accessors
+--------------------------
 
 -  *uint256* difficulty() ``19cae462``
 -  *uint256* blockNumber() ``57e871e7``
 
-Events
-------
+DifficultyOracle Events
+-----------------------
 
 OutcomeAssignment(\ *uint256* ``difficulty``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,8 +37,8 @@ OutcomeAssignment(\ *uint256* ``difficulty``)
 **Signature hash**:
 ``39972cb21edd888c2061a2b4b37874524bbc055cfeaa3054682ba5369f5029aa``
 
-Functions
----------
+DifficultyOracle Functions
+--------------------------
 
 setOutcome()
 ~~~~~~~~~~~~

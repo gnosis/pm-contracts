@@ -1,35 +1,37 @@
+-  `FutarchyOracleFactory <#futarchyoraclefactory>`__
+
+   -  `Events <#futarchyoraclefactory-events>`__
+
+      -  `FutarchyOracleCreation(\ *address* indexed ``creator``,
+         *address* ``futarchyOracle``, *address* ``collateralToken``,
+         *address* ``oracle``, *uint8* ``outcomeCount``, *int256*
+         ``lowerBound``, *int256* ``upperBound``, *address*
+         ``marketMaker``, *uint24* ``fee``, *uint256* ``tradingPeriod``,
+         *uint256*
+         ``startDate``) <#futarchyoraclecreationaddress-indexed-creator-address-futarchyoracle-address-collateraltoken-address-oracle-uint8-outcomecount-int256-lowerbound-int256-upperbound-address-marketmaker-uint24-fee-uint256-tradingperiod-uint256-startdate>`__
+
+   -  `Functions <#futarchyoraclefactory-functions>`__
+
+      -  `createFutarchyOracle(\ *address* ``collateralToken``,
+         *address* ``oracle``, *uint8* ``outcomeCount``, *int256*
+         ``lowerBound``, *int256* ``upperBound``, *address*
+         ``marketMaker``, *uint24* ``fee``, *uint256* ``tradingPeriod``,
+         *uint256*
+         ``startDate``) <#createfutarchyoracleaddress-collateraltoken-address-oracle-uint8-outcomecount-int256-lowerbound-int256-upperbound-address-marketmaker-uint24-fee-uint256-tradingperiod-uint256-startdate>`__
+
 FutarchyOracleFactory
 =====================
 
--  `FutarchyOracleFactory <#futarchyoraclefactory>`__
-
-   -  `Events <#events>`__
-
-      -  `FutarchyOracleCreation <#futarchyoraclecreation-address-indexed-creator-address-futarchyoracle-address-collateraltoken-address-oracle-uint8-outcomecount-int256-lowerbound-int256-upperbound-address-marketmaker-uint24-fee-uint256-tradingperiod-uint256-startdate>`__\ (*address*
-         indexed ``creator``, *address* ``futarchyOracle``, *address*
-         ``collateralToken``, *address* ``oracle``, *uint8*
-         ``outcomeCount``, *int256* ``lowerBound``, *int256*
-         ``upperBound``, *address* ``marketMaker``, *uint24* ``fee``,
-         *uint256* ``tradingPeriod``, *uint256* ``startDate``)
-
-   -  `Functions <#functions>`__
-
-      -  `createFutarchyOracle <#createfutarchyoracle-address-collateraltoken-address-oracle-uint8-outcomecount-int256-lowerbound-int256-upperbound-address-marketmaker-uint24-fee-uint256-tradingperiod-uint256-startdate>`__\ (*address*
-         ``collateralToken``, *address* ``oracle``, *uint8*
-         ``outcomeCount``, *int256* ``lowerBound``, *int256*
-         ``upperBound``, *address* ``marketMaker``, *uint24* ``fee``,
-         *uint256* ``tradingPeriod``, *uint256* ``startDate``)
-
 Futarchy oracle factory contract - Allows to create Futarchy oracle contracts
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: FutarchyOracleFactory(\ *address* ``_eventFactory``,
    *address* ``_marketFactory``)
 -  This contract does **not** have a fallback function.
 
-Events
-------
+FutarchyOracleFactory Events
+----------------------------
 
 FutarchyOracleCreation(\ *address* indexed ``creator``, *address* ``futarchyOracle``, *address* ``collateralToken``, *address* ``oracle``, *uint8* ``outcomeCount``, *int256* ``lowerBound``, *int256* ``upperBound``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``tradingPeriod``, *uint256* ``startDate``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,8 +39,8 @@ FutarchyOracleCreation(\ *address* indexed ``creator``, *address* ``futarchyOrac
 **Signature hash**:
 ``31b2f2efb8e38b0139781fb93941176394ceb31c7433234a12da403999ca8766``
 
-Functions
----------
+FutarchyOracleFactory Functions
+-------------------------------
 
 createFutarchyOracle(\ *address* ``collateralToken``, *address* ``oracle``, *uint8* ``outcomeCount``, *int256* ``lowerBound``, *int256* ``upperBound``, *address* ``marketMaker``, *uint24* ``fee``, *uint256* ``tradingPeriod``, *uint256* ``startDate``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

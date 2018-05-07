@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/pm-contracts",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",

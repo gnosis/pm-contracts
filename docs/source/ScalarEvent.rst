@@ -1,38 +1,40 @@
+-  `ScalarEvent <#scalarevent>`__
+
+   -  `Accessors <#scalarevent-accessors>`__
+   -  `Events <#scalarevent-events>`__
+
+      -  `OutcomeTokenCreation(\ *address* ``outcomeToken``, *uint8*
+         ``index``) <#outcometokencreationaddress-outcometoken-uint8-index>`__
+      -  `OutcomeTokenSetIssuance(\ *address* indexed ``buyer``,
+         *uint256*
+         ``collateralTokenCount``) <#outcometokensetissuanceaddress-indexed-buyer-uint256-collateraltokencount>`__
+      -  `OutcomeTokenSetRevocation(\ *address* indexed ``seller``,
+         *uint256*
+         ``outcomeTokenCount``) <#outcometokensetrevocationaddress-indexed-seller-uint256-outcometokencount>`__
+      -  `OutcomeAssignment(\ *int256*
+         ``outcome``) <#outcomeassignmentint256-outcome>`__
+      -  `WinningsRedemption(\ *address* indexed ``receiver``, *uint256*
+         ``winnings``) <#winningsredemptionaddress-indexed-receiver-uint256-winnings>`__
+
+   -  `Functions <#scalarevent-functions>`__
+
+      -  `setOutcome() <#setoutcome>`__
+      -  `buyAllOutcomes(\ *uint256*
+         ``collateralTokenCount``) <#buyalloutcomesuint256-collateraltokencount>`__
+      -  `getOutcomeTokenDistribution(\ *address*
+         ``owner``) <#getoutcometokendistributionaddress-owner>`__
+      -  `sellAllOutcomes(\ *uint256*
+         ``outcomeTokenCount``) <#sellalloutcomesuint256-outcometokencount>`__
+      -  `getOutcomeCount() <#getoutcomecount>`__
+      -  `redeemWinnings() <#redeemwinnings>`__
+      -  `getEventHash() <#geteventhash>`__
+      -  `getOutcomeTokens() <#getoutcometokens>`__
+
 ScalarEvent
 ===========
 
--  `ScalarEvent <#scalarevent>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `OutcomeTokenCreation <#outcometokencreation-address-outcometoken-uint8-index>`__\ (*address*
-         ``outcomeToken``, *uint8* ``index``)
-      -  `OutcomeTokenSetIssuance <#outcometokensetissuance-address-indexed-buyer-uint256-collateraltokencount>`__\ (*address*
-         indexed ``buyer``, *uint256* ``collateralTokenCount``)
-      -  `OutcomeTokenSetRevocation <#outcometokensetrevocation-address-indexed-seller-uint256-outcometokencount>`__\ (*address*
-         indexed ``seller``, *uint256* ``outcomeTokenCount``)
-      -  `OutcomeAssignment <#outcomeassignment-int256-outcome>`__\ (*int256*
-         ``outcome``)
-      -  `WinningsRedemption <#winningsredemption-address-indexed-receiver-uint256-winnings>`__\ (*address*
-         indexed ``receiver``, *uint256* ``winnings``)
-
-   -  `Functions <#functions>`__
-
-      -  `setOutcome <#setoutcome>`__\ ()
-      -  `buyAllOutcomes <#buyalloutcomes-uint256-collateraltokencount>`__\ (*uint256*
-         ``collateralTokenCount``)
-      -  `getOutcomeTokenDistribution <#getoutcometokendistribution-address-owner>`__\ (*address*
-         ``owner``)
-      -  `sellAllOutcomes <#sellalloutcomes-uint256-outcometokencount>`__\ (*uint256*
-         ``outcomeTokenCount``)
-      -  `getOutcomeCount <#getoutcomecount>`__\ ()
-      -  `redeemWinnings <#redeemwinnings>`__\ ()
-      -  `getEventHash <#geteventhash>`__\ ()
-      -  `getOutcomeTokens <#getoutcometokens>`__\ ()
-
 Scalar event contract - Scalar events resolve to a number within a range
-------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: ScalarEvent(\ *address* ``_collateralToken``,
@@ -40,8 +42,8 @@ Scalar event contract - Scalar events resolve to a number within a range
    ``_upperBound``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+ScalarEvent Accessors
+---------------------
 
 -  *int256* outcome() ``27793f87``
 -  *uint8* LONG() ``561cce0a``
@@ -54,8 +56,8 @@ Accessors
 -  *address* collateralToken() ``b2016bd4``
 -  *bool* isOutcomeSet() ``ccdf68f3``
 
-Events
-------
+ScalarEvent Events
+------------------
 
 OutcomeTokenCreation(\ *address* ``outcomeToken``, *uint8* ``index``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,8 +89,8 @@ WinningsRedemption(\ *address* indexed ``receiver``, *uint256* ``winnings``)
 **Signature hash**:
 ``2fe921bb50a459800ae7eae7c0124e9e875094a539eb7dc5b3f728017347e0fb``
 
-Functions
----------
+ScalarEvent Functions
+---------------------
 
 setOutcome()
 ~~~~~~~~~~~~

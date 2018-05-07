@@ -1,53 +1,53 @@
+-  `EtherToken <#ethertoken>`__
+
+   -  `Accessors <#ethertoken-accessors>`__
+   -  `Events <#ethertoken-events>`__
+
+      -  `Deposit(\ *address* indexed ``sender``, *uint256*
+         ``value``) <#depositaddress-indexed-sender-uint256-value>`__
+      -  `Withdrawal(\ *address* indexed ``receiver``, *uint256*
+         ``value``) <#withdrawaladdress-indexed-receiver-uint256-value>`__
+      -  `Transfer(\ *address* indexed ``from``, *address* indexed
+         ``to``, *uint256*
+         ``value``) <#transferaddress-indexed-from-address-indexed-to-uint256-value>`__
+      -  `Approval(\ *address* indexed ``owner``, *address* indexed
+         ``spender``, *uint256*
+         ``value``) <#approvaladdress-indexed-owner-address-indexed-spender-uint256-value>`__
+
+   -  `Functions <#ethertoken-functions>`__
+
+      -  `approve(\ *address* ``spender``, *uint256*
+         ``value``) <#approveaddress-spender-uint256-value>`__
+      -  `totalSupply() <#totalsupply>`__
+      -  `transferFrom(\ *address* ``from``, *address* ``to``, *uint256*
+         ``value``) <#transferfromaddress-from-address-to-uint256-value>`__
+      -  `withdraw(\ *uint256* ``value``) <#withdrawuint256-value>`__
+      -  `balanceOf(\ *address* ``owner``) <#balanceofaddress-owner>`__
+      -  `transfer(\ *address* ``to``, *uint256*
+         ``value``) <#transferaddress-to-uint256-value>`__
+      -  `deposit() <#deposit>`__
+      -  `allowance(\ *address* ``owner``, *address*
+         ``spender``) <#allowanceaddress-owner-address-spender>`__
+
 EtherToken
 ==========
 
--  `EtherToken <#ethertoken>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `Deposit <#deposit-address-indexed-sender-uint256-value>`__\ (*address*
-         indexed ``sender``, *uint256* ``value``)
-      -  `Withdrawal <#withdrawal-address-indexed-receiver-uint256-value>`__\ (*address*
-         indexed ``receiver``, *uint256* ``value``)
-      -  `Transfer <#transfer-address-indexed-from-address-indexed-to-uint256-value>`__\ (*address*
-         indexed ``from``, *address* indexed ``to``, *uint256*
-         ``value``)
-      -  `Approval <#approval-address-indexed-owner-address-indexed-spender-uint256-value>`__\ (*address*
-         indexed ``owner``, *address* indexed ``spender``, *uint256*
-         ``value``)
-
-   -  `Functions <#functions>`__
-
-      -  `approve <#approve-address-spender-uint256-value>`__\ (*address*
-         ``spender``, *uint256* ``value``)
-      -  `totalSupply <#totalsupply>`__\ ()
-      -  `transferFrom <#transferfrom-address-from-address-to-uint256-value>`__\ (*address*
-         ``from``, *address* ``to``, *uint256* ``value``)
-      -  `withdraw <#withdraw-uint256-value>`__\ (*uint256* ``value``)
-      -  `balanceOf <#balanceof-address-owner>`__\ (*address* ``owner``)
-      -  `transfer <#transfer-address-to-uint256-value>`__\ (*address*
-         ``to``, *uint256* ``value``)
-      -  `deposit <#deposit>`__\ ()
-      -  `allowance <#allowance-address-owner-address-spender>`__\ (*address*
-         ``owner``, *address* ``spender``)
-
 Token contract - Token exchanging Ether 1:1
--------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: EtherToken()
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+EtherToken Accessors
+--------------------
 
 -  *string* name() ``06fdde03``
 -  *uint8* decimals() ``313ce567``
 -  *string* symbol() ``95d89b41``
 
-Events
-------
+EtherToken Events
+-----------------
 
 Deposit(\ *address* indexed ``sender``, *uint256* ``value``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,8 +73,8 @@ Approval(\ *address* indexed ``owner``, *address* indexed ``spender``, *uint256*
 **Signature hash**:
 ``8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925``
 
-Functions
----------
+EtherToken Functions
+--------------------
 
 approve(\ *address* ``spender``, *uint256* ``value``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,43 +1,43 @@
+-  `CentralizedOracle <#centralizedoracle>`__
+
+   -  `Accessors <#centralizedoracle-accessors>`__
+   -  `Events <#centralizedoracle-events>`__
+
+      -  `OwnerReplacement(\ *address* indexed
+         ``newOwner``) <#ownerreplacementaddress-indexed-newowner>`__
+      -  `OutcomeAssignment(\ *int256*
+         ``outcome``) <#outcomeassignmentint256-outcome>`__
+
+   -  `Functions <#centralizedoracle-functions>`__
+
+      -  `setOutcome(\ *int256*
+         ``_outcome``) <#setoutcomeint256-_outcome>`__
+      -  `getOutcome() <#getoutcome>`__
+      -  `replaceOwner(\ *address*
+         ``newOwner``) <#replaceowneraddress-newowner>`__
+      -  `isOutcomeSet() <#isoutcomeset>`__
+
 CentralizedOracle
 =================
 
--  `CentralizedOracle <#centralizedoracle>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `OwnerReplacement <#ownerreplacement-address-indexed-newowner>`__\ (*address*
-         indexed ``newOwner``)
-      -  `OutcomeAssignment <#outcomeassignment-int256-outcome>`__\ (*int256*
-         ``outcome``)
-
-   -  `Functions <#functions>`__
-
-      -  `setOutcome <#setoutcome-int256-_outcome>`__\ (*int256*
-         ``_outcome``)
-      -  `getOutcome <#getoutcome>`__\ ()
-      -  `replaceOwner <#replaceowner-address-newowner>`__\ (*address*
-         ``newOwner``)
-      -  `isOutcomeSet <#isoutcomeset>`__\ ()
-
 Centralized oracle contract - Allows the contract owner to set an outcome
--------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: CentralizedOracle(\ *address* ``_owner``, *bytes*
    ``_ipfsHash``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+CentralizedOracle Accessors
+---------------------------
 
 -  *int256* outcome() ``27793f87``
 -  *address* owner() ``8da5cb5b``
 -  *bytes* ipfsHash() ``c623674f``
 -  *bool* isSet() ``c65fb380``
 
-Events
-------
+CentralizedOracle Events
+------------------------
 
 OwnerReplacement(\ *address* indexed ``newOwner``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,8 +51,8 @@ OutcomeAssignment(\ *int256* ``outcome``)
 **Signature hash**:
 ``b1aaa9f4484acc283375c8e495a44766e4026170797dc9280b4ae2ab5632fb71``
 
-Functions
----------
+CentralizedOracle Functions
+---------------------------
 
 setOutcome(\ *int256* ``_outcome``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

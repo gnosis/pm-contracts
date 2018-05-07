@@ -1,27 +1,27 @@
+-  `MarketMaker <#marketmaker>`__
+
+   -  `Functions <#marketmaker-functions>`__
+
+      -  `calcProfit(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``) <#calcprofitaddress-market-uint8-outcometokenindex-uint256-outcometokencount>`__
+      -  `calcCost(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``) <#calccostaddress-market-uint8-outcometokenindex-uint256-outcometokencount>`__
+      -  `calcMarginalPrice(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``) <#calcmarginalpriceaddress-market-uint8-outcometokenindex>`__
+
 MarketMaker
 ===========
 
--  `MarketMaker <#marketmaker>`__
-
-   -  `Functions <#functions>`__
-
-      -  `calcProfit <#calcprofit-address-market-uint8-outcometokenindex-uint256-outcometokencount>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``)
-      -  `calcCost <#calccost-address-market-uint8-outcometokenindex-uint256-outcometokencount>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``)
-      -  `calcMarginalPrice <#calcmarginalprice-address-market-uint8-outcometokenindex>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``)
-
 Abstract market maker contract - Functions to be implemented by market maker contracts
---------------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Constructor**: MarketMaker()
 -  This contract does **not** have a fallback function.
 
-Functions
----------
+MarketMaker Functions
+---------------------
 
 calcProfit(\ *address* ``market``, *uint8* ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

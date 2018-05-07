@@ -1,28 +1,28 @@
+-  `LMSRMarketMaker <#lmsrmarketmaker>`__
+
+   -  `Functions <#lmsrmarketmaker-functions>`__
+
+      -  `calcProfit(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``) <#calcprofitaddress-market-uint8-outcometokenindex-uint256-outcometokencount>`__
+      -  `calcCost(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``) <#calccostaddress-market-uint8-outcometokenindex-uint256-outcometokencount>`__
+      -  `calcMarginalPrice(\ *address* ``market``, *uint8*
+         ``outcomeTokenIndex``) <#calcmarginalpriceaddress-market-uint8-outcometokenindex>`__
+
 LMSRMarketMaker
 ===============
 
--  `LMSRMarketMaker <#lmsrmarketmaker>`__
-
-   -  `Functions <#functions>`__
-
-      -  `calcProfit <#calcprofit-address-market-uint8-outcometokenindex-uint256-outcometokencount>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``)
-      -  `calcCost <#calccost-address-market-uint8-outcometokenindex-uint256-outcometokencount>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``)
-      -  `calcMarginalPrice <#calcmarginalprice-address-market-uint8-outcometokenindex>`__\ (*address*
-         ``market``, *uint8* ``outcomeTokenIndex``)
-
 LMSR market maker contract - Calculates share prices based on share distribution and initial funding
-----------------------------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Alan Lu - alan.lu@gnosis.pm
 -  **Constructor**: LMSRMarketMaker()
 -  This contract does **not** have a fallback function.
 
-Functions
----------
+LMSRMarketMaker Functions
+-------------------------
 
 calcProfit(\ *address* ``market``, *uint8* ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

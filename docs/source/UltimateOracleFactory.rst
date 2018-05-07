@@ -1,32 +1,32 @@
+-  `UltimateOracleFactory <#ultimateoraclefactory>`__
+
+   -  `Events <#ultimateoraclefactory-events>`__
+
+      -  `UltimateOracleCreation(\ *address* indexed ``creator``,
+         *address* ``ultimateOracle``, *address* ``oracle``, *address*
+         ``collateralToken``, *uint8* ``spreadMultiplier``, *uint256*
+         ``challengePeriod``, *uint256* ``challengeAmount``, *uint256*
+         ``frontRunnerPeriod``) <#ultimateoraclecreationaddress-indexed-creator-address-ultimateoracle-address-oracle-address-collateraltoken-uint8-spreadmultiplier-uint256-challengeperiod-uint256-challengeamount-uint256-frontrunnerperiod>`__
+
+   -  `Functions <#ultimateoraclefactory-functions>`__
+
+      -  `createUltimateOracle(\ *address* ``oracle``, *address*
+         ``collateralToken``, *uint8* ``spreadMultiplier``, *uint256*
+         ``challengePeriod``, *uint256* ``challengeAmount``, *uint256*
+         ``frontRunnerPeriod``) <#createultimateoracleaddress-oracle-address-collateraltoken-uint8-spreadmultiplier-uint256-challengeperiod-uint256-challengeamount-uint256-frontrunnerperiod>`__
+
 UltimateOracleFactory
 =====================
 
--  `UltimateOracleFactory <#ultimateoraclefactory>`__
-
-   -  `Events <#events>`__
-
-      -  `UltimateOracleCreation <#ultimateoraclecreation-address-indexed-creator-address-ultimateoracle-address-oracle-address-collateraltoken-uint8-spreadmultiplier-uint256-challengeperiod-uint256-challengeamount-uint256-frontrunnerperiod>`__\ (*address*
-         indexed ``creator``, *address* ``ultimateOracle``, *address*
-         ``oracle``, *address* ``collateralToken``, *uint8*
-         ``spreadMultiplier``, *uint256* ``challengePeriod``, *uint256*
-         ``challengeAmount``, *uint256* ``frontRunnerPeriod``)
-
-   -  `Functions <#functions>`__
-
-      -  `createUltimateOracle <#createultimateoracle-address-oracle-address-collateraltoken-uint8-spreadmultiplier-uint256-challengeperiod-uint256-challengeamount-uint256-frontrunnerperiod>`__\ (*address*
-         ``oracle``, *address* ``collateralToken``, *uint8*
-         ``spreadMultiplier``, *uint256* ``challengePeriod``, *uint256*
-         ``challengeAmount``, *uint256* ``frontRunnerPeriod``)
-
 Ultimate oracle factory contract - Allows to create ultimate oracle contracts
------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: UltimateOracleFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+UltimateOracleFactory Events
+----------------------------
 
 UltimateOracleCreation(\ *address* indexed ``creator``, *address* ``ultimateOracle``, *address* ``oracle``, *address* ``collateralToken``, *uint8* ``spreadMultiplier``, *uint256* ``challengePeriod``, *uint256* ``challengeAmount``, *uint256* ``frontRunnerPeriod``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,8 +34,8 @@ UltimateOracleCreation(\ *address* indexed ``creator``, *address* ``ultimateOrac
 **Signature hash**:
 ``e6ae2b8211e9721c5dae1d93f70be0ba07bd111608ba4db4317742e1a87fff40``
 
-Functions
----------
+UltimateOracleFactory Functions
+-------------------------------
 
 createUltimateOracle(\ *address* ``oracle``, *address* ``collateralToken``, *uint8* ``spreadMultiplier``, *uint256* ``challengePeriod``, *uint256* ``challengeAmount``, *uint256* ``frontRunnerPeriod``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,29 +1,29 @@
+-  `SignedMessageOracleFactory <#signedmessageoraclefactory>`__
+
+   -  `Events <#signedmessageoraclefactory-events>`__
+
+      -  `SignedMessageOracleCreation(\ *address* indexed ``creator``,
+         *address* ``signedMessageOracle``, *address*
+         ``oracle``) <#signedmessageoraclecreationaddress-indexed-creator-address-signedmessageoracle-address-oracle>`__
+
+   -  `Functions <#signedmessageoraclefactory-functions>`__
+
+      -  `createSignedMessageOracle(\ *bytes32* ``descriptionHash``,
+         *uint8* ``v``, *bytes32* ``r``, *bytes32*
+         ``s``) <#createsignedmessageoraclebytes32-descriptionhash-uint8-v-bytes32-r-bytes32-s>`__
+
 SignedMessageOracleFactory
 ==========================
 
--  `SignedMessageOracleFactory <#signedmessageoraclefactory>`__
-
-   -  `Events <#events>`__
-
-      -  `SignedMessageOracleCreation <#signedmessageoraclecreation-address-indexed-creator-address-signedmessageoracle-address-oracle>`__\ (*address*
-         indexed ``creator``, *address* ``signedMessageOracle``,
-         *address* ``oracle``)
-
-   -  `Functions <#functions>`__
-
-      -  `createSignedMessageOracle <#createsignedmessageoracle-bytes32-descriptionhash-uint8-v-bytes32-r-bytes32-s>`__\ (*bytes32*
-         ``descriptionHash``, *uint8* ``v``, *bytes32* ``r``, *bytes32*
-         ``s``)
-
 Signed message oracle factory contract - Allows to create signed message oracle contracts
------------------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: SignedMessageOracleFactory()
 -  This contract does **not** have a fallback function.
 
-Events
-------
+SignedMessageOracleFactory Events
+---------------------------------
 
 SignedMessageOracleCreation(\ *address* indexed ``creator``, *address* ``signedMessageOracle``, *address* ``oracle``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -31,8 +31,8 @@ SignedMessageOracleCreation(\ *address* indexed ``creator``, *address* ``signedM
 **Signature hash**:
 ``7be438e4a33b832fcd7adccf30167ee27bd3e693a5ff6daf7fcf98fb2163b7a2``
 
-Functions
----------
+SignedMessageOracleFactory Functions
+------------------------------------
 
 createSignedMessageOracle(\ *bytes32* ``descriptionHash``, *uint8* ``v``, *bytes32* ``r``, *bytes32* ``s``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

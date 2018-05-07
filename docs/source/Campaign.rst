@@ -1,31 +1,31 @@
+-  `Campaign <#campaign>`__
+
+   -  `Accessors <#campaign-accessors>`__
+   -  `Events <#campaign-events>`__
+
+      -  `CampaignFunding(\ *address* indexed ``sender``, *uint256*
+         ``funding``) <#campaignfundingaddress-indexed-sender-uint256-funding>`__
+      -  `CampaignRefund(\ *address* indexed ``sender``, *uint256*
+         ``refund``) <#campaignrefundaddress-indexed-sender-uint256-refund>`__
+      -  `MarketCreation(\ *address* indexed
+         ``market``) <#marketcreationaddress-indexed-market>`__
+      -  `MarketClosing() <#marketclosing>`__
+      -  `FeeWithdrawal(\ *address* indexed ``receiver``, *uint256*
+         ``fees``) <#feewithdrawaladdress-indexed-receiver-uint256-fees>`__
+
+   -  `Functions <#campaign-functions>`__
+
+      -  `withdrawFees() <#withdrawfees>`__
+      -  `refund() <#refund>`__
+      -  `createMarket() <#createmarket>`__
+      -  `closeMarket() <#closemarket>`__
+      -  `fund(\ *uint256* ``amount``) <#funduint256-amount>`__
+
 Campaign
 ========
 
--  `Campaign <#campaign>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `CampaignFunding <#campaignfunding-address-indexed-sender-uint256-funding>`__\ (*address*
-         indexed ``sender``, *uint256* ``funding``)
-      -  `CampaignRefund <#campaignrefund-address-indexed-sender-uint256-refund>`__\ (*address*
-         indexed ``sender``, *uint256* ``refund``)
-      -  `MarketCreation <#marketcreation-address-indexed-market>`__\ (*address*
-         indexed ``market``)
-      -  `MarketClosing <#marketclosing>`__\ ()
-      -  `FeeWithdrawal <#feewithdrawal-address-indexed-receiver-uint256-fees>`__\ (*address*
-         indexed ``receiver``, *uint256* ``fees``)
-
-   -  `Functions <#functions>`__
-
-      -  `withdrawFees <#withdrawfees>`__\ ()
-      -  `refund <#refund>`__\ ()
-      -  `createMarket <#createmarket>`__\ ()
-      -  `closeMarket <#closemarket>`__\ ()
-      -  `fund <#fund-uint256-amount>`__\ (*uint256* ``amount``)
-
 Campaign contract - Allows to crowdfund a market
-------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: Campaign(\ *address* ``_eventContract``, *address*
@@ -33,8 +33,8 @@ Campaign contract - Allows to crowdfund a market
    *uint256* ``_funding``, *uint256* ``_deadline``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+Campaign Accessors
+------------------
 
 -  *address* marketFactory() ``06ae7095``
 -  *address* marketMaker() ``1f21f9af``
@@ -48,8 +48,8 @@ Accessors
 -  *address* eventContract() ``e274fd24``
 -  *uint24* FEE_RANGE() ``fbde47f6``
 
-Events
-------
+Campaign Events
+---------------
 
 CampaignFunding(\ *address* indexed ``sender``, *uint256* ``funding``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,8 +81,8 @@ FeeWithdrawal(\ *address* indexed ``receiver``, *uint256* ``fees``)
 **Signature hash**:
 ``ee33a3a9cb48e4ff209f8b1c67c4632f1dbbf55aeff8e6f17d957ade7a6fb17c``
 
-Functions
----------
+Campaign Functions
+------------------
 
 withdrawFees()
 ~~~~~~~~~~~~~~

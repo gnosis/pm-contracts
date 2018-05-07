@@ -1,27 +1,27 @@
+-  `FutarchyOracle <#futarchyoracle>`__
+
+   -  `Accessors <#futarchyoracle-accessors>`__
+   -  `Events <#futarchyoracle-events>`__
+
+      -  `FutarchyFunding(\ *uint256*
+         ``funding``) <#futarchyfundinguint256-funding>`__
+      -  `FutarchyClosing() <#futarchyclosing>`__
+      -  `OutcomeAssignment(\ *uint256*
+         ``winningMarketIndex``) <#outcomeassignmentuint256-winningmarketindex>`__
+
+   -  `Functions <#futarchyoracle-functions>`__
+
+      -  `setOutcome() <#setoutcome>`__
+      -  `close() <#close>`__
+      -  `getOutcome() <#getoutcome>`__
+      -  `fund(\ *uint256* ``funding``) <#funduint256-funding>`__
+      -  `isOutcomeSet() <#isoutcomeset>`__
+
 FutarchyOracle
 ==============
 
--  `FutarchyOracle <#futarchyoracle>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `FutarchyFunding <#futarchyfunding-uint256-funding>`__\ (*uint256*
-         ``funding``)
-      -  `FutarchyClosing <#futarchyclosing>`__\ ()
-      -  `OutcomeAssignment <#outcomeassignment-uint256-winningmarketindex>`__\ (*uint256*
-         ``winningMarketIndex``)
-
-   -  `Functions <#functions>`__
-
-      -  `setOutcome <#setoutcome>`__\ ()
-      -  `close <#close>`__\ ()
-      -  `getOutcome <#getoutcome>`__\ ()
-      -  `fund <#fund-uint256-funding>`__\ (*uint256* ``funding``)
-      -  `isOutcomeSet <#isoutcomeset>`__\ ()
-
 Futarchy oracle contract - Allows to create an oracle based on market behaviour
--------------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Stefan George - stefan@gnosis.pm
 -  **Constructor**: FutarchyOracle(\ *address* ``_creator``, *address*
@@ -32,8 +32,8 @@ Futarchy oracle contract - Allows to create an oracle based on market behaviour
    *uint256* ``startDate``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+FutarchyOracle Accessors
+------------------------
 
 -  *uint8* LONG() ``561cce0a``
 -  *uint256* winningMarketIndex() ``56cfb75f``
@@ -42,8 +42,8 @@ Accessors
 -  *bool* isSet() ``c65fb380``
 -  *uint256* tradingPeriod() ``f86e3153``
 
-Events
-------
+FutarchyOracle Events
+---------------------
 
 FutarchyFunding(\ *uint256* ``funding``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -63,8 +63,8 @@ OutcomeAssignment(\ *uint256* ``winningMarketIndex``)
 **Signature hash**:
 ``39972cb21edd888c2061a2b4b37874524bbc055cfeaa3054682ba5369f5029aa``
 
-Functions
----------
+FutarchyOracle Functions
+------------------------
 
 setOutcome()
 ~~~~~~~~~~~~

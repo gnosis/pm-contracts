@@ -1,53 +1,54 @@
-StandardMarketWithPriceLogger
-=============================
-
 -  `StandardMarketWithPriceLogger <#standardmarketwithpricelogger>`__
 
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
+   -  `Accessors <#standardmarketwithpricelogger-accessors>`__
+   -  `Events <#standardmarketwithpricelogger-events>`__
 
-      -  `MarketFunding <#marketfunding-uint256-funding>`__\ (*uint256*
-         ``funding``)
-      -  `MarketClosing <#marketclosing>`__\ ()
-      -  `FeeWithdrawal <#feewithdrawal-uint256-fees>`__\ (*uint256*
-         ``fees``)
-      -  `OutcomeTokenPurchase <#outcometokenpurchase-address-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokencost-uint256-marketfees>`__\ (*address*
-         indexed ``buyer``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``outcomeTokenCost``,
-         *uint256* ``marketFees``)
-      -  `OutcomeTokenSale <#outcometokensale-address-indexed-seller-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokenprofit-uint256-marketfees>`__\ (*address*
-         indexed ``seller``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``outcomeTokenProfit``,
-         *uint256* ``marketFees``)
-      -  `OutcomeTokenShortSale <#outcometokenshortsale-address-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-cost>`__\ (*address*
-         indexed ``buyer``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``cost``)
+      -  `MarketFunding(\ *uint256*
+         ``funding``) <#marketfundinguint256-funding>`__
+      -  `MarketClosing() <#marketclosing>`__
+      -  `FeeWithdrawal(\ *uint256*
+         ``fees``) <#feewithdrawaluint256-fees>`__
+      -  `OutcomeTokenPurchase(\ *address* indexed ``buyer``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256* ``outcomeTokenCost``, *uint256*
+         ``marketFees``) <#outcometokenpurchaseaddress-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokencost-uint256-marketfees>`__
+      -  `OutcomeTokenSale(\ *address* indexed ``seller``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256* ``outcomeTokenProfit``, *uint256*
+         ``marketFees``) <#outcometokensaleaddress-indexed-seller-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokenprofit-uint256-marketfees>`__
+      -  `OutcomeTokenShortSale(\ *address* indexed ``buyer``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256*
+         ``cost``) <#outcometokenshortsaleaddress-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-cost>`__
 
-   -  `Functions <#functions>`__
+   -  `Functions <#standardmarketwithpricelogger-functions>`__
 
-      -  `shortSell <#shortsell-uint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``minProfit``)
-      -  `close <#close>`__\ ()
-      -  `sell <#sell-uint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``minProfit``)
-      -  `withdrawFees <#withdrawfees>`__\ ()
-      -  `calcMarketFee <#calcmarketfee-uint256-outcometokencost>`__\ (*uint256*
-         ``outcomeTokenCost``)
-      -  `fund <#fund-uint256-_funding>`__\ (*uint256* ``_funding``)
-      -  `getAvgPrice <#getavgprice>`__\ ()
-      -  `buy <#buy-uint8-outcometokenindex-uint256-outcometokencount-uint256-maxcost>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``maxCost``)
+      -  `shortSell(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``minProfit``) <#shortselluint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__
+      -  `close() <#close>`__
+      -  `sell(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``minProfit``) <#selluint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__
+      -  `withdrawFees() <#withdrawfees>`__
+      -  `calcMarketFee(\ *uint256*
+         ``outcomeTokenCost``) <#calcmarketfeeuint256-outcometokencost>`__
+      -  `fund(\ *uint256* ``_funding``) <#funduint256-_funding>`__
+      -  `getAvgPrice() <#getavgprice>`__
+      -  `buy(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``maxCost``) <#buyuint8-outcometokenindex-uint256-outcometokencount-uint256-maxcost>`__
+
+StandardMarketWithPriceLogger
+=============================
 
 -  **Constructor**: StandardMarketWithPriceLogger(\ *address*
    ``_creator``, *address* ``_eventContract``, *address*
    ``_marketMaker``, *uint24* ``_fee``, *uint256* ``_startDate``)
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+StandardMarketWithPriceLogger Accessors
+---------------------------------------
 
 -  *address* creator() ``02d05d3f``
 -  *uint256* startDate() ``0b97bc86``
@@ -65,8 +66,8 @@ Accessors
 -  *address* eventContract() ``e274fd24``
 -  *uint24* FEE_RANGE() ``fbde47f6``
 
-Events
-------
+StandardMarketWithPriceLogger Events
+------------------------------------
 
 MarketFunding(\ *uint256* ``funding``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,8 +105,8 @@ OutcomeTokenShortSale(\ *address* indexed ``buyer``, *uint8* ``outcomeTokenIndex
 **Signature hash**:
 ``1dbdc4ff4d51949738d56e120b2be4edecc55d8d2150f1616ec5802abaae3f88``
 
-Functions
----------
+StandardMarketWithPriceLogger Functions
+---------------------------------------
 
 shortSell(\ *uint8* ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``, *uint256* ``minProfit``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

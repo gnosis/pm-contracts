@@ -1,57 +1,57 @@
+-  `Math <#math>`__
+
+   -  `Accessors <#math-accessors>`__
+   -  `Functions <#math-functions>`__
+
+      -  `safeToMul(\ *int256* ``a``, *int256*
+         ``b``) <#safetomulint256-a-int256-b>`__
+      -  `ln(\ *uint256* ``x``) <#lnuint256-x>`__
+      -  `floorLog2(\ *uint256* ``x``) <#floorlog2uint256-x>`__
+      -  `safeToAdd(\ *uint256* ``a``, *uint256*
+         ``b``) <#safetoadduint256-a-uint256-b>`__
+      -  `add(\ *uint256* ``a``, *uint256*
+         ``b``) <#adduint256-a-uint256-b>`__
+      -  `safeToSub(\ *int256* ``a``, *int256*
+         ``b``) <#safetosubint256-a-int256-b>`__
+      -  `add(\ *int256* ``a``, *int256*
+         ``b``) <#addint256-a-int256-b>`__
+      -  `sub(\ *int256* ``a``, *int256*
+         ``b``) <#subint256-a-int256-b>`__
+      -  `sub(\ *uint256* ``a``, *uint256*
+         ``b``) <#subuint256-a-uint256-b>`__
+      -  `mul(\ *int256* ``a``, *int256*
+         ``b``) <#mulint256-a-int256-b>`__
+      -  `mul(\ *uint256* ``a``, *uint256*
+         ``b``) <#muluint256-a-uint256-b>`__
+      -  `safeToMul(\ *uint256* ``a``, *uint256*
+         ``b``) <#safetomuluint256-a-uint256-b>`__
+      -  `max(\ *int256[]* ``nums``) <#maxint256-nums>`__
+      -  `safeToAdd(\ *int256* ``a``, *int256*
+         ``b``) <#safetoaddint256-a-int256-b>`__
+      -  `safeToSub(\ *uint256* ``a``, *uint256*
+         ``b``) <#safetosubuint256-a-uint256-b>`__
+      -  `exp(\ *int256* ``x``) <#expint256-x>`__
+
 Math
 ====
 
--  `Math <#math>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Functions <#functions>`__
-
-      -  `safeToMul <#safetomul-int256-a-int256-b>`__\ (*int256* ``a``,
-         *int256* ``b``)
-      -  `ln <#ln-uint256-x>`__\ (*uint256* ``x``)
-      -  `floorLog2 <#floorlog2-uint256-x>`__\ (*uint256* ``x``)
-      -  `safeToAdd <#safetoadd-uint256-a-uint256-b>`__\ (*uint256*
-         ``a``, *uint256* ``b``)
-      -  `add <#add-uint256-a-uint256-b>`__\ (*uint256* ``a``, *uint256*
-         ``b``)
-      -  `safeToSub <#safetosub-int256-a-int256-b>`__\ (*int256* ``a``,
-         *int256* ``b``)
-      -  `add <#add-int256-a-int256-b>`__\ (*int256* ``a``, *int256*
-         ``b``)
-      -  `sub <#sub-int256-a-int256-b>`__\ (*int256* ``a``, *int256*
-         ``b``)
-      -  `sub <#sub-uint256-a-uint256-b>`__\ (*uint256* ``a``, *uint256*
-         ``b``)
-      -  `mul <#mul-int256-a-int256-b>`__\ (*int256* ``a``, *int256*
-         ``b``)
-      -  `mul <#mul-uint256-a-uint256-b>`__\ (*uint256* ``a``, *uint256*
-         ``b``)
-      -  `safeToMul <#safetomul-uint256-a-uint256-b>`__\ (*uint256*
-         ``a``, *uint256* ``b``)
-      -  `max <#max-int256-nums>`__\ (*int256[]* ``nums``)
-      -  `safeToAdd <#safetoadd-int256-a-int256-b>`__\ (*int256* ``a``,
-         *int256* ``b``)
-      -  `safeToSub <#safetosub-uint256-a-uint256-b>`__\ (*uint256*
-         ``a``, *uint256* ``b``)
-      -  `exp <#exp-int256-x>`__\ (*int256* ``x``)
-
 Math library - Allows calculation of logarithmic and exponential functions
---------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Author**: Alan Lu - alan.lu@gnosis.pm\ Stefan George -
    stefan@gnosis.pm
 -  **Constructor**: Math()
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+Math Accessors
+--------------
 
 -  *uint256* LN2() ``02780677``
 -  *uint256* LOG2_E() ``24902e24``
 -  *uint256* ONE() ``c2ee3a08``
 
-Functions
----------
+Math Functions
+--------------
 
 safeToMul(\ *int256* ``a``, *int256* ``b``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

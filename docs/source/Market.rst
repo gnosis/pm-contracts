@@ -1,53 +1,54 @@
+-  `Market <#market>`__
+
+   -  `Accessors <#market-accessors>`__
+   -  `Events <#market-events>`__
+
+      -  `MarketFunding(\ *uint256*
+         ``funding``) <#marketfundinguint256-funding>`__
+      -  `MarketClosing() <#marketclosing>`__
+      -  `FeeWithdrawal(\ *uint256*
+         ``fees``) <#feewithdrawaluint256-fees>`__
+      -  `OutcomeTokenPurchase(\ *address* indexed ``buyer``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256* ``outcomeTokenCost``, *uint256*
+         ``marketFees``) <#outcometokenpurchaseaddress-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokencost-uint256-marketfees>`__
+      -  `OutcomeTokenSale(\ *address* indexed ``seller``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256* ``outcomeTokenProfit``, *uint256*
+         ``marketFees``) <#outcometokensaleaddress-indexed-seller-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokenprofit-uint256-marketfees>`__
+      -  `OutcomeTokenShortSale(\ *address* indexed ``buyer``, *uint8*
+         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
+         *uint256*
+         ``cost``) <#outcometokenshortsaleaddress-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-cost>`__
+
+   -  `Functions <#market-functions>`__
+
+      -  `shortSell(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``minProfit``) <#shortselluint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__
+      -  `close() <#close>`__
+      -  `sell(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``minProfit``) <#selluint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__
+      -  `withdrawFees() <#withdrawfees>`__
+      -  `calcMarketFee(\ *uint256*
+         ``outcomeTokenCost``) <#calcmarketfeeuint256-outcometokencost>`__
+      -  `fund(\ *uint256* ``_funding``) <#funduint256-_funding>`__
+      -  `buy(\ *uint8* ``outcomeTokenIndex``, *uint256*
+         ``outcomeTokenCount``, *uint256*
+         ``maxCost``) <#buyuint8-outcometokenindex-uint256-outcometokencount-uint256-maxcost>`__
+
 Market
 ======
 
--  `Market <#market>`__
-
-   -  `Accessors <#accessors>`__
-   -  `Events <#events>`__
-
-      -  `MarketFunding <#marketfunding-uint256-funding>`__\ (*uint256*
-         ``funding``)
-      -  `MarketClosing <#marketclosing>`__\ ()
-      -  `FeeWithdrawal <#feewithdrawal-uint256-fees>`__\ (*uint256*
-         ``fees``)
-      -  `OutcomeTokenPurchase <#outcometokenpurchase-address-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokencost-uint256-marketfees>`__\ (*address*
-         indexed ``buyer``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``outcomeTokenCost``,
-         *uint256* ``marketFees``)
-      -  `OutcomeTokenSale <#outcometokensale-address-indexed-seller-uint8-outcometokenindex-uint256-outcometokencount-uint256-outcometokenprofit-uint256-marketfees>`__\ (*address*
-         indexed ``seller``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``outcomeTokenProfit``,
-         *uint256* ``marketFees``)
-      -  `OutcomeTokenShortSale <#outcometokenshortsale-address-indexed-buyer-uint8-outcometokenindex-uint256-outcometokencount-uint256-cost>`__\ (*address*
-         indexed ``buyer``, *uint8* ``outcomeTokenIndex``, *uint256*
-         ``outcomeTokenCount``, *uint256* ``cost``)
-
-   -  `Functions <#functions>`__
-
-      -  `shortSell <#shortsell-uint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``minProfit``)
-      -  `close <#close>`__\ ()
-      -  `sell <#sell-uint8-outcometokenindex-uint256-outcometokencount-uint256-minprofit>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``minProfit``)
-      -  `withdrawFees <#withdrawfees>`__\ ()
-      -  `calcMarketFee <#calcmarketfee-uint256-outcometokencost>`__\ (*uint256*
-         ``outcomeTokenCost``)
-      -  `fund <#fund-uint256-_funding>`__\ (*uint256* ``_funding``)
-      -  `buy <#buy-uint8-outcometokenindex-uint256-outcometokencount-uint256-maxcost>`__\ (*uint8*
-         ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``,
-         *uint256* ``maxCost``)
-
 Abstract market contract - Functions to be implemented by market contracts
---------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  **Constructor**: Market()
 -  This contract does **not** have a fallback function.
 
-Accessors
----------
+Market Accessors
+----------------
 
 -  *address* creator() ``02d05d3f``
 -  *address* marketMaker() ``1f21f9af``
@@ -58,8 +59,8 @@ Accessors
 -  *uint24* fee() ``ddca3f43``
 -  *address* eventContract() ``e274fd24``
 
-Events
-------
+Market Events
+-------------
 
 MarketFunding(\ *uint256* ``funding``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -97,8 +98,8 @@ OutcomeTokenShortSale(\ *address* indexed ``buyer``, *uint8* ``outcomeTokenIndex
 **Signature hash**:
 ``1dbdc4ff4d51949738d56e120b2be4edecc55d8d2150f1616ec5802abaae3f88``
 
-Functions
----------
+Market Functions
+----------------
 
 shortSell(\ *uint8* ``outcomeTokenIndex``, *uint256* ``outcomeTokenCount``, *uint256* ``minProfit``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
