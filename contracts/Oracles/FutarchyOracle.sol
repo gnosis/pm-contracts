@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
-import "../Utils/Proxy.sol";
 
 
 contract FutarchyOracleData {

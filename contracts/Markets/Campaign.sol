@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Math.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
-import "../Utils/Math.sol";
-import "../Utils/Proxy.sol";
 
 contract CampaignData {
 

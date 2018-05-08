@@ -1,6 +1,6 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Oracles/Oracle.sol";
-import "../Utils/Proxy.sol";
 
 
 contract CentralizedOracleData {

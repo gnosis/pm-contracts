@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
-import "../Utils/Proxy.sol";
 
 
 contract MarketData {

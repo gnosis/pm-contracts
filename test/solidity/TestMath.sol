@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
-import "../../contracts/Utils/Math.sol";
+import "@gnosis.pm/util-contracts/contracts/Math.sol";
 
 contract TestMath {
     function testMathOverloaded() public {
