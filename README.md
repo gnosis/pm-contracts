@@ -1,13 +1,13 @@
-Gnosis Smart Contracts
-======================
+Gnosis Prediction Market Contracts
+==================================
 
-[![Logo](https://raw.githubusercontent.com/gnosis/gnosis-contracts/master/assets/logo.png)](https://gnosis.pm/)
+[![Logo](https://raw.githubusercontent.com/gnosis/pm-contracts/master/assets/logo.png)](https://gnosis.pm/)
 
-[![Build Status](https://travis-ci.org/gnosis/gnosis-contracts.svg?branch=master)](https://travis-ci.org/gnosis/gnosis-contracts)
+[![Build Status](https://travis-ci.org/gnosis/pm-contracts.svg?branch=master)](https://travis-ci.org/gnosis/pm-contracts)
 
-[![Codecov badge](https://codecov.io/gh/gnosis/gnosis-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/gnosis-contracts/)
+[![Codecov badge](https://codecov.io/gh/gnosis/pm-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/pm-contracts/)
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/gnosis-contracts.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/pm-contracts.svg)](https://greenkeeper.io/)
 
 [![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
 
@@ -103,9 +103,9 @@ npm run measuregasstats
 Documentation
 -------------
 
-There is a copy version hosted online at https://gnosis.github.io/gnosis-contracts/
+There is a copy version hosted online at https://gnosis-pm-contracts.readthedocs.io
 
-### Build docs with doxity
+### Build docs
 
 ```bash
 scripts/makedocs.sh
