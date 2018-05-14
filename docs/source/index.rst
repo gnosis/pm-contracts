@@ -1,7 +1,7 @@
 Gnosis Contracts Documentation
 ============================================
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
-To interact with those contracts have a look at (https://github.com/gnosis/gnosis.js/).
+To interact with those contracts have a look at (https://github.com/gnosis/pm-js).
 
 Install
 -------
