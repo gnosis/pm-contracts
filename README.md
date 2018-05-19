@@ -105,10 +105,14 @@ Documentation
 
 There is a copy version hosted online at https://gnosis-pm-contracts.readthedocs.io
 
-### Build docs
+### Locally build docs for readthedocs
+
+Will install [Sphinx](http://www.sphinx-doc.org/en/stable/) and [Solidity Domain for Sphinx](https://github.com/cag/sphinxcontrib-soliditydomain/):
 
 ```bash
-scripts/makedocs.sh
+cd docs
+pip install -r requirements.txt
+make html
 ```
 
 Security and Liability
