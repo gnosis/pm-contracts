@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
@@ -33,7 +33,7 @@ contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
 
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
-    function CentralizedOracleProxy(address proxied, address _owner, bytes _ipfsHash)
+    constructor(address proxied, address _owner, bytes _ipfsHash)
         public
         Proxy(proxied)
     {
@@ -60,7 +60,7 @@ contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
         // Result is not set yet
         require(!isSet);
         owner = newOwner;
-        OwnerReplacement(newOwner);
+        emit OwnerReplacement(newOwner);
     }
 
     /// @dev Sets event outcome
@@ -73,7 +73,7 @@ contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
         require(!isSet);
         isSet = true;
         outcome = _outcome;
-        OutcomeAssignment(_outcome);
+        emit OutcomeAssignment(_outcome);
     }
 
     /// @dev Returns if winning outcome is set

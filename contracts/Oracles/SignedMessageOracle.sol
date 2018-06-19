@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
@@ -37,7 +37,7 @@ contract SignedMessageOracleProxy is Proxy, SignedMessageOracleData {
     /// @param v Signature parameter
     /// @param r Signature parameter
     /// @param s Signature parameter
-    function SignedMessageOracleProxy(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
+    constructor(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
         Proxy(proxied)
         public
     {
@@ -69,7 +69,7 @@ contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
                 && signer == ecrecover(keccak256(descriptionHash, newSigner, _nonce), v, r, s));
         nonce = _nonce;
         signer = newSigner;
-        SignerReplacement(newSigner);
+        emit SignerReplacement(newSigner);
     }
 
     /// @dev Sets outcome based on signed message
@@ -85,7 +85,7 @@ contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
                 && signer == ecrecover(keccak256(descriptionHash, _outcome), v, r, s));
         isSet = true;
         outcome = _outcome;
-        OutcomeAssignment(_outcome);
+        emit OutcomeAssignment(_outcome);
     }
 
     /// @dev Returns if winning outcome

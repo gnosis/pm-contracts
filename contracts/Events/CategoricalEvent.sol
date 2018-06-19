@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Events/Event.sol";
 import "../Utils/Proxy.sol";
 
@@ -9,7 +9,7 @@ contract CategoricalEventProxy is Proxy, EventData {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function CategoricalEventProxy(address proxied, address outcomeTokenMasterCopy, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+    constructor(address proxied, address outcomeTokenMasterCopy, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
         Proxy(proxied)
         public
     {
@@ -21,7 +21,7 @@ contract CategoricalEventProxy is Proxy, EventData {
         for (uint8 i = 0; i < outcomeCount; i++) {
             OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
             outcomeTokens.push(outcomeToken);
-            OutcomeTokenCreation(outcomeToken, i);
+            emit OutcomeTokenCreation(outcomeToken, i);
         }
     }
 }
@@ -47,7 +47,7 @@ contract CategoricalEvent is Proxied, Event {
         outcomeTokens[uint(outcome)].revoke(msg.sender, winnings);
         // Payout winnings
         require(collateralToken.transfer(msg.sender, winnings));
-        WinningsRedemption(msg.sender, winnings);
+        emit WinningsRedemption(msg.sender, winnings);
     }
 
     /// @dev Calculates and returns event hash
@@ -57,6 +57,6 @@ contract CategoricalEvent is Proxied, Event {
         view
         returns (bytes32)
     {
-        return keccak256(collateralToken, oracle, outcomeTokens.length);
+        return keccak256(abi.encodePacked(collateralToken, oracle, outcomeTokens.length));
     }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Tokens/StandardToken.sol";
 
 
@@ -28,7 +28,7 @@ contract OutcomeTokenData {
 contract OutcomeTokenProxy is Proxy, StandardTokenData, OutcomeTokenData {
 
     /// @dev Constructor sets events contract address
-    function OutcomeTokenProxy(address proxied)
+    constructor(address proxied)
         Proxy(proxied)
         public
     {
@@ -54,7 +54,7 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
         totalTokens = totalTokens.add(outcomeTokenCount);
-        Issuance(_for, outcomeTokenCount);
+        emit Issuance(_for, outcomeTokenCount);
     }
 
     /// @dev Events contract revokes tokens for address. Returns success
@@ -66,6 +66,6 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
         totalTokens = totalTokens.sub(outcomeTokenCount);
-        Revocation(_for, outcomeTokenCount);
+        emit Revocation(_for, outcomeTokenCount);
     }
 }
