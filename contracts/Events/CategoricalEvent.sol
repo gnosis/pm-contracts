@@ -57,6 +57,6 @@ contract CategoricalEvent is Proxied, Event {
         view
         returns (bytes32)
     {
-        return keccak256(collateralToken, oracle, outcomeTokens.length);
+        return keccak256(abi.encodePacked(collateralToken, oracle, outcomeTokens.length));
     }
 }

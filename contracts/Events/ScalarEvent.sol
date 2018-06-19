@@ -102,6 +102,6 @@ contract ScalarEvent is Proxied, Event, ScalarEventData {
         view
         returns (bytes32)
     {
-        return keccak256(collateralToken, oracle, lowerBound, upperBound);
+        return keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
     }
 }
