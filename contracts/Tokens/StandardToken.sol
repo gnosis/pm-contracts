@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Tokens/Token.sol";
 import "../Utils/Math.sol";
 import "../Utils/Proxy.sol";
@@ -34,7 +34,7 @@ contract StandardToken is Token, StandardTokenData {
             return false;
         balances[msg.sender] -= value;
         balances[to] += value;
-        Transfer(msg.sender, to, value);
+        emit Transfer(msg.sender, to, value);
         return true;
     }
 
@@ -54,7 +54,7 @@ contract StandardToken is Token, StandardTokenData {
         balances[from] -= value;
         allowances[from][msg.sender] -= value;
         balances[to] += value;
-        Transfer(from, to, value);
+        emit Transfer(from, to, value);
         return true;
     }
 
@@ -67,7 +67,7 @@ contract StandardToken is Token, StandardTokenData {
         returns (bool)
     {
         allowances[msg.sender][spender] = value;
-        Approval(msg.sender, spender, value);
+        emit Approval(msg.sender, spender, value);
         return true;
     }
 

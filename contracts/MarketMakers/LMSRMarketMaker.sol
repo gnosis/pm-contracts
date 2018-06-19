@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Utils/Math.sol";
 import "../MarketMakers/MarketMaker.sol";
 
@@ -70,7 +70,9 @@ contract LMSRMarketMaker is MarketMaker {
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        var (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
+        uint sum;
+        uint outcomeExpTerm;
+        (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex);
         return outcomeExpTerm / (sum / ONE);
     }
 
@@ -91,7 +93,9 @@ contract LMSRMarketMaker is MarketMaker {
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)).
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
-        var (sum, offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0);
+        uint sum;
+        int offset;
+        (sum, offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0);
         costLevel = Math.ln(sum);
         costLevel = costLevel.add(offset);
         costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));

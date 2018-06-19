@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
@@ -54,7 +54,7 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
     /// @param fee Market fee
     /// @param _tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
-    function FutarchyOracleProxy(
+    constructor(
         address proxied,
         address _creator,
         EventFactory eventFactory,
@@ -116,7 +116,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
             require(market.eventContract().collateralToken().approve(market, funding));
             market.fund(funding);
         }
-        FutarchyFunding(funding);
+        emit FutarchyFunding(funding);
     }
 
     /// @dev Closes market for winning outcome and redeems winnings and sends all collateral tokens to creator
@@ -134,7 +134,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
         require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
-        FutarchyClosing();
+        emit FutarchyClosing();
     }
 
     /// @dev Allows to set the oracle outcome based on the market with largest long position
@@ -155,7 +155,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
         }
         winningMarketIndex = highestIndex;
         isSet = true;
-        OutcomeAssignment(winningMarketIndex);
+        emit OutcomeAssignment(winningMarketIndex);
     }
 
     /// @dev Returns if winning outcome is set

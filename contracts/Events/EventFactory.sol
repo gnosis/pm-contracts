@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.24;
 import "../Events/CategoricalEvent.sol";
 import "../Events/ScalarEvent.sol";
 
@@ -25,7 +25,7 @@ contract EventFactory {
     /*
      *  Public functions
      */
-    function EventFactory(
+    constructor(
         CategoricalEvent _categoricalEventMasterCopy,
         ScalarEvent _scalarEventMasterCopy,
         OutcomeToken _outcomeTokenMasterCopy
@@ -62,7 +62,7 @@ contract EventFactory {
             outcomeCount
         ));
         categoricalEvents[eventHash] = eventContract;
-        CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
+        emit CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
     }
 
     /// @dev Creates a new scalar event and adds it to the event mapping
@@ -93,6 +93,6 @@ contract EventFactory {
             upperBound
         ));
         scalarEvents[eventHash] = eventContract;
-        ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
+        emit ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
     }
 }
