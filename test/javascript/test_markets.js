@@ -1,7 +1,7 @@
 const { wait } = require('@digix/tempo')(web3)
 
 const utils = require('./utils')
-const { getParamFromTxEvent, assertRejects } = utils
+const { getParamFromTxEvent, assertRejects, Decimal, randrange } = utils
 
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')
@@ -25,6 +25,7 @@ contract('StandardMarket', function (accounts) {
     let lmsrMarketMaker
     let campaignFactory
     let ipfsHash, centralizedOracle, event
+    const numOutcomes = 3
 
     before(utils.createGasStatCollectorBeforeHook(contracts))
     after(utils.createGasStatCollectorAfterHook(contracts))
@@ -44,7 +45,7 @@ contract('StandardMarket', function (accounts) {
             'centralizedOracle', CentralizedOracle
         )
         event = getParamFromTxEvent(
-            await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle.address, 2),
+            await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle.address, numOutcomes),
             'categoricalEvent', CategoricalEvent
         )
     })
@@ -310,5 +311,65 @@ contract('StandardMarket', function (accounts) {
             getParamFromTxEvent(
                 await campaign.refund({ from: accounts[backer1] }), 'refund'),
             0)
+    })
+
+    it('trading stress testing', async () => {
+        const MAX_VALUE = Decimal(2).pow(256).sub(1)
+
+        const trader = 9
+        const feeFactor = 0
+
+        const market = getParamFromTxEvent(
+            await standardMarketFactory.createMarket(event.address, lmsrMarketMaker.address, feeFactor, { from: accounts[trader] }),
+            'market', StandardMarket
+        )
+
+        // Get ready for trading
+        await etherToken.deposit({ value: 1e19, from: accounts[trader] })
+        await etherToken.approve(event.address, 1e17, { from: accounts[trader] })
+        await event.buyAllOutcomes(1e17, { from: accounts[trader] })
+
+        // Allow all trading
+        const outcomeTokens = (await Promise.all(
+            _.range(numOutcomes).map(i => event.outcomeTokens.call(i))
+        )).map(OutcomeToken.at)
+
+        await etherToken.approve(market.address, MAX_VALUE.valueOf(), { from: accounts[trader] })
+        await Promise.all(outcomeTokens.map(outcomeToken =>
+            outcomeToken.approve(market.address, MAX_VALUE.valueOf(), { from: accounts[trader] })))
+
+        // Fund market
+        const funding = 1e17
+        await market.fund(funding, { from: accounts[trader] })
+
+        for(let i = 0; i < 100; i++) {
+            const outcome = Math.floor(numOutcomes * Math.random())
+            const tokenCount = randrange(0, 1e17).valueOf()
+            const [method, forWhat] = Math.random() < 0.5 ? ['buy', 'Cost'] : ['sell', 'Profit']
+            const limit = await lmsrMarketMaker['calc' + forWhat]
+                .call(market.address, outcome, tokenCount)
+
+            let txResult;
+            try {
+                txResult = await market[method](outcome, tokenCount, limit, { from: accounts[trader] })
+            } catch(e) {
+                throw new Error(`trade ${ i } (a ${
+                    method
+                } of ${
+                    tokenCount
+                } of outcome ${
+                    outcome
+                } with limit ${
+                    limit
+                }) failed: ${
+                    e.message
+                }`)
+            }
+
+            if(txResult)
+                assert.equal(
+                    getParamFromTxEvent(txResult, 'outcomeToken' + forWhat).valueOf(),
+                    limit.valueOf())
+        }
     })
 })
