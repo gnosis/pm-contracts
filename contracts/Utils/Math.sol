@@ -30,76 +30,109 @@ library Math {
         require(x <= 2454971259878909886679);
         // return 0 if exp(x) is tiny, using
         // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE) * ONE))
-        if (x < -818323753292969962227)
+        if (x <= -818323753292969962227)
             return 0;
+
         // Transform so that e^x -> 2^x
-        x = x * int(ONE) / int(LN2);
-        // 2^x = 2^whole(x) * 2^frac(x)
-        //       ^^^^^^^^^^ is a bit shift
-        // so Taylor expand on z = frac(x)
+        var (lower, upper) = pow2Bounds(x * int(ONE) / int(LN2));
+        return (upper - lower) / 2 + lower;
+    }
+
+    /// @dev Returns bounds for value of 2**x given x
+    /// @param x exponent in fixed point
+    /// @return {
+    ///   "lower": "lower bound of 2**x in fixed point",
+    ///   "upper": "upper bound of 2**x in fixed point"
+    /// }
+    function pow2Bounds(int x)
+        public
+        constant
+        returns (uint lower, uint upper)
+    {
+        // revert if x is > MAX_POWER, where
+        // MAX_POWER = int(mp.floor(mp.log(mpf(2**256 - 1) / ONE, 2) * ONE))
+        require(x <= 3541774862152233910271);
+        // return 0 if exp(x) is tiny, using
+        // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE, 2) * ONE))
+        if (x < -1180591620717411303424)
+            return (0, 0);
+
+        // 2^x = 2^(whole(x)+1) * 2^(frac(x)-1)
+        //       ^^^^^^^^^^^^^^ is a bit shift
+        // so Taylor expand on z = frac(x)-1, -1 <= z < 0
         int shift;
-        uint z;
-        if (x >= 0) {
+        int z;
+        if (x <= 0) {
             shift = x / int(ONE);
-            z = uint(x % int(ONE));
+            z = x % int(ONE);
         }
         else {
-            shift = x / int(ONE) - 1;
-            z = ONE - uint(-x % int(ONE));
+            shift = x / int(ONE) + 1;
+            z = x % int(ONE) - 1;
         }
         // 2^x = 1 + (ln 2) x + (ln 2)^2/2! x^2 + ...
         //
         // Can generate the z coefficients using mpmath and the following lines
         // >>> from mpmath import mp
         // >>> mp.dps = 100
-        // >>> ONE =  0x10000000000000000
-        // >>> print('\n'.join(hex(int(mp.log(2)**i / mp.factorial(i) * ONE)) for i in range(1, 7)))
-        // 0xb17217f7d1cf79ab
-        // 0x3d7f7bff058b1d50
-        // 0xe35846b82505fc5
-        // 0x276556df749cee5
-        // 0x5761ff9e299cc4
-        // 0xa184897c363c3
-        uint zpow = z;
-        uint result = ONE;
-        result += 0xb17217f7d1cf79ab * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x3d7f7bff058b1d50 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0xe35846b82505fc5 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x276556df749cee5 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x5761ff9e299cc4 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0xa184897c363c3 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0xffe5fe2c4586 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x162c0223a5c8 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x1b5253d395e * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x1e4cf5158b * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x1e8cac735 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x1c3bd650 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x1816193 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x131496 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0xe1b7 * zpow / ONE;
-        zpow = zpow * z / ONE;
-        result += 0x9c7 * zpow / ONE;
+        // >>> coeffs = [mp.log(2)**i / mp.factorial(i) for i in range(1, 21)]
+        // >>> shifts = [64 - int(mp.log(c, 2)) for c in coeffs]
+        // >>> print('\n'.join(hex(int(c * (1 << s))) + ', ' + str(s) for c, s in zip(coeffs, shifts)))
+        int result = int(ONE);
+        int zpow = z;
+        result += 0xb17217f7d1cf79ab * zpow >> 64;
+        zpow = zpow * z / int(ONE);
+        result += 0xf5fdeffc162c7543 * zpow >> 66;
+        zpow = zpow * z / int(ONE);
+        result += 0xe35846b82505fc59 * zpow >> 68;
+        zpow = zpow * z / int(ONE);
+        result += 0x9d955b7dd273b94e * zpow >> 70;
+        zpow = zpow * z / int(ONE);
+        result += 0xaec3ff3c53398883 * zpow >> 73;
+        zpow = zpow * z / int(ONE);
+        result += 0xa184897c363c3b7a * zpow >> 76;
+        zpow = zpow * z / int(ONE);
+        result += 0xffe5fe2c45863435 * zpow >> 80;
+        zpow = zpow * z / int(ONE);
+        result += 0xb160111d2e411fec * zpow >> 83;
+        zpow = zpow * z / int(ONE);
+        result += 0xda929e9caf3e1ed2 * zpow >> 87;
+        zpow = zpow * z / int(ONE);
+        result += 0xf267a8ac5c764fb7 * zpow >> 91;
+        zpow = zpow * z / int(ONE);
+        result += 0xf465639a8dd92607 * zpow >> 95;
+        zpow = zpow * z / int(ONE);
+        result += 0xe1deb287e14c2f15 * zpow >> 99;
+        zpow = zpow * z / int(ONE);
+        result += 0xc0b0c98b3687cb14 * zpow >> 103;
+        zpow = zpow * z / int(ONE);
+        result += 0x98a4b26ac3c54b9f * zpow >> 107;
+        zpow = zpow * z / int(ONE);
+        result += 0xe1b7421d82010f33 * zpow >> 112;
+        zpow = zpow * z / int(ONE);
+        result += 0x9c744d73cfc59c91 * zpow >> 116;
+        zpow = zpow * z / int(ONE);
+        result += 0xcc2225a0e12d3eab * zpow >> 121;
+        zpow = zpow * z / int(ONE);
+        zpow = 0xfb8bb5eda1b4aeb9 * zpow >> 126 + 1;
+        assert(zpow >= 0);
         if (shift >= 0) {
-            if (result >> (256-shift) > 0)
-                return (2**256-1);
-            return result << shift;
+            if (result >> (256-shift) == 0) {
+                lower = uint(result) << shift;
+                zpow <<= shift; // todo: is this safe?
+                if (safeToAdd(lower, uint(zpow)))
+                    upper = lower + uint(zpow);
+                else
+                    upper = 2**256-1;
+                return;
+            }
+            else
+                return (2**256-1, 2**256-1);
         }
-        else
-            return result >> (-shift);
+        zpow = zpow >> (-shift) + 1;
+        lower = uint(result) >> (-shift);
+        upper = lower + uint(zpow);
+        return;
     }
 
     /// @dev Returns natural logarithm value of given x
