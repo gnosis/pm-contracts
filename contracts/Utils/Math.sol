@@ -55,21 +55,22 @@ library Math {
         // return 0 if exp(x) is tiny, using
         // MIN_POWER = int(mp.floor(mp.log(mpf(1) / ONE, 2) * ONE))
         if (x < -1180591620717411303424)
-            return (0, 0);
+            return (0, 1);
 
-        // 2^x = 2^(whole(x)+1) * 2^(frac(x)-1)
-        //       ^^^^^^^^^^^^^^ is a bit shift
-        // so Taylor expand on z = frac(x)-1, -1 <= z < 0
+        // 2^x = 2^(floor(x)) * 2^(x-floor(x))
+        //       ^^^^^^^^^^^^^^ is a bit shift of ceil(x)
+        // so Taylor expand on z = x-floor(x), z in [0, 1)
         int shift;
         int z;
-        if (x <= 0) {
+        if (x >= 0) {
             shift = x / int(ONE);
             z = x % int(ONE);
         }
         else {
-            shift = x / int(ONE) + 1;
-            z = x % int(ONE) - 1;
+            shift = (x+1) / int(ONE) - 1;
+            z = x - (int(ONE) * shift);
         }
+        assert(z >= 0);
         // 2^x = 1 + (ln 2) x + (ln 2)^2/2! x^2 + ...
         //
         // Can generate the z coefficients using mpmath and the following lines
@@ -78,44 +79,47 @@ library Math {
         // >>> coeffs = [mp.log(2)**i / mp.factorial(i) for i in range(1, 21)]
         // >>> shifts = [64 - int(mp.log(c, 2)) for c in coeffs]
         // >>> print('\n'.join(hex(int(c * (1 << s))) + ', ' + str(s) for c, s in zip(coeffs, shifts)))
-        int result = int(ONE);
+        int result = int(ONE) << 64;
         int zpow = z;
-        result += 0xb17217f7d1cf79ab * zpow >> 64;
+        result += 0xb17217f7d1cf79ab * zpow;
         zpow = zpow * z / int(ONE);
-        result += 0xf5fdeffc162c7543 * zpow >> 66;
+        result += 0xf5fdeffc162c7543 * zpow >> (66 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xe35846b82505fc59 * zpow >> 68;
+        result += 0xe35846b82505fc59 * zpow >> (68 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0x9d955b7dd273b94e * zpow >> 70;
+        result += 0x9d955b7dd273b94e * zpow >> (70 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xaec3ff3c53398883 * zpow >> 73;
+        result += 0xaec3ff3c53398883 * zpow >> (73 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xa184897c363c3b7a * zpow >> 76;
+        result += 0xa184897c363c3b7a * zpow >> (76 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xffe5fe2c45863435 * zpow >> 80;
+        result += 0xffe5fe2c45863435 * zpow >> (80 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xb160111d2e411fec * zpow >> 83;
+        result += 0xb160111d2e411fec * zpow >> (83 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xda929e9caf3e1ed2 * zpow >> 87;
+        result += 0xda929e9caf3e1ed2 * zpow >> (87 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xf267a8ac5c764fb7 * zpow >> 91;
+        result += 0xf267a8ac5c764fb7 * zpow >> (91 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xf465639a8dd92607 * zpow >> 95;
+        result += 0xf465639a8dd92607 * zpow >> (95 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xe1deb287e14c2f15 * zpow >> 99;
+        result += 0xe1deb287e14c2f15 * zpow >> (99 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xc0b0c98b3687cb14 * zpow >> 103;
+        result += 0xc0b0c98b3687cb14 * zpow >> (103 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0x98a4b26ac3c54b9f * zpow >> 107;
+        result += 0x98a4b26ac3c54b9f * zpow >> (107 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xe1b7421d82010f33 * zpow >> 112;
+        result += 0xe1b7421d82010f33 * zpow >> (112 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0x9c744d73cfc59c91 * zpow >> 116;
+        result += 0x9c744d73cfc59c91 * zpow >> (116 - 64);
         zpow = zpow * z / int(ONE);
-        result += 0xcc2225a0e12d3eab * zpow >> 121;
+        result += 0xcc2225a0e12d3eab * zpow >> (121 - 64);
         zpow = zpow * z / int(ONE);
-        zpow = 0xfb8bb5eda1b4aeb9 * zpow >> 126 + 1;
-        assert(zpow >= 0);
+        zpow = 0xfb8bb5eda1b4aeb9 * zpow >> (126 - 64);
+        result += zpow;
+        zpow = int(8 * ONE);
+
+        shift -= 64;
         if (shift >= 0) {
             if (result >> (256-shift) == 0) {
                 lower = uint(result) << shift;
@@ -129,7 +133,7 @@ library Math {
             else
                 return (2**256-1, 2**256-1);
         }
-        zpow = zpow >> (-shift) + 1;
+        zpow = (zpow >> (-shift)) + 1;
         lower = uint(result) >> (-shift);
         upper = lower + uint(zpow);
         return;
@@ -143,46 +147,48 @@ library Math {
         constant
         returns (int)
     {
+        var (lower, upper) = log2Bounds(x);
+        return ((upper - lower) / 2 + lower) * int(ONE) / int(LOG2_E);
+    }
+
+    /// @dev Returns bounds for value of log2(x) given x
+    /// @param x logarithm argument in fixed point
+    /// @return {
+    ///   "lower": "lower bound of log2(x) in fixed point",
+    ///   "upper": "upper bound of log2(x) in fixed point"
+    /// }
+    function log2Bounds(uint x)
+        public
+        constant
+        returns (int lower, int upper)
+    {
         require(x > 0);
-        // binary search for floor(log2(x))
-        int ilog2 = floorLog2(x);
-        int z;
-        if (ilog2 < 0)
-            z = int(x << uint(-ilog2));
+        // compute ⌊log₂x⌋
+        lower = floorLog2(x);
+
+        uint y;
+        if (lower < 0)
+            y = x << uint(-lower);
         else
-            z = int(x >> uint(ilog2));
-        // z = x * 2^-⌊log₂x⌋
-        // so 1 <= z < 2
-        // and ln z = ln x - ⌊log₂x⌋/log₂e
-        // so just compute ln z using artanh series
-        // and calculate ln x from that
-        int term = (z - int(ONE)) * int(ONE) / (z + int(ONE));
-        int halflnz = term;
-        int termpow = term * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 3;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 5;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 7;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 9;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 11;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 13;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 15;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 17;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 19;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 21;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 23;
-        termpow = termpow * term / int(ONE) * term / int(ONE);
-        halflnz += termpow / 25;
-        return (ilog2 * int(ONE)) * int(ONE) / int(LOG2_E) + 2 * halflnz;
+            y = x >> uint(lower);
+
+        lower *= int(ONE);
+
+        // y = x * 2^(-⌊log₂x⌋)
+        // so 1 <= y < 2
+        // and log₂x = ⌊log₂x⌋ + log₂y
+        for (int m = 1; m <= 64; m++) {
+            if(y == ONE) {
+                break;
+            }
+            y = y * y / ONE;
+            if(y >= 2 * ONE) {
+                lower += int(ONE >> m);
+                y /= 2;
+            }
+        }
+
+        return (lower, lower + 4);
     }
 
     /// @dev Returns base 2 logarithm value of given x
