@@ -6,6 +6,8 @@ pragma solidity ^0.4.15;
 /// @author Stefan George - <stefan@gnosis.pm>
 library Math {
 
+    enum EstimationMode { LowerBound, UpperBound, Midpoint }
+
     /*
      *  Constants
      */
@@ -36,6 +38,28 @@ library Math {
         // Transform so that e^x -> 2^x
         var (lower, upper) = pow2Bounds(x * int(ONE) / int(LN2));
         return (upper - lower) / 2 + lower;
+    }
+
+    /// @dev Returns estimate of 2**x given x
+    /// @param x exponent in fixed point
+    /// @param estimationMode whether to return a lower bound, upper bound, or a midpoint
+    /// @return estimate of 2**x in fixed point
+    function pow2(int x, EstimationMode estimationMode)
+        public
+        constant
+        returns (uint)
+    {
+        var (lower, upper) = pow2Bounds(x);
+        if(estimationMode == EstimationMode.LowerBound) {
+            return lower;
+        }
+        if(estimationMode == EstimationMode.UpperBound) {
+            return upper;
+        }
+        if(estimationMode == EstimationMode.Midpoint) {
+            return (upper - lower) / 2 + lower;
+        }
+        revert();
     }
 
     /// @dev Returns bounds for value of 2**x given x
@@ -149,6 +173,28 @@ library Math {
     {
         var (lower, upper) = log2Bounds(x);
         return ((upper - lower) / 2 + lower) * int(ONE) / int(LOG2_E);
+    }
+
+    /// @dev Returns estimate of log2(x) given x
+    /// @param x logarithm argument in fixed point
+    /// @param estimationMode whether to return a lower bound, upper bound, or a midpoint
+    /// @return estimate of log2(x) in fixed point
+    function log2(uint x, EstimationMode estimationMode)
+        public
+        constant
+        returns (int)
+    {
+        var (lower, upper) = log2Bounds(x);
+        if(estimationMode == EstimationMode.LowerBound) {
+            return lower;
+        }
+        if(estimationMode == EstimationMode.UpperBound) {
+            return upper;
+        }
+        if(estimationMode == EstimationMode.Midpoint) {
+            return (upper - lower) / 2 + lower;
+        }
+        revert();
     }
 
     /// @dev Returns bounds for value of log2(x) given x
