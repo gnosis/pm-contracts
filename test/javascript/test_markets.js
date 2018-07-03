@@ -325,9 +325,9 @@ contract('StandardMarket', function (accounts) {
         )
 
         // Get ready for trading
-        await etherToken.deposit({ value: 1e19, from: accounts[trader] })
-        await etherToken.approve(event.address, 1e17, { from: accounts[trader] })
-        await event.buyAllOutcomes(1e17, { from: accounts[trader] })
+        await etherToken.deposit({ value: 2e19, from: accounts[trader] })
+        await etherToken.approve(event.address, 1e19, { from: accounts[trader] })
+        await event.buyAllOutcomes(1e19, { from: accounts[trader] })
 
         // Allow all trading
         const outcomeTokens = (await Promise.all(
@@ -339,15 +339,33 @@ contract('StandardMarket', function (accounts) {
             outcomeToken.approve(market.address, MAX_VALUE.valueOf(), { from: accounts[trader] })))
 
         // Fund market
-        const funding = 1e17
+        const funding = 1e16
         await market.fund(funding, { from: accounts[trader] })
 
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 1000; i++) {
             const outcome = Math.floor(numOutcomes * Math.random())
-            const tokenCount = randrange(0, 1e17).valueOf()
+            const tokenCount = randrange(0, 1e16).valueOf()
             const [method, forWhat] = Math.random() < 0.5 ? ['buy', 'Cost'] : ['sell', 'Profit']
             const limit = await lmsrMarketMaker['calc' + forWhat]
                 .call(market.address, outcome, tokenCount)
+
+            const marketOutcomeTokenCounts = await Promise.all(outcomeTokens.map(outcomeToken =>
+                outcomeToken.balanceOf.call(market.address)))
+
+            const marketCollateralTokenCount = await etherToken.balanceOf.call(market.address)
+
+            if(method == 'buy') {
+                const marketOutcomeTokenCount = marketOutcomeTokenCounts[outcome]
+                // assert(marketOutcomeTokenCount.add(limit).gte(tokenCount),
+                //     `trade ${i}: ${marketOutcomeTokenCount} + ${limit} < ${tokenCount}`)
+            } else {
+                const BigNumber = web3.toBigNumber(0).constructor
+                const newAmounts = marketOutcomeTokenCounts.slice()
+                newAmounts[outcome] = newAmounts[outcome].add(tokenCount)
+                const marketOutcomeSetAmount = BigNumber.min(newAmounts)
+                // assert(marketOutcomeSetAmount.add(marketCollateralTokenCount).gte(limit),
+                //     `trade ${i}: ${marketOutcomeSetAmount} + ${marketCollateralTokenCount} < ${limit}`)
+            }
 
             let txResult;
             try {
@@ -361,7 +379,11 @@ contract('StandardMarket', function (accounts) {
                     outcome
                 } with limit ${
                     limit
-                }) failed: ${
+                }) failed while market has:\n\n${
+                    marketOutcomeTokenCounts.map(c => c.valueOf()).join('\n')
+                }\n\nand ${
+                    marketCollateralTokenCount.valueOf()
+                }: ${
                     e.message
                 }`)
             }
