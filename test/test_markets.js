@@ -323,9 +323,9 @@ contract('StandardMarket', function (accounts) {
         )
 
         // Get ready for trading
-        await etherToken.deposit({ value: 1e19, from: accounts[trader] })
-        await etherToken.approve(event.address, 1e17, { from: accounts[trader] })
-        await event.buyAllOutcomes(1e17, { from: accounts[trader] })
+        await etherToken.deposit({ value: 2e19, from: accounts[trader] })
+        await etherToken.approve(event.address, 1e19, { from: accounts[trader] })
+        await event.buyAllOutcomes(1e19, { from: accounts[trader] })
 
         // Allow all trading
         const outcomeTokens = (await Promise.all(
@@ -337,18 +337,33 @@ contract('StandardMarket', function (accounts) {
             outcomeToken.approve(market.address, MAX_VALUE.valueOf(), { from: accounts[trader] })))
 
         // Fund market
-        const funding = 1e17
+        const funding = 1e16
         await market.fund(funding, { from: accounts[trader] })
 
-        for(let i = 0; i < 100; i++) {
-            const outcomeTokenAmounts = randnums(-1e17, 1e17, numOutcomes).map(n => n.valueOf())
+        for(let i = 0; i < 1000; i++) {
+            const outcomeTokenAmounts = randnums(-1e16, 1e16, numOutcomes).map(n => n.valueOf())
             const netCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
+
+            const marketOutcomeTokenCounts = await Promise.all(outcomeTokens.map(outcomeToken =>
+                outcomeToken.balanceOf.call(market.address)))
+
+            const marketCollateralTokenCount = await etherToken.balanceOf.call(market.address)
 
             let txResult;
             try {
                 txResult = await market.trade(outcomeTokenAmounts, netCost, { from: accounts[trader] })
             } catch(e) {
-                throw new Error(`trade ${ i } failed with input ${ outcomeTokenAmounts }: ${ e.message }`)
+                throw new Error(`trade ${ i } with input ${
+                    outcomeTokenAmounts
+                } and limit ${
+                    netCost
+                } failed while market has:\n\n${
+                    marketOutcomeTokenCounts.map(c => c.valueOf()).join('\n')
+                }\n\nand ${
+                    marketCollateralTokenCount.valueOf()
+                }: ${
+                    e.message
+                }`)
             }
 
             if(txResult)
