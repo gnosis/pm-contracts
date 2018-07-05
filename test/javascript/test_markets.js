@@ -342,7 +342,7 @@ contract('StandardMarket', function (accounts) {
         const funding = 1e16
         await market.fund(funding, { from: accounts[trader] })
 
-        for(let i = 0; i < 1000; i++) {
+        for(let i = 0; i < 100; i++) {
             const outcome = Math.floor(numOutcomes * Math.random())
             const tokenCount = randrange(0, 1e16).valueOf()
             const [method, forWhat] = Math.random() < 0.5 ? ['buy', 'Cost'] : ['sell', 'Profit']
