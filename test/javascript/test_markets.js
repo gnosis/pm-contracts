@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const { wait } = require('@digix/tempo')(web3)
 
 const utils = require('./utils')
@@ -356,15 +357,15 @@ contract('StandardMarket', function (accounts) {
 
             if(method == 'buy') {
                 const marketOutcomeTokenCount = marketOutcomeTokenCounts[outcome]
-                // assert(marketOutcomeTokenCount.add(limit).gte(tokenCount),
-                //     `trade ${i}: ${marketOutcomeTokenCount} + ${limit} < ${tokenCount}`)
+                assert(marketOutcomeTokenCount.add(limit).gte(tokenCount),
+                    `trade ${i}: ${marketOutcomeTokenCount} + ${limit} < ${tokenCount}`)
             } else {
                 const BigNumber = web3.toBigNumber(0).constructor
                 const newAmounts = marketOutcomeTokenCounts.slice()
                 newAmounts[outcome] = newAmounts[outcome].add(tokenCount)
                 const marketOutcomeSetAmount = BigNumber.min(newAmounts)
-                // assert(marketOutcomeSetAmount.add(marketCollateralTokenCount).gte(limit),
-                //     `trade ${i}: ${marketOutcomeSetAmount} + ${marketCollateralTokenCount} < ${limit}`)
+                assert(marketOutcomeSetAmount.add(marketCollateralTokenCount).gte(limit),
+                    `trade ${i}: ${marketOutcomeSetAmount} + ${marketCollateralTokenCount} < ${limit}`)
             }
 
             let txResult;
