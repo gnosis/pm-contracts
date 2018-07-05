@@ -13,7 +13,6 @@ contract LMSRMarketMaker is MarketMaker {
      *  Constants
      */
     uint constant ONE = 0x10000000000000000;
-    // int constant EXP_LIMIT = 2352680790717288641401;
     int constant EXP_LIMIT = 3394200909562557497344;
 
     /*
@@ -32,9 +31,9 @@ contract LMSRMarketMaker is MarketMaker {
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
 
         // Calculate cost level based on net outcome token balances
-        (int logNLower, int logNUpper) = Math.log2Bounds(netOutcomeTokensSold.length * ONE);
+        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(logNUpper, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
 
         // Change amounts based on outcomeTokenAmounts passed in
         require(netOutcomeTokensSold.length == outcomeTokenAmounts.length);
@@ -43,7 +42,7 @@ contract LMSRMarketMaker is MarketMaker {
         }
 
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(logNLower, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
 
         // Calculate net cost as cost level difference and use the ceil
         netCost = costLevelAfter.sub(costLevelBefore);
