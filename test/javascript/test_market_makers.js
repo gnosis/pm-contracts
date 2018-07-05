@@ -32,7 +32,7 @@ contract('MarketMaker', function(accounts) {
         etherToken = await EtherToken.deployed()
     })
 
-    it('should move price of an outcome to 0 after participants sell lots of that outcome to market maker', async () => {
+    it.skip('should move price of an outcome to 0 after participants sell lots of that outcome to market maker', async () => {
         // Create event
         const numOutcomes = 2
         const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
@@ -106,7 +106,7 @@ contract('MarketMaker', function(accounts) {
         assert.isAbove(await etherToken.balanceOf.call(accounts[trader]), buyerBalance)
     })
 
-    it('should move price of an outcome to 1 after participants buy lots of that outcome from market maker', async () => {
+    it.skip('should move price of an outcome to 1 after participants buy lots of that outcome from market maker', async () => {
         for(let [investor, funding, tokenCount] of [
             [2, 1e17, 1e18],
             [3, 1, 10],
