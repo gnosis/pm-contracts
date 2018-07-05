@@ -12,7 +12,6 @@ contract LMSRMarketMaker is MarketMaker {
      *  Constants
      */
     uint constant ONE = 0x10000000000000000;
-    // int constant EXP_LIMIT = 2352680790717288641401;
     int constant EXP_LIMIT = 3394200909562557497344;
 
     /*
@@ -31,14 +30,14 @@ contract LMSRMarketMaker is MarketMaker {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         // Calculate cost level based on net outcome token balances
-        var (logNLower, logNUpper) = Math.log2Bounds(netOutcomeTokensSold.length * ONE);
+        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(logNUpper, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
         // Add outcome token count to net outcome token balance
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(logNLower, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
         // Calculate cost as cost level difference
         if(costLevelAfter < costLevelBefore)
             costLevelAfter = costLevelBefore;
@@ -67,14 +66,14 @@ contract LMSRMarketMaker is MarketMaker {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         // Calculate cost level based on net outcome token balances
-        var (logNLower, logNUpper) = Math.log2Bounds(netOutcomeTokensSold.length * ONE);
+        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(logNUpper, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
         // Subtract outcome token count from the net outcome token balance
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(logNLower, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
         // Calculate profit as cost level difference
         if(costLevelBefore <= costLevelAfter)
             costLevelBefore = costLevelAfter;
