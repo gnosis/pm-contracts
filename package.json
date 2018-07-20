@@ -9,11 +9,11 @@
     "migrate": "truffle migrate",
     "networks": "truffle networks",
     "test": "truffle test",
-    "injectnetinfo": "node scripts/inject_network_info.js",
-    "extractnetinfo": "node scripts/extract_network_info.js",
-    "resetnetinfo": "truffle networks --clean && node scripts/inject_network_info.js",
-    "measuregasstats": "node scripts/measure_gas_stats.js",
-    "prepublishOnly": "eslint . && node scripts/measure_gas_stats.js && truffle compile && truffle networks --clean && node scripts/inject_network_info.js"
+    "injectnetinfo": "tnt iN",
+    "extractnetinfo": "tnt eN",
+    "resetnetinfo": "truffle networks --clean && tnt iN",
+    "measuregasstats": "tnt measureGas -f inheritanceMap.json -o build/gas-stats.json --test-command 'npm test'",
+    "prepublishOnly": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN"
   },
   "keywords": [
     "Ethereum",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
+    "@gnosis.pm/truffle-nice-tools": "^1.1.0",
     "babel-eslint": "^8.0.2",
     "decimal.js": "^10.0.1",
     "eslint": "^4.11.0",
