@@ -1,3 +1,5 @@
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
+
 const utils = require('./utils')
 
 const CategoricalEvent = artifacts.require('CategoricalEvent')
@@ -16,8 +18,8 @@ contract('Event', function (accounts) {
     let etherToken
     let ipfsHash, oracle, event
 
-    before(utils.createGasStatCollectorBeforeHook(contracts))
-    after(utils.createGasStatCollectorAfterHook(contracts))
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
