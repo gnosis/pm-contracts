@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const utils = require('./utils')
 const { Decimal, isClose, randrange, randnums, ONE, assertRejects } = utils
@@ -13,8 +14,8 @@ contract('Math', function () {
     const MAX_VALUE = Decimal(2).pow(256).sub(1)
     let mathLib
 
-    before(utils.createGasStatCollectorBeforeHook(contracts))
-    after(utils.createGasStatCollectorAfterHook(contracts))
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         mathLib = await MathLib.deployed()

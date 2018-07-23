@@ -1,6 +1,7 @@
 const utils = require('./utils')
 
 const { wait } = require('@digix/tempo')(web3)
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const EtherToken = artifacts.require('EtherToken')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
@@ -33,8 +34,8 @@ contract('Oracle', function (accounts) {
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
     let fee, deadline, funding, startDate
 
-    before(utils.createGasStatCollectorBeforeHook(contracts))
-    after(utils.createGasStatCollectorAfterHook(contracts))
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         // deployed factory contracts
