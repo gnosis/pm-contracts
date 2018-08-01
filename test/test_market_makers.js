@@ -7,12 +7,12 @@ const EventFactory = artifacts.require('EventFactory')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const StandardMarket = artifacts.require('StandardMarket')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 
-const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, EtherToken, OutcomeToken, StandardMarket, CategoricalEvent]
+const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, WETH9, OutcomeToken, StandardMarket, CategoricalEvent]
 
 contract('MarketMaker', function(accounts) {
     let eventFactory
@@ -29,7 +29,7 @@ contract('MarketMaker', function(accounts) {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
     })
 
     it('should move price of an outcome to 0 after participants sell lots of that outcome to market maker', async () => {
@@ -207,10 +207,10 @@ contract('MarketMaker', function(accounts) {
 
         const trader = 6
         const initialOutcomeTokenCount = 1e18
-        const initialEtherTokenCount = 10e18
+        const initialWETH9Count = 10e18
 
         // User buys all outcomes
-        await etherToken.deposit({ value: initialOutcomeTokenCount + initialEtherTokenCount, from: accounts[trader] })
+        await etherToken.deposit({ value: initialOutcomeTokenCount + initialWETH9Count, from: accounts[trader] })
         await etherToken.approve(event.address, initialOutcomeTokenCount, { from: accounts[trader] })
         await event.buyAllOutcomes(initialOutcomeTokenCount, { from: accounts[trader] })
 
@@ -232,6 +232,6 @@ contract('MarketMaker', function(accounts) {
             assert.equal(await outcomeTokens[i].balanceOf.call(accounts[trader]), initialOutcomeTokenCount + tradeValue)
         }
 
-        assert.equal(await etherToken.balanceOf.call(accounts[trader]), initialEtherTokenCount - cost.valueOf())
+        assert.equal(await etherToken.balanceOf.call(accounts[trader]), initialWETH9Count - cost.valueOf())
     })
 })

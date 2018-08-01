@@ -2,7 +2,7 @@ const utils = require('./utils')
 const { getBlock } = utils
 const { wait } = require('@digix/tempo')(web3)
 
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarketWithPriceLogger = artifacts.require('StandardMarketWithPriceLogger')
@@ -11,7 +11,7 @@ const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const OutcomeToken = artifacts.require('OutcomeToken')
 
-const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, OutcomeToken]
+const contracts = [WETH9, CentralizedOracle, CentralizedOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, OutcomeToken]
 
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
@@ -32,7 +32,7 @@ contract('Oracle', function (accounts) {
         // deployed factory contracts
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
 
         // ipfs hashes
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
