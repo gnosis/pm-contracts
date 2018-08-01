@@ -1,12 +1,13 @@
 pragma solidity ^0.4.24;
-import "../Utils/Math.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../MarketMakers/MarketMaker.sol";
+import "../Utils/Math.sol";
 
 
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
 /// @author Alan Lu - <alan.lu@gnosis.pm>
 contract LMSRMarketMaker is MarketMaker {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Constants

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Markets/Market.sol";
-import "../Tokens/Token.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 
@@ -32,7 +32,7 @@ contract StandardMarketProxy is Proxy, MarketData, StandardMarketData {
 /// @title Standard market contract - Backed implementation of standard markets
 /// @author Stefan George - <stefan@gnosis.pm>
 contract StandardMarket is Proxied, Market, StandardMarketData {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Modifiers

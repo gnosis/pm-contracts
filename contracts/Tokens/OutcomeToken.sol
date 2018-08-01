@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
-import "../Tokens/StandardToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "../Utils/Proxy.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
 contract OutcomeTokenData {
@@ -25,7 +27,7 @@ contract OutcomeTokenData {
     }
 }
 
-contract OutcomeTokenProxy is Proxy, StandardTokenData, OutcomeTokenData {
+contract OutcomeTokenProxy is Proxy, OutcomeTokenData {
 
     /// @dev Constructor sets events contract address
     constructor(address proxied)
@@ -39,8 +41,8 @@ contract OutcomeTokenProxy is Proxy, StandardTokenData, OutcomeTokenData {
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
-    using Math for *;
+contract OutcomeToken is Proxied, OutcomeTokenData, StandardToken {
+    using SafeMath for *;
 
     /*
      *  Public functions
@@ -53,7 +55,7 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
         isEventContract
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
-        totalTokens = totalTokens.add(outcomeTokenCount);
+        totalSupply_ = totalSupply_.add(outcomeTokenCount);
         emit Issuance(_for, outcomeTokenCount);
     }
 
@@ -65,7 +67,7 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
         isEventContract
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
-        totalTokens = totalTokens.sub(outcomeTokenCount);
+        totalSupply_ = totalSupply_.sub(outcomeTokenCount);
         emit Revocation(_for, outcomeTokenCount);
     }
 }

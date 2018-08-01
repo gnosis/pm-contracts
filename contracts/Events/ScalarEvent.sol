@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "../Events/Event.sol";
 import "../Utils/Proxy.sol";
 
@@ -29,7 +30,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
     constructor(
         address proxied,
         address outcomeTokenMasterCopy,
-        Token _collateralToken,
+        ERC20 _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound
@@ -58,7 +59,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
 /// @title Scalar event contract - Scalar events resolve to a number within a range
 /// @author Stefan George - <stefan@gnosis.pm>
 contract ScalarEvent is Proxied, Event, ScalarEventData {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Public functions
