@@ -101,23 +101,18 @@ Contributors
    CampaignFactory
    Campaign
    CategoricalEvent
-   CentralizedOracleFactory
-   CentralizedOracle
    EventFactory
    Event
-   HumanFriendlyToken
    LMSRMarketMaker
    MarketMaker
    Market
    Math
-   Oracle
    OutcomeToken
    ScalarEvent
    StandardMarketFactory
    StandardMarket
    StandardMarketWithPriceLoggerFactory
    StandardMarketWithPriceLogger
-   StandardToken
 
 Indices and tables
 ==================
