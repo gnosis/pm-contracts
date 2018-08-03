@@ -6,7 +6,7 @@ const { getBlock, getParamFromTxEvent, assertRejects } = utils
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarket = artifacts.require('StandardMarket')
@@ -15,7 +15,7 @@ const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const Campaign = artifacts.require('Campaign')
 const CampaignFactory = artifacts.require('CampaignFactory')
 
-const contracts = [CategoricalEvent, EventFactory, OutcomeToken, EtherToken, CentralizedOracle, CentralizedOracleFactory, StandardMarket, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
+const contracts = [CategoricalEvent, EventFactory, OutcomeToken, WETH9, CentralizedOracle, CentralizedOracleFactory, StandardMarket, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
 
 contract('StandardMarket', function (accounts) {
     let centralizedOracleFactory
@@ -33,7 +33,7 @@ contract('StandardMarket', function (accounts) {
     beforeEach(async () => {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         eventFactory = await EventFactory.deployed()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
         campaignFactory = await CampaignFactory.deployed()
