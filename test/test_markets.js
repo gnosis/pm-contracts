@@ -1,3 +1,4 @@
+const NewWeb3 = require('web3')
 const { wait } = require('@digix/tempo')(web3)
 
 const utils = require('./utils')
@@ -7,18 +8,15 @@ const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const WETH9 = artifacts.require('WETH9')
-const CentralizedOracle = artifacts.require('CentralizedOracle')
-const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarket = artifacts.require('StandardMarket')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const Campaign = artifacts.require('Campaign')
 const CampaignFactory = artifacts.require('CampaignFactory')
 
-const contracts = [CategoricalEvent, EventFactory, OutcomeToken, WETH9, CentralizedOracle, CentralizedOracleFactory, StandardMarket, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
+const contracts = [CategoricalEvent, EventFactory, OutcomeToken, WETH9, StandardMarket, StandardMarketFactory, LMSRMarketMaker, Campaign, CampaignFactory]
 
 contract('StandardMarket', function (accounts) {
-    let centralizedOracleFactory
     let eventFactory
     let etherToken
     let standardMarketFactory
@@ -31,7 +29,6 @@ contract('StandardMarket', function (accounts) {
     after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
-        centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         eventFactory = await EventFactory.deployed()
         etherToken = await WETH9.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
@@ -40,12 +37,9 @@ contract('StandardMarket', function (accounts) {
 
         // create event
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        centralizedOracle = getParamFromTxEvent(
-            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-            'centralizedOracle', CentralizedOracle
-        )
+        centralizedOracle = accounts[1]
         event = getParamFromTxEvent(
-            await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle.address, numOutcomes),
+            await eventFactory.createCategoricalEvent(etherToken.address, centralizedOracle, numOutcomes),
             'categoricalEvent', CategoricalEvent
         )
     })
@@ -249,8 +243,7 @@ contract('StandardMarket', function (accounts) {
         , outcomeTokenCost.valueOf())
 
         // Set outcome
-        await centralizedOracle.setOutcome(1)
-        await event.setOutcome()
+        await event.receiveResult('0x0', NewWeb3.utils.padLeft('0x1', 64), {from: centralizedOracle})
 
         // Withdraw fees
         await campaign.closeMarket()

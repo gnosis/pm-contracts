@@ -24,14 +24,14 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
 
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
-    /// @param _oracle Oracle contract used to resolve the event
+    /// @param _oracle Address of oracle expected to resolve the event
     /// @param _lowerBound Lower bound for event outcome
     /// @param _upperBound Lower bound for event outcome
     constructor(
         address proxied,
         address outcomeTokenMasterCopy,
         ERC20 _collateralToken,
-        Oracle _oracle,
+        address _oracle,
         int _lowerBound,
         int _upperBound
     )

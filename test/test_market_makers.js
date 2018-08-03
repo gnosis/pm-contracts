@@ -4,7 +4,6 @@ const utils = require('./utils')
 const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent } = utils
 
 const EventFactory = artifacts.require('EventFactory')
-const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const StandardMarketFactory = artifacts.require('StandardMarketFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const WETH9 = artifacts.require('WETH9')
@@ -12,11 +11,10 @@ const OutcomeToken = artifacts.require('OutcomeToken')
 const StandardMarket = artifacts.require('StandardMarket')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 
-const contracts = [EventFactory, CentralizedOracleFactory, StandardMarketFactory, LMSRMarketMaker, WETH9, OutcomeToken, StandardMarket, CategoricalEvent]
+const contracts = [EventFactory, StandardMarketFactory, LMSRMarketMaker, WETH9, OutcomeToken, StandardMarket, CategoricalEvent]
 
 contract('MarketMaker', function(accounts) {
     let eventFactory
-    let centralizedOracleFactory
     let standardMarketFactory
     let lmsrMarketMaker
     let etherToken
@@ -26,7 +24,6 @@ contract('MarketMaker', function(accounts) {
 
     beforeEach(async () => {
         eventFactory = await EventFactory.deployed()
-        centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         standardMarketFactory = await StandardMarketFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
         etherToken = await WETH9.deployed()
@@ -36,9 +33,7 @@ contract('MarketMaker', function(accounts) {
         // Create event
         const numOutcomes = 2
         const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        const oracleAddress = getParamFromTxEvent(
-            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-            'centralizedOracle')
+        const oracleAddress = accounts[1]
         const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
             'categoricalEvent', CategoricalEvent)
@@ -116,9 +111,7 @@ contract('MarketMaker', function(accounts) {
             // Create event
             const numOutcomes = 2
             const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-            const oracleAddress = getParamFromTxEvent(
-                await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-                'centralizedOracle')
+            const oracleAddress = accounts[5]
             const event = getParamFromTxEvent(
                 await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
                 'categoricalEvent', CategoricalEvent)
@@ -179,9 +172,7 @@ contract('MarketMaker', function(accounts) {
         // Create event
         const numOutcomes = 4
         const ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        const oracleAddress = getParamFromTxEvent(
-            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-            'centralizedOracle')
+        const oracleAddress = accounts[1]
         const event = getParamFromTxEvent(
             await eventFactory.createCategoricalEvent(etherToken.address, oracleAddress, numOutcomes),
             'categoricalEvent', CategoricalEvent)

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "./OracleConsumer.sol";
 import "../Tokens/OutcomeToken.sol";
-import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 
 
@@ -20,7 +20,7 @@ contract EventData {
      *  Storage
      */
     ERC20 public collateralToken;
-    Oracle public oracle;
+    address public oracle;
     bool public isOutcomeSet;
     int public outcome;
     OutcomeToken[] public outcomeTokens;
@@ -28,7 +28,7 @@ contract EventData {
 
 /// @title Event contract - Provide basic functionality required by different event types
 /// @author Stefan George - <stefan@gnosis.pm>
-contract Event is EventData {
+contract Event is OracleConsumer, EventData {
 
     /*
      *  Public functions
@@ -59,14 +59,15 @@ contract Event is EventData {
         emit OutcomeTokenSetRevocation(msg.sender, outcomeTokenCount);
     }
 
-    /// @dev Sets winning event outcome
-    function setOutcome()
-        public
+    /// @dev Receives a result. Caller must be the oracle. Will ignore the ID.
+    /// @param result The result
+    function receiveResult(bytes32 /*id*/, bytes32 result)
+        external
     {
         // Winning outcome is not set yet in event contract but in oracle contract
-        require(!isOutcomeSet && oracle.isOutcomeSet());
+        require(msg.sender == oracle && !isOutcomeSet);
         // Set winning outcome
-        outcome = oracle.getOutcome();
+        outcome = int(result);
         isOutcomeSet = true;
         emit OutcomeAssignment(outcome);
     }
