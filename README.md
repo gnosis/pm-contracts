@@ -5,8 +5,6 @@ Gnosis Prediction Market Contracts
 
 [![Build Status](https://travis-ci.org/gnosis/pm-contracts.svg?branch=master)](https://travis-ci.org/gnosis/pm-contracts)
 
-[![Codecov badge](https://codecov.io/gh/gnosis/pm-contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/pm-contracts/)
-
 [![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/pm-contracts.svg)](https://greenkeeper.io/)
 
 [![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)

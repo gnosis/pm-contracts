@@ -9,7 +9,6 @@
     "migrate": "truffle migrate",
     "networks": "truffle networks",
     "test": "truffle test",
-    "coverage": "solidity-coverage",
     "injectnetinfo": "node scripts/inject_network_info.js",
     "extractnetinfo": "node scripts/extract_network_info.js",
     "resetnetinfo": "truffle networks --clean && node scripts/inject_network_info.js",
@@ -37,7 +36,6 @@
     "eslint-plugin-babel": "^5.1.0",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
-    "solidity-coverage": "^0.5.4",
     "truffle": "^4.0.4"
   },
   "repository": {

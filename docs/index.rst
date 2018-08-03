@@ -103,33 +103,21 @@ Contributors
    CategoricalEvent
    CentralizedOracleFactory
    CentralizedOracle
-   DifficultyOracleFactory
-   DifficultyOracle
-   EtherToken
    EventFactory
    Event
-   FutarchyOracleFactory
-   FutarchyOracle
    HumanFriendlyToken
    LMSRMarketMaker
-   MajorityOracleFactory
-   MajorityOracle
    MarketMaker
    Market
    Math
    Oracle
    OutcomeToken
    ScalarEvent
-   SignedMessageOracleFactory
-   SignedMessageOracle
    StandardMarketFactory
    StandardMarket
    StandardMarketWithPriceLoggerFactory
    StandardMarketWithPriceLogger
    StandardToken
-   Token
-   UltimateOracleFactory
-   UltimateOracle
 
 Indices and tables
 ==================
