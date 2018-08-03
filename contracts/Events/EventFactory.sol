@@ -16,8 +16,6 @@ contract EventFactory {
     /*
      *  Storage
      */
-    mapping (bytes32 => CategoricalEvent) public categoricalEvents;
-    mapping (bytes32 => ScalarEvent) public scalarEvents;
     CategoricalEvent public categoricalEventMasterCopy;
     ScalarEvent public scalarEventMasterCopy;
     OutcomeToken public outcomeTokenMasterCopy;
@@ -50,9 +48,6 @@ contract EventFactory {
         public
         returns (CategoricalEvent eventContract)
     {
-        bytes32 eventHash = keccak256(abi.encodePacked(collateralToken, oracle, outcomeCount));
-        // Event should not exist yet
-        require(address(categoricalEvents[eventHash]) == 0);
         // Create event
         eventContract = CategoricalEvent(new CategoricalEventProxy(
             categoricalEventMasterCopy,
@@ -61,7 +56,6 @@ contract EventFactory {
             oracle,
             outcomeCount
         ));
-        categoricalEvents[eventHash] = eventContract;
         emit CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
     }
 
@@ -80,9 +74,6 @@ contract EventFactory {
         public
         returns (ScalarEvent eventContract)
     {
-        bytes32 eventHash = keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
-        // Event should not exist yet
-        require(address(scalarEvents[eventHash]) == 0);
         // Create event
         eventContract = ScalarEvent(new ScalarEventProxy(
             scalarEventMasterCopy,
@@ -92,7 +83,6 @@ contract EventFactory {
             lowerBound,
             upperBound
         ));
-        scalarEvents[eventHash] = eventContract;
         emit ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
     }
 }

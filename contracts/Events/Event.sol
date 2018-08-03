@@ -103,10 +103,6 @@ contract Event is EventData {
             outcomeTokenDistribution[i] = outcomeTokens[i].balanceOf(owner);
     }
 
-    /// @dev Calculates and returns event hash
-    /// @return Event hash
-    function getEventHash() public view returns (bytes32);
-
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
     function redeemWinnings() public returns (uint);

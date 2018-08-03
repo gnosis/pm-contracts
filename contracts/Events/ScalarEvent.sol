@@ -95,14 +95,4 @@ contract ScalarEvent is Proxied, Event, ScalarEventData {
         require(collateralToken.transfer(msg.sender, winnings));
         emit WinningsRedemption(msg.sender, winnings);
     }
-
-    /// @dev Calculates and returns event hash
-    /// @return Event hash
-    function getEventHash()
-        public
-        view
-        returns (bytes32)
-    {
-        return keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
-    }
 }
