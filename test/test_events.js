@@ -1,14 +1,12 @@
 const utils = require('./utils')
-
+const NewWeb3 = require('web3')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const EventFactory = artifacts.require('EventFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const WETH9 = artifacts.require('WETH9')
-const CentralizedOracle = artifacts.require('CentralizedOracle')
-const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 
-const contracts = [CategoricalEvent, ScalarEvent, EventFactory, OutcomeToken, WETH9, CentralizedOracle, CentralizedOracleFactory]
+const contracts = [CategoricalEvent, ScalarEvent, EventFactory, OutcomeToken, WETH9]
 
 contract('Event', function (accounts) {
     let centralizedOracleFactory
@@ -20,18 +18,14 @@ contract('Event', function (accounts) {
     after(utils.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
-        centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         eventFactory = await EventFactory.deployed()
         etherToken = await WETH9.deployed()
 
         // create event
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
-        oracle = utils.getParamFromTxEvent(
-            await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
-            'centralizedOracle', CentralizedOracle
-        )
+        oracle = accounts[1]
         event = utils.getParamFromTxEvent(
-            await eventFactory.createCategoricalEvent(etherToken.address, oracle.address, 2),
+            await eventFactory.createCategoricalEvent(etherToken.address, oracle, 2),
             'categoricalEvent', CategoricalEvent
         )
     })
@@ -107,13 +101,8 @@ contract('Event', function (accounts) {
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
-        //Set outcome in oracle contract
-        await oracle.setOutcome(1)
-        assert.equal(await oracle.getOutcome.call(), 1)
-        assert.equal(await oracle.isOutcomeSet.call(), true)
-
-        //Set outcome in event
-        await event.setOutcome()
+        // Set outcome in event
+        await event.receiveResult('0x0', NewWeb3.utils.padLeft('0x1', 64), { from: oracle })
         assert.equal(await event.outcome.call(), 1)
         assert.equal(await event.isOutcomeSet.call(),true)
 
@@ -128,7 +117,7 @@ contract('Event', function (accounts) {
 
     it('should buy, set, and redeem outcomes for scalar event', async () => {
         const scalarEvent = utils.getParamFromTxEvent(
-            await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100),
+            await eventFactory.createScalarEvent(etherToken.address, oracle, -100, 100),
             'scalarEvent', ScalarEvent
         )
         // Buy all outcomes
@@ -147,15 +136,10 @@ contract('Event', function (accounts) {
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
-        //Set outcome in oracle contract
-        await oracle.setOutcome(0)
-        assert.equal(await oracle.getOutcome.call(), 0)
-        assert.equal(await oracle.isOutcomeSet.call(), true)
-
-        //Set outcome in event
-        await scalarEvent.setOutcome()
+        // Set outcome in scalarEvent
+        await scalarEvent.receiveResult('0x0', '0x0', { from: oracle })
         assert.equal(await scalarEvent.outcome.call(), 0)
-        assert.equal(await scalarEvent.isOutcomeSet.call(), true)
+        assert.equal(await scalarEvent.isOutcomeSet.call(),true)
 
         //Redeem winnings for buyer account
         const buyerWinnings = utils.getParamFromTxEvent(
