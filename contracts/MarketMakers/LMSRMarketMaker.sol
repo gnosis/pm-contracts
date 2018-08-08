@@ -31,7 +31,7 @@ contract LMSRMarketMaker is MarketMaker {
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
 
         // Calculate cost level based on net outcome token balances
-        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        int log2N = Math.binaryLog(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
         uint funding = market.funding();
         int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
 
@@ -66,7 +66,7 @@ contract LMSRMarketMaker is MarketMaker {
     {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
-        int logN = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.Midpoint);
+        int logN = Math.binaryLog(netOutcomeTokensSold.length * ONE, Math.EstimationMode.Midpoint);
         uint funding = market.funding();
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
@@ -93,7 +93,7 @@ contract LMSRMarketMaker is MarketMaker {
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
         (uint sum, int offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0, estimationMode);
-        costLevel = Math.log2(sum, estimationMode);
+        costLevel = Math.binaryLog(sum, estimationMode);
         costLevel = costLevel.add(offset);
         costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));
     }

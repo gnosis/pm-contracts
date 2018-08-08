@@ -175,11 +175,11 @@ library Math {
         return ((upper - lower) / 2 + lower) * int(ONE) / int(LOG2_E);
     }
 
-    /// @dev Returns estimate of log2(x) given x
+    /// @dev Returns estimate of binaryLog(x) given x
     /// @param x logarithm argument in fixed point
     /// @param estimationMode whether to return a lower bound, upper bound, or a midpoint
-    /// @return estimate of log2(x) in fixed point
-    function log2(uint x, EstimationMode estimationMode)
+    /// @return estimate of binaryLog(x) in fixed point
+    function binaryLog(uint x, EstimationMode estimationMode)
         public
         pure
         returns (int)
@@ -197,11 +197,11 @@ library Math {
         revert();
     }
 
-    /// @dev Returns bounds for value of log2(x) given x
+    /// @dev Returns bounds for value of binaryLog(x) given x
     /// @param x logarithm argument in fixed point
     /// @return {
-    ///   "lower": "lower bound of log2(x) in fixed point",
-    ///   "upper": "upper bound of log2(x) in fixed point"
+    ///   "lower": "lower bound of binaryLog(x) in fixed point",
+    ///   "upper": "upper bound of binaryLog(x) in fixed point"
     /// }
     function log2Bounds(uint x)
         public
