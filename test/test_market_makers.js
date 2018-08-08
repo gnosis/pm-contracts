@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const utils = require('./utils')
 const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent } = utils
@@ -19,8 +20,8 @@ contract('MarketMaker', function(accounts) {
     let lmsrMarketMaker
     let etherToken
 
-    before(utils.createGasStatCollectorBeforeHook(contracts))
-    after(utils.createGasStatCollectorAfterHook(contracts))
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         eventFactory = await EventFactory.deployed()

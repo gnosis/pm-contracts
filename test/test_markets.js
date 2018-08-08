@@ -1,5 +1,6 @@
 const NewWeb3 = require('web3')
 const { wait } = require('@digix/tempo')(web3)
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const utils = require('./utils')
 const { getBlock, getParamFromTxEvent, assertRejects, Decimal, randnums } = utils
@@ -25,8 +26,8 @@ contract('StandardMarket', function (accounts) {
     let ipfsHash, centralizedOracle, event
     const numOutcomes = 2
 
-    before(utils.createGasStatCollectorBeforeHook(contracts))
-    after(utils.createGasStatCollectorAfterHook(contracts))
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         eventFactory = await EventFactory.deployed()
