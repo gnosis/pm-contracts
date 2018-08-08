@@ -7,7 +7,7 @@ const Decimal = require('decimal.js').clone({ precision: PRECISION })
 
 const ONE = Decimal(2).pow(64)
 
-function isClose(a, b, relTol=1e9, absTol=1e18) {
+function isClose(a, b, relTol=1e-9, absTol=1e-18) {
     return Decimal(a.valueOf()).sub(b).abs().lte(
         Decimal.max(
             Decimal.max(
