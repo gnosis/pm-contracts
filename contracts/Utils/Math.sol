@@ -148,7 +148,7 @@ library Math {
             if (result >> (256-shift) == 0) {
                 lower = uint(result) << shift;
                 zpow <<= shift; // todo: is this safe?
-                if (safeToAdd(lower, uint(zpow)))
+                if (lower + uint(zpow) >= lower)
                     upper = lower + uint(zpow);
                 else
                     upper = 2**256-1;
