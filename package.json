@@ -9,6 +9,7 @@
     "migrate": "truffle migrate",
     "networks": "truffle networks",
     "test": "truffle test",
+    "lint-contracts": "solhint contracts/**/*.sol",
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
     "resetnetinfo": "truffle networks --clean && tnt iN",
@@ -38,6 +39,7 @@
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
     "truffle": "^4.0.4",
+    "solhint": "^1.1.10",
     "web3": "^1.0.0-beta.35"
   },
   "repository": {
