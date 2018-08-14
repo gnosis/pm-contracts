@@ -1,0 +1,13 @@
+{
+  "extends": "default",
+  "rules": {
+    "bracket-align": "warn",
+    "code-complexity": "warn",
+    "const-name-snakecase": "warn",
+    "expression-indent": "warn",
+    "function-max-lines": "warn",
+    "indent": "warn",
+    "max-line-length": "warn",
+    "statement-indent": "warn"
+  }
+}
