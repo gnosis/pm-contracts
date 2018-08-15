@@ -1,9 +1,7 @@
+const Math = artifacts.require('Math')
+const LMSRMarketMakerFactory = artifacts.require('LMSRMarketMakerFactory')
+
 module.exports = function (deployer) {
-    [
-        'StandardMarket',
-    ].forEach(contractName => {
-        const contract = artifacts.require(contractName)
-        const factory = artifacts.require(contractName + 'Factory')
-        deployer.deploy(factory, contract.address)
-    })
+    deployer.link(Math, LMSRMarketMakerFactory)
+    deployer.deploy(LMSRMarketMakerFactory)
 }
