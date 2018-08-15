@@ -44,7 +44,6 @@ contract LMSRMarketMaker is Ownable {
     /*
      *  Modifiers
      */
-
     modifier atStage(Stages _stage) {
         // Contract has to be in given stage
         require(stage == _stage);
@@ -80,7 +79,7 @@ contract LMSRMarketMaker is Ownable {
 
         // Calculate cost level based on net outcome token balances
         int log2N = Math.binaryLog(netOutcomeTokensSoldCopy.length * ONE, Math.EstimationMode.UpperBound);
-        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSoldCopy, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSoldCopy, Math.EstimationMode.LowerBound);
 
         // Change amounts based on outcomeTokenAmounts passed in
         require(netOutcomeTokensSoldCopy.length == outcomeTokenAmounts.length);
@@ -89,7 +88,7 @@ contract LMSRMarketMaker is Ownable {
         }
 
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSoldCopy, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSoldCopy, Math.EstimationMode.UpperBound);
 
         // Calculate net cost as cost level difference and use the ceil
         netCost = costLevelAfter.sub(costLevelBefore);
@@ -116,7 +115,7 @@ contract LMSRMarketMaker is Ownable {
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        (uint sum, , uint outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSoldCopy, funding, outcomeTokenIndex, Math.EstimationMode.Midpoint);
+        (uint sum, , uint outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSoldCopy, outcomeTokenIndex, Math.EstimationMode.Midpoint);
         return outcomeExpTerm / (sum / ONE);
     }
 
@@ -127,32 +126,30 @@ contract LMSRMarketMaker is Ownable {
     ///      derive prices from the market state
     /// @param logN Logarithm of the number of outcomes
     /// @param netOutcomeTokensSoldCopy Net outcome tokens sold by market
-    /// @param _funding Initial funding for market
     /// @return Cost level
-    function calcCostLevel(int logN, int[] netOutcomeTokensSoldCopy, uint _funding, Math.EstimationMode estimationMode)
+    function calcCostLevel(int logN, int[] netOutcomeTokensSoldCopy, Math.EstimationMode estimationMode)
         private
-        pure
+        view
         returns(int costLevel)
     {
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)).
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
-        (uint sum, int offset, ) = sumExpOffset(logN, netOutcomeTokensSoldCopy, _funding, 0, estimationMode);
+        (uint sum, int offset, ) = sumExpOffset(logN, netOutcomeTokensSoldCopy, 0, estimationMode);
         costLevel = Math.binaryLog(sum, estimationMode);
         costLevel = costLevel.add(offset);
-        costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(_funding));
+        costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));
     }
 
     /// @dev Calculates sum(exp(q/b - offset) for q in quantities), where offset is set
     ///      so that the sum fits in 248-256 bits
     /// @param logN Logarithm of the number of outcomes
     /// @param netOutcomeTokensSoldCopy Net outcome tokens sold by market
-    /// @param _funding Initial funding for market
     /// @param outcomeIndex Index of exponential term to extract (for use by marginal price function)
     /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
-    function sumExpOffset(int logN, int[] netOutcomeTokensSoldCopy, uint _funding, uint8 outcomeIndex, Math.EstimationMode estimationMode)
+    function sumExpOffset(int logN, int[] netOutcomeTokensSoldCopy, uint8 outcomeIndex, Math.EstimationMode estimationMode)
         private
-        pure
+        view
         returns (uint sum, int offset, uint outcomeExpTerm)
     {
         // Naive calculation of this causes an overflow
@@ -170,13 +167,13 @@ contract LMSRMarketMaker is Ownable {
         // BIG offset will cause the tiny quantities to go really negative
         // causing the associated exponentials to vanish.
 
-        require(logN >= 0 && int(_funding) >= 0);
+        require(logN >= 0 && int(funding) >= 0);
         offset = Math.max(netOutcomeTokensSoldCopy);
-        offset = offset.mul(logN) / int(_funding);
+        offset = offset.mul(logN) / int(funding);
         offset = offset.sub(EXP_LIMIT);
         uint term;
         for (uint8 i = 0; i < netOutcomeTokensSoldCopy.length; i++) {
-            term = Math.pow2((netOutcomeTokensSoldCopy[i].mul(logN) / int(_funding)).sub(offset), estimationMode);
+            term = Math.pow2((netOutcomeTokensSoldCopy[i].mul(logN) / int(funding)).sub(offset), estimationMode);
             if (i == outcomeIndex)
                 outcomeExpTerm = term;
             sum = sum.add(term);
