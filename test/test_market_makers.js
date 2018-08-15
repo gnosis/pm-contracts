@@ -424,7 +424,7 @@ contract('LMSRMarketMaker', function (accounts) {
         const funding = 1e16
         await lmsrMarketMaker.fund(funding, { from: accounts[trader] })
 
-        for(let i = 0; i < 100; i++) {
+        for(let i = 0; i < 10; i++) {
             const outcomeTokenAmounts = randnums(-1e16, 1e16, numOutcomes).map(n => n.valueOf())
             const netCost = await lmsrMarketMaker.calcNetCost.call(outcomeTokenAmounts)
 
