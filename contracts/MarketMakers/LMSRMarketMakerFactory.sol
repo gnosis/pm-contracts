@@ -9,7 +9,8 @@ contract LMSRMarketMakerFactory {
         public
         returns (LMSRMarketMaker lmsrMarketMaker)
     {
-        lmsrMarketMaker = new LMSRMarketMaker(msg.sender, eventContract, fee);
+        lmsrMarketMaker = new LMSRMarketMaker(eventContract, fee);
+        lmsrMarketMaker.transferOwnership(msg.sender);
         emit LMSRMarketMakerCreation(msg.sender, lmsrMarketMaker, eventContract, fee);
     }
 }
