@@ -8,7 +8,7 @@ Install
 -------
 Install requirements with npm:
 
-``npm install``
+``npm install @gnosis.pm/pm-contracts``
 
 Testing and Linting
 -------------------

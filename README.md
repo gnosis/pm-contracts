@@ -17,9 +17,8 @@ To interact with those contracts have a look at (https://github.com/gnosis/pm-js
 Install
 -------
 ### Install requirements with npm:
-
 ```bash
-npm install
+npm install @gnosis.pm/pm-contracts
 ```
 
 Testing and Linting
