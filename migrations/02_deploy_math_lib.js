@@ -1,5 +1,3 @@
-const Math = artifacts.require('Math')
-
 module.exports = function (deployer) {
-    deployer.deploy(Math)
+    deployer.deploy(artifacts.require('Fixed192x64Math'))
 }

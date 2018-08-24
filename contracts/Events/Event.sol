@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 import "./OracleConsumer.sol";
 import "../Tokens/OutcomeToken.sol";
-import "../Utils/Proxy.sol";
 
 
 contract EventData {
