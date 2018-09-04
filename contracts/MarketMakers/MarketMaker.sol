@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import "../Events/Event.sol";
+import "../Events/EventManager.sol";
 
 contract MarketMaker is Ownable {
     using SafeMath for *;
@@ -22,7 +22,8 @@ contract MarketMaker is Ownable {
     /*
      *  Storage
      */
-    Event public eventContract;
+    EventManager public eventManager;
+    bytes32 public outcomeTokenSetId;
     uint64 public fee;
     uint public funding;
     int[] public netOutcomeTokensSold;
@@ -42,13 +43,14 @@ contract MarketMaker is Ownable {
         _;
     }
 
-    constructor(Event _eventContract, uint64 _fee)
+    constructor(EventManager _eventManager, bytes32 _outcomeTokenSetId, uint64 _fee)
         public
     {
         // Validate inputs
-        require(address(_eventContract) != 0 && _fee < FEE_RANGE);
-        eventContract = _eventContract;
-        netOutcomeTokensSold = new int[](eventContract.getOutcomeCount());
+        require(address(_eventManager) != 0 && _fee < FEE_RANGE);
+        eventManager = _eventManager;
+        outcomeTokenSetId = _outcomeTokenSetId;
+        netOutcomeTokensSold = new int[](eventManager.getOutcomeTokenSetLength(outcomeTokenSetId));
         fee = _fee;
         stage = Stages.MarketCreated;
     }
@@ -63,9 +65,9 @@ contract MarketMaker is Ownable {
         atStage(Stages.MarketCreated)
     {
         // Request collateral tokens and allow event contract to transfer them to buy all outcomes
-        require(   eventContract.collateralToken().transferFrom(msg.sender, this, _funding)
-                && eventContract.collateralToken().approve(eventContract, _funding));
-        eventContract.buyAllOutcomes(_funding);
+        require(   eventManager.collateralToken().transferFrom(msg.sender, this, _funding)
+                && eventManager.collateralToken().approve(eventManager, _funding));
+        eventManager.mintOutcomeTokenSet(outcomeTokenSetId, _funding);
         funding = _funding;
         stage = Stages.MarketFunded;
         emit AutomatedMarketMakerFunding(funding);
@@ -77,9 +79,11 @@ contract MarketMaker is Ownable {
         onlyOwner
         atStage(Stages.MarketFunded)
     {
-        uint8 outcomeCount = eventContract.getOutcomeCount();
-        for (uint8 i = 0; i < outcomeCount; i++)
-            require(eventContract.outcomeTokens(i).transfer(owner, eventContract.outcomeTokens(i).balanceOf(this)));
+        uint outcomeCount = eventManager.getOutcomeTokenSetLength(outcomeTokenSetId);
+        for (uint i = 0; i < outcomeCount; i++) {
+            OutcomeToken outcomeToken = eventManager.outcomeTokens(outcomeTokenSetId, i);
+            require(outcomeToken.transfer(owner, outcomeToken.balanceOf(this)));
+        }
         stage = Stages.MarketClosed;
         emit AutomatedMarketMakerClosing();
     }
@@ -91,9 +95,9 @@ contract MarketMaker is Ownable {
         onlyOwner
         returns (uint fees)
     {
-        fees = eventContract.collateralToken().balanceOf(this);
+        fees = eventManager.collateralToken().balanceOf(this);
         // Transfer fees
-        require(eventContract.collateralToken().transfer(owner, fees));
+        require(eventManager.collateralToken().transfer(owner, fees));
         emit FeeWithdrawal(fees);
     }
 
@@ -106,7 +110,7 @@ contract MarketMaker is Ownable {
         atStage(Stages.MarketFunded)
         returns (int netCost)
     {
-        uint8 outcomeCount = eventContract.getOutcomeCount();
+        uint outcomeCount = eventManager.getOutcomeTokenSetLength(outcomeTokenSetId);
         require(outcomeTokenAmounts.length == outcomeCount);
 
         // Calculate net cost for executing trade
@@ -127,19 +131,19 @@ contract MarketMaker is Ownable {
 
         if(outcomeTokenNetCost > 0) {
             require(
-                eventContract.collateralToken().transferFrom(msg.sender, this, uint(netCost)) &&
-                eventContract.collateralToken().approve(eventContract, uint(outcomeTokenNetCost))
+                eventManager.collateralToken().transferFrom(msg.sender, this, uint(netCost)) &&
+                eventManager.collateralToken().approve(eventManager, uint(outcomeTokenNetCost))
             );
 
-            eventContract.buyAllOutcomes(uint(outcomeTokenNetCost));
+            eventManager.mintOutcomeTokenSet(outcomeTokenSetId, uint(outcomeTokenNetCost));
         }
 
-        for (uint8 i = 0; i < outcomeCount; i++) {
+        for (uint i = 0; i < outcomeCount; i++) {
             if(outcomeTokenAmounts[i] != 0) {
                 if(outcomeTokenAmounts[i] < 0) {
-                    require(eventContract.outcomeTokens(i).transferFrom(msg.sender, this, uint(-outcomeTokenAmounts[i])));
+                    require(eventManager.outcomeTokens(outcomeTokenSetId, i).transferFrom(msg.sender, this, uint(-outcomeTokenAmounts[i])));
                 } else {
-                    require(eventContract.outcomeTokens(i).transfer(msg.sender, uint(outcomeTokenAmounts[i])));
+                    require(eventManager.outcomeTokens(outcomeTokenSetId, i).transfer(msg.sender, uint(outcomeTokenAmounts[i])));
                 }
 
                 netOutcomeTokensSold[i] = netOutcomeTokensSold[i].add(outcomeTokenAmounts[i]);
@@ -150,9 +154,9 @@ contract MarketMaker is Ownable {
             // This is safe since
             // 0x8000000000000000000000000000000000000000000000000000000000000000 ==
             // uint(-int(-0x8000000000000000000000000000000000000000000000000000000000000000))
-            eventContract.sellAllOutcomes(uint(-outcomeTokenNetCost));
+            eventManager.burnOutcomeTokenSet(outcomeTokenSetId, uint(-outcomeTokenNetCost));
             if(netCost < 0) {
-                require(eventContract.collateralToken().transfer(msg.sender, uint(-netCost)));
+                require(eventManager.collateralToken().transfer(msg.sender, uint(-netCost)));
             }
         }
 

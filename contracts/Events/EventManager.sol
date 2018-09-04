@@ -5,22 +5,26 @@ import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./OracleConsumer.sol";
 
-contract OutcomeTokn is MintableToken, StandardBurnableToken {}
+contract OutcomeToken is MintableToken, StandardBurnableToken {}
 
 contract EventManager is OracleConsumer {
     using SafeMath for uint;
 
     ERC20 public collateralToken;
-    mapping(bytes32 => OutcomeTokn[]) public outcomeTokens;
+    mapping(bytes32 => OutcomeToken[]) public outcomeTokens;
     mapping(bytes32 => uint) public payoutDenominator;
     mapping(address => uint) public payoutForOutcomeToken;
+
+    constructor(ERC20 _collateralToken) public {
+        collateralToken = _collateralToken;
+    }
 
     function prepareEvent(address oracle, bytes32 questionId, uint numOutcomes) public {
         bytes32 outcomeTokenSetId = keccak256(abi.encodePacked(oracle, questionId, numOutcomes));
         require(outcomeTokens[outcomeTokenSetId].length == 0, "outcome tokens already created");
-        outcomeTokens[outcomeTokenSetId] = new OutcomeTokn[](numOutcomes);
+        outcomeTokens[outcomeTokenSetId] = new OutcomeToken[](numOutcomes);
         for(uint i = 0; i < numOutcomes; i++) {
-            outcomeTokens[outcomeTokenSetId][i] = new OutcomeTokn();
+            outcomeTokens[outcomeTokenSetId][i] = new OutcomeToken();
         }
     }
 
@@ -57,5 +61,9 @@ contract EventManager is OracleConsumer {
             outcomeTokens[outcomeTokenSetId][i].burnFrom(msg.sender, amount);
         }
         require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
+    }
+
+    function getOutcomeTokenSetLength(bytes32 outcomeTokenSetId) public view returns (uint) {
+        return outcomeTokens[outcomeTokenSetId].length;
     }
 }
