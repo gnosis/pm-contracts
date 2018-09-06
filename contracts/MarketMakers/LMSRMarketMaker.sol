@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 import "@gnosis.pm/util-contracts/contracts/Fixed192x64Math.sol";
 import "./MarketMaker.sol";
-import "../Events/Event.sol";
+import "../Events/EventManager.sol";
 
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
 /// @author Alan Lu - <alan.lu@gnosis.pm>
@@ -13,8 +13,8 @@ contract LMSRMarketMaker is MarketMaker {
     uint constant ONE = 0x10000000000000000;
     int constant EXP_LIMIT = 3394200909562557497344;
 
-    constructor(Event _eventContract, uint64 _fee)
-        public MarketMaker(_eventContract, _fee) {}
+    constructor(EventManager _eventManager, bytes32 _outcomeTokenSetId, uint64 _fee)
+        public MarketMaker(_eventManager, _outcomeTokenSetId, _fee) {}
     
     /// @dev Calculates the net cost for executing a given trade.
     /// @param outcomeTokenAmounts Amounts of outcome tokens to buy from the market. If an amount is negative, represents an amount to sell to the market.
@@ -24,7 +24,7 @@ contract LMSRMarketMaker is MarketMaker {
         view
         returns (int netCost)
     {
-        require(eventContract.getOutcomeCount() > 1);
+        require(eventManager.getOutcomeTokenSetLength(outcomeTokenSetId) > 1);
         int[] memory netOutcomeTokensSoldCopy = netOutcomeTokensSold;
 
         // Calculate cost level based on net outcome token balances
@@ -59,7 +59,7 @@ contract LMSRMarketMaker is MarketMaker {
         view
         returns (uint price)
     {
-        require(eventContract.getOutcomeCount() > 1);
+        require(eventManager.getOutcomeTokenSetLength(outcomeTokenSetId) > 1);
         int[] memory netOutcomeTokensSoldCopy = netOutcomeTokensSold;
         int logN = Fixed192x64Math.binaryLog(netOutcomeTokensSoldCopy.length * ONE, Fixed192x64Math.EstimationMode.Midpoint);
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
