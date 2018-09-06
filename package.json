@@ -32,15 +32,15 @@
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
-    "@gnosis.pm/truffle-nice-tools": "^1.1.0",
+    "@gnosis.pm/truffle-nice-tools": "^1.1.2-prerelease",
     "babel-eslint": "^8.0.2",
     "decimal.js": "^10.0.1",
     "eslint": "^4.11.0",
     "eslint-plugin-babel": "^5.1.0",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
-    "truffle": "^4.0.4",
     "solhint": "^1.1.10",
+    "truffle": "^4.0.4",
     "web3": "^1.0.0-beta.35"
   },
   "repository": {

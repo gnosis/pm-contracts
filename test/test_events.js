@@ -6,8 +6,7 @@ const EventManager = artifacts.require('EventManager')
 const EventManagerFactory = artifacts.require('EventManagerFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const WETH9 = artifacts.require('WETH9')
-
-const contracts = [EventManager, EventManagerFactory, OutcomeToken, WETH9]
+const contracts = [EventManager, EventManagerFactory, OutcomeToken]
 
 contract('EventManager', function (accounts) {
     let eventManagerFactory
@@ -19,6 +18,7 @@ contract('EventManager', function (accounts) {
     after(testGas.createGasStatCollectorAfterHook(contracts))
 
     before(async () => {
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         eventManagerFactory = await EventManagerFactory.deployed()
         etherToken = await WETH9.deployed()
 
@@ -33,7 +33,6 @@ contract('EventManager', function (accounts) {
         numOutcomes = 2
         await eventManager.prepareEvent(oracle, questionId, numOutcomes)
 
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         outcomeTokenSetId = keccak256(oracle + [questionId, numOutcomes].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
     })
 

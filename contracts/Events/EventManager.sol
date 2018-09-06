@@ -1,5 +1,4 @@
 pragma solidity ^0.4.24;
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/StandardBurnableToken.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -9,6 +8,11 @@ contract OutcomeToken is MintableToken, StandardBurnableToken {}
 
 contract EventManager is OracleConsumer {
     using SafeMath for uint;
+
+    event EventCreation(bytes32 indexed outcomeTokenSetId, address indexed oracle, bytes32 indexed questionId, uint numOutcomes);
+    event EventResolution(bytes32 indexed outcomeTokenSetId, address indexed oracle, bytes32 indexed questionId, uint numOutcomes, bytes result);
+    event OutcomeTokenSetMinting(bytes32 indexed outcomeTokenSetId, uint amount);
+    event OutcomeTokenSetBurning(bytes32 indexed outcomeTokenSetId, uint amount);
 
     ERC20 public collateralToken;
     mapping(bytes32 => OutcomeToken[]) public outcomeTokens;
@@ -26,6 +30,7 @@ contract EventManager is OracleConsumer {
         for(uint i = 0; i < numOutcomes; i++) {
             outcomeTokens[outcomeTokenSetId][i] = new OutcomeToken();
         }
+        emit EventCreation(outcomeTokenSetId, oracle, questionId, numOutcomes);
     }
 
     function receiveResult(bytes32 questionId, bytes result) external {
@@ -45,6 +50,7 @@ contract EventManager is OracleConsumer {
             require(payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] == 0, "payout already set");
             payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] = payout;
         }
+        emit EventResolution(outcomeTokenSetId, msg.sender, questionId, numOutcomes, result);
     }
 
     function mintOutcomeTokenSet(bytes32 outcomeTokenSetId, uint amount) public {
@@ -53,6 +59,7 @@ contract EventManager is OracleConsumer {
         for(uint i = 0; i < outcomeTokens[outcomeTokenSetId].length; i++) {
             require(outcomeTokens[outcomeTokenSetId][i].mint(msg.sender, amount), "could not mint outcome tokens");
         }
+        emit OutcomeTokenSetMinting(outcomeTokenSetId, amount);
     }
 
     function burnOutcomeTokenSet(bytes32 outcomeTokenSetId, uint amount) public {
@@ -61,6 +68,7 @@ contract EventManager is OracleConsumer {
             outcomeTokens[outcomeTokenSetId][i].burnFrom(msg.sender, amount);
         }
         require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
+        emit OutcomeTokenSetBurning(outcomeTokenSetId, amount);
     }
 
     function getOutcomeTokenSetLength(bytes32 outcomeTokenSetId) public view returns (uint) {
