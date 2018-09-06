@@ -13,6 +13,7 @@ contract EventManager is OracleConsumer {
     event EventResolution(bytes32 indexed outcomeTokenSetId, address indexed oracle, bytes32 indexed questionId, uint numOutcomes, bytes result);
     event OutcomeTokenSetMinting(bytes32 indexed outcomeTokenSetId, uint amount);
     event OutcomeTokenSetBurning(bytes32 indexed outcomeTokenSetId, uint amount);
+    event PayoutRedemption(address indexed redeemer, uint payout);
 
     ERC20 public collateralToken;
     mapping(bytes32 => OutcomeToken[]) public outcomeTokens;
@@ -50,6 +51,7 @@ contract EventManager is OracleConsumer {
             require(payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] == 0, "payout already set");
             payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] = payout;
         }
+        require(payoutDenominator[outcomeTokenSetId] > 0, "payout is all zeroes");
         emit EventResolution(outcomeTokenSetId, msg.sender, questionId, numOutcomes, result);
     }
 
@@ -73,5 +75,27 @@ contract EventManager is OracleConsumer {
 
     function getOutcomeTokenSetLength(bytes32 outcomeTokenSetId) public view returns (uint) {
         return outcomeTokens[outcomeTokenSetId].length;
+    }
+
+    function redeemPayout(bytes32 outcomeTokenSetId) public {
+        uint totalPayout = 0;
+        for(uint i = 0; i < outcomeTokens[outcomeTokenSetId].length; i++) {
+            OutcomeToken ot = outcomeTokens[outcomeTokenSetId][i];
+            uint payoutNumerator = payoutForOutcomeToken[ot];
+            uint otAmount = ot.allowance(msg.sender, this);
+            uint senderBalance = ot.balanceOf(msg.sender);
+            if(otAmount > senderBalance) otAmount = senderBalance;
+            if(otAmount > 0) {
+                ot.burnFrom(msg.sender, otAmount);
+                if(payoutNumerator > 0) {
+                    uint payout = otAmount.mul(payoutNumerator)
+                        .div(payoutDenominator[outcomeTokenSetId]);
+                    require(collateralToken.transfer(msg.sender, payout),
+                        "could not transfer payout to message sender");
+                    totalPayout += payout;
+                }
+            }
+        }
+        emit PayoutRedemption(msg.sender, totalPayout);
     }
 }

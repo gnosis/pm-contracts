@@ -48,7 +48,14 @@ contract MarketMaker is Ownable {
         require(address(_eventManager) != 0 && _fee < FEE_RANGE);
         eventManager = _eventManager;
         outcomeTokenSetId = _outcomeTokenSetId;
-        netOutcomeTokensSold = new int[](eventManager.getOutcomeTokenSetLength(outcomeTokenSetId));
+
+        uint outcomeTokenSetLength = eventManager.getOutcomeTokenSetLength(outcomeTokenSetId);
+        require(outcomeTokenSetLength > 0);
+        netOutcomeTokensSold = new int[](outcomeTokenSetLength);
+        for(uint i = 0; i < outcomeTokenSetLength; i++) {
+            eventManager.outcomeTokens(_outcomeTokenSetId, i).approve(_eventManager, 2**256-1);
+        }
+
         fee = _fee;
         stage = Stages.MarketCreated;
     }
@@ -127,10 +134,11 @@ contract MarketMaker is Ownable {
             collateralLimit == 0
         );
 
+        ERC20 collateralToken = eventManager.collateralToken();
         if(outcomeTokenNetCost > 0) {
             require(
-                eventManager.collateralToken().transferFrom(msg.sender, this, uint(netCost)) &&
-                eventManager.collateralToken().approve(eventManager, uint(outcomeTokenNetCost))
+                collateralToken.transferFrom(msg.sender, this, uint(netCost)) &&
+                collateralToken.approve(eventManager, uint(outcomeTokenNetCost))
             );
 
             eventManager.mintOutcomeTokenSet(outcomeTokenSetId, uint(outcomeTokenNetCost));
@@ -154,7 +162,7 @@ contract MarketMaker is Ownable {
             // uint(-int(-0x8000000000000000000000000000000000000000000000000000000000000000))
             eventManager.burnOutcomeTokenSet(outcomeTokenSetId, uint(-outcomeTokenNetCost));
             if(netCost < 0) {
-                require(eventManager.collateralToken().transfer(msg.sender, uint(-netCost)));
+                require(collateralToken.transfer(msg.sender, uint(-netCost)));
             }
         }
 
