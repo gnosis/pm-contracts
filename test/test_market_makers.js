@@ -6,14 +6,14 @@ const { wait } = require('@digix/tempo')(web3)
 const utils = require('./utils')
 const { ONE, isClose, lmsrMarginalPrice, getParamFromTxEvent, getBlock, assertRejects, Decimal, randnums } = utils
 
-const EventFactory = artifacts.require('EventFactory')
+const EventManagerFactory = artifacts.require('EventManagerFactory')
 const LMSRMarketMakerFactory = artifacts.require('LMSRMarketMakerFactory')
 const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const WETH9 = artifacts.require('WETH9')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 
-const contracts = [EventFactory, LMSRMarketMakerFactory, LMSRMarketMaker, WETH9, OutcomeToken, CategoricalEvent]
+const contracts = [EventManagerFactory, LMSRMarketMakerFactory, LMSRMarketMaker, WETH9, OutcomeToken, CategoricalEvent]
 
 contract('MarketMaker', function(accounts) {
     let eventFactory
@@ -24,7 +24,7 @@ contract('MarketMaker', function(accounts) {
     after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
-        eventFactory = await EventFactory.deployed()
+        eventFactory = await EventManagerFactory.deployed()
         lmsrMarketMakerFactory = await LMSRMarketMakerFactory.deployed()
         etherToken = await WETH9.deployed()
     })
@@ -239,7 +239,7 @@ contract('LMSRMarketMaker', function (accounts) {
     after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
-        eventFactory = await EventFactory.deployed()
+        eventFactory = await EventManagerFactory.deployed()
         etherToken = await WETH9.deployed()
         lmsrMarketMakerFactory = await LMSRMarketMakerFactory.deployed()
 
