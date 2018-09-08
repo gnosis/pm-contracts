@@ -13,6 +13,8 @@ contract EventManagerFactory {
     {
         require(address(eventManagers[collateralToken]) == 0);
         eventManager = new EventManager(collateralToken);
+        eventManagers[address(collateralToken)] = eventManager;
         emit EventManagerCreation(msg.sender, eventManager, collateralToken);
+        return eventManager;
     }
 }

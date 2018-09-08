@@ -1,24 +1,18 @@
-const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
-
 const utils = require('./utils')
 const NewWeb3 = require('web3')
 const EventManager = artifacts.require('EventManager')
 const EventManagerFactory = artifacts.require('EventManagerFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const WETH9 = artifacts.require('WETH9')
-const contracts = [EventManager, EventManagerFactory, OutcomeToken]
 
 contract('EventManager', function (accounts) {
     let eventManagerFactory
-    let etherToken
+    let individualOutcomeToken
     let oracle, questionId, numOutcomes, eventManager
     let outcomeTokenSetId
 
-    before(testGas.createGasStatCollectorBeforeHook(contracts))
-    after(testGas.createGasStatCollectorAfterHook(contracts))
-
     before(async () => {
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
+        const { toHex, padLeft, keccak256, assertRejects } = NewWeb3.utils;
         eventManagerFactory = await EventManagerFactory.deployed()
         etherToken = await WETH9.deployed()
 
@@ -36,11 +30,46 @@ contract('EventManager', function (accounts) {
         outcomeTokenSetId = keccak256(oracle + [questionId, numOutcomes].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
     })
 
-    it('should target the right event manager');
-    it('should be creatable when nonexistent');
+    it('should target the right event manager', async () => {
+        const eventManager = await eventManagerFactory.eventManagers(etherToken.address);
+        assert.equal(await EventManager.at(eventManager).collateralToken(), etherToken.address);    
+    });
+
+    it('should not be creatable when the collateralToken already exists', async () => {
+        try {
+            await eventManagerFactory.createEventManager(etherToken.address);
+            assert.fail();
+        } catch (e) {
+            assert.ok(/revert/.test(e.message));
+        }
+    });
 
     it('should have obtainable outcomeTokenSetIds if in possession of oracle, questionId, and numOutcomes', async () => {
         assert.equal((await eventManager.getOutcomeTokenSetLength(outcomeTokenSetId)).valueOf(), numOutcomes)
+    });
+
+    it('should revert if receiveResult reports all outcomes equal to 0', async () => {
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
+        
+        const _oracle = accounts[1];
+        const _questionId = 999123; 
+        const _numOutcomes = 4;
+        await eventManager.prepareEvent(_oracle, _questionId, _numOutcomes);
+        
+        try {
+            await eventManager.receiveResult(_questionId, 
+                '0x' + [
+                    padLeft('0', 64),
+                    padLeft('0', 64),
+                    padLeft('0', 64),
+                    padLeft('0', 64)
+                ].join(''),
+                { from: _oracle }
+            );
+            assert.fail();
+        } catch (e) {
+           assert.ok(/revert/.test(e.message)); 
+        }
     });
 
     it('should mint and burn outcome tokens', async () => {
@@ -75,6 +104,7 @@ contract('EventManager', function (accounts) {
     })
 
     it('should mint and set outcome tokens and redeem payouts for events', async () => {
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         // Mint outcome tokens
         const buyer = 2
         const collateralTokenCount = 10
@@ -94,8 +124,8 @@ contract('EventManager', function (accounts) {
         // Set outcome in event
         await eventManager.receiveResult(questionId,
             '0x' + [
-                NewWeb3.utils.padLeft('3', 64),
-                NewWeb3.utils.padLeft('7', 64),
+                padLeft('3', 64),
+                padLeft('7', 64),
             ].join(''),
             { from: oracle })
         assert.equal(await eventManager.payoutDenominator.call(outcomeTokenSetId), 10)
@@ -113,5 +143,61 @@ contract('EventManager', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), buyerPayout.valueOf())
     })
 
-    it('should redeem payouts in more complex scenarios')
+    it('should redeem payouts in more complex scenarios', async () => {
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
+        // Setup a more complex scenario
+        const _oracle = accounts[1];
+        const _questionId = '0x1234567812345678123456781234567812345678123456781234567812345678'; 
+        const _numOutcomes = 4;
+        await eventManager.prepareEvent(_oracle, _questionId, _numOutcomes);
+        const _outcomeTokenSetId = keccak256(_oracle + [_questionId, _numOutcomes].map(v => padLeft(toHex(v), 64).slice(2)).join(''));
+        assert.equal(await eventManager.getOutcomeTokenSetLength(_outcomeTokenSetId), 4);
+
+        // create some buyers and purchase collateralTokens and then some outcomeTokens
+        const buyers = [3, 4, 5, 6];
+        const collateralTokenCounts = [1e19, 100, 1e18, 0];
+        for (var i=0; i<buyers.length; i++) {
+            await etherToken.deposit({ value: collateralTokenCounts[i], from: accounts[buyers[i]]});
+            assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
+            // before we Mint, we have to approve() the collateralTokens
+            await etherToken.approve(eventManager.address, collateralTokenCounts[i], { from: accounts[buyers[i]]});
+            await eventManager.mintOutcomeTokenSet(_outcomeTokenSetId, collateralTokenCounts[i], { from: accounts[buyers[i]]} );
+        }
+
+        // resolve the event
+        const resultsTransaction = await eventManager.receiveResult(_questionId, 
+            '0x' + [
+                padLeft('14D', 64), // 333
+                padLeft('29A', 64), // 666 
+                padLeft('1', 64), // 1
+                padLeft('0', 64)                     
+            ].join(''),
+            { from: _oracle }
+        );
+        assert.equal(await eventManager.payoutDenominator.call(_outcomeTokenSetId).then(res => res.toString()), 1000);
+
+        // assert correct payouts for outcome tokens 
+        const payoutsForOutcomeTokens = [333, 666, 1, 0];
+        for (var i=0; i<buyers.length; i++) {
+            let individualOutcomeToken = OutcomeToken.at(await eventManager.outcomeTokens(_outcomeTokenSetId, i));
+            assert.equal(await individualOutcomeToken.balanceOf(accounts[buyers[i]]).valueOf(), collateralTokenCounts[i]);
+            assert(await eventManager.payoutForOutcomeToken(individualOutcomeToken.address), payoutsForOutcomeTokens[i]);
+        }
+
+        // assert payout redemption
+        for (var i=0; i<buyers.length; i++) {
+            var denominator = await eventManager.payoutDenominator(_outcomeTokenSetId);
+            console.log('denominator', denominator.valueOf());
+            for (var j=0; j<_numOutcomes; j++) {
+                let individualOutcomeToken = OutcomeToken.at(await eventManager.outcomeTokens(_outcomeTokenSetId, j)); 
+                await individualOutcomeToken.approve(eventManager.address, await individualOutcomeToken.balanceOf(accounts[buyers[i]]), { from: accounts[buyers[i]] });
+            }
+            await eventManager.redeemPayout(_outcomeTokenSetId, { from: accounts[buyers[i]] });
+            assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);
+        }
+    });
+
+    it('should not be able to burn a partial outcome set', async () => {
+        // waiting for MarketMaker integration.
+    });
 })
