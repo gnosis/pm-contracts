@@ -155,7 +155,7 @@ contract('EventManager', function (accounts) {
 
         // create some buyers and purchase collateralTokens and then some outcomeTokens
         const buyers = [3, 4, 5, 6];
-        const collateralTokenCounts = [1e19, 100, 1e18, 0];
+        const collateralTokenCounts = [1e19, 1e9, 1e18, 1000];
         for (var i=0; i<buyers.length; i++) {
             await etherToken.deposit({ value: collateralTokenCounts[i], from: accounts[buyers[i]]});
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
@@ -187,7 +187,6 @@ contract('EventManager', function (accounts) {
         // assert payout redemption
         for (var i=0; i<buyers.length; i++) {
             var denominator = await eventManager.payoutDenominator(_outcomeTokenSetId);
-            console.log('denominator', denominator.valueOf());
             for (var j=0; j<_numOutcomes; j++) {
                 let individualOutcomeToken = OutcomeToken.at(await eventManager.outcomeTokens(_outcomeTokenSetId, j)); 
                 await individualOutcomeToken.approve(eventManager.address, await individualOutcomeToken.balanceOf(accounts[buyers[i]]), { from: accounts[buyers[i]] });
