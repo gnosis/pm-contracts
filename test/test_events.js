@@ -113,5 +113,60 @@ contract('EventManager', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), buyerPayout.valueOf())
     })
 
-    it('should redeem payouts in more complex scenarios')
+    it('should redeem payouts in more complex scenarios', async () => {
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
+        // Setup a more complex scenario
+        const _oracle = accounts[1];
+        const _questionId = '0x1234567812345678123456781234567812345678123456781234567812345678'; 
+        const _numOutcomes = 4;
+        await eventManager.prepareEvent(_oracle, _questionId, _numOutcomes);
+        const _outcomeTokenSetId = keccak256(_oracle + [_questionId, _numOutcomes].map(v => padLeft(toHex(v), 64).slice(2)).join(''));
+        assert.equal(await eventManager.getOutcomeTokenSetLength(_outcomeTokenSetId), 4);
+
+        // create some buyers and purchase collateralTokens and then some outcomeTokens
+        const buyers = [3, 4, 5, 6];
+        const collateralTokenCounts = [1e19, 1e9, 1e18, 1000];
+        for (var i=0; i<buyers.length; i++) {
+            await etherToken.deposit({ value: collateralTokenCounts[i], from: accounts[buyers[i]]});
+            assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
+            // before we Mint, we have to approve() the collateralTokens
+            await etherToken.approve(eventManager.address, collateralTokenCounts[i], { from: accounts[buyers[i]]});
+            await eventManager.mintOutcomeTokenSet(_outcomeTokenSetId, collateralTokenCounts[i], { from: accounts[buyers[i]]} );
+        }
+
+        // resolve the event
+        const resultsTransaction = await eventManager.receiveResult(_questionId, 
+            '0x' + [
+                padLeft('14D', 64), // 333
+                padLeft('29A', 64), // 666 
+                padLeft('1', 64), // 1
+                padLeft('0', 64)                     
+            ].join(''),
+            { from: _oracle }
+        );
+        assert.equal(await eventManager.payoutDenominator.call(_outcomeTokenSetId).then(res => res.toString()), 1000);
+
+        // assert correct payouts for outcome tokens 
+        const payoutsForOutcomeTokens = [333, 666, 1, 0];
+        for (var i=0; i<buyers.length; i++) {
+            let individualOutcomeToken = OutcomeToken.at(await eventManager.outcomeTokens(_outcomeTokenSetId, i));
+            assert.equal(await individualOutcomeToken.balanceOf(accounts[buyers[i]]).valueOf(), collateralTokenCounts[i]);
+            assert(await eventManager.payoutForOutcomeToken(individualOutcomeToken.address), payoutsForOutcomeTokens[i]);
+        }
+
+        // assert payout redemption
+        for (var i=0; i<buyers.length; i++) {
+            var denominator = await eventManager.payoutDenominator(_outcomeTokenSetId);
+            for (var j=0; j<_numOutcomes; j++) {
+                let individualOutcomeToken = OutcomeToken.at(await eventManager.outcomeTokens(_outcomeTokenSetId, j)); 
+                await individualOutcomeToken.approve(eventManager.address, await individualOutcomeToken.balanceOf(accounts[buyers[i]]), { from: accounts[buyers[i]] });
+            }
+            await eventManager.redeemPayout(_outcomeTokenSetId, { from: accounts[buyers[i]] });
+            assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);
+        }
+    });
+
+    it('should not be able to burn a partial outcome set', async () => {
+        // waiting for MarketMaker integration.
+    });
 })

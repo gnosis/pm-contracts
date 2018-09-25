@@ -87,14 +87,13 @@ contract EventManager is OracleConsumer {
             if(otAmount > senderBalance) otAmount = senderBalance;
             if(otAmount > 0) {
                 ot.burnFrom(msg.sender, otAmount);
-                if(payoutNumerator > 0) {
-                    uint payout = otAmount.mul(payoutNumerator)
-                        .div(payoutDenominator[outcomeTokenSetId]);
-                    require(collateralToken.transfer(msg.sender, payout),
-                        "could not transfer payout to message sender");
-                    totalPayout += payout;
+                if (payoutNumerator > 0) {
+                    totalPayout = totalPayout.add(otAmount.mul(payoutNumerator).div(payoutDenominator[outcomeTokenSetId]));
                 }
             }
+        }
+        if (totalPayout > 0) {
+            require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");               
         }
         emit PayoutRedemption(msg.sender, totalPayout);
     }
