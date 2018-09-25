@@ -1,6 +1,6 @@
 {
-  "name": "@gnosis.pm/pm-contracts",
-  "version": "2.0.0",
+  "name": "@gnosis.pm/gnosis-core-contracts",
+  "version": "1.0.0",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
@@ -13,6 +13,7 @@
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
     "resetnetinfo": "truffle networks --clean && tnt iN",
+    "measuregasstats": "tnt measureGas -f inheritanceMap.json -o build/gas-stats.json --test-command 'npm test'",
     "prepublishOnly": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN"
   },
   "keywords": [
@@ -30,7 +31,8 @@
     "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath"
   },
   "devDependencies": {
-    "@gnosis.pm/truffle-nice-tools": "^1.1.3",
+    "@digix/tempo": "^0.2.0",
+    "@gnosis.pm/truffle-nice-tools": "^1.1.2-prerelease",
     "babel-eslint": "^8.0.2",
     "decimal.js": "^10.0.1",
     "eslint": "^4.11.0",
@@ -43,10 +45,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gnosis/pm-contracts.git"
+    "url": "git+https://github.com/gnosis/gnosis-contracts.git"
   },
   "bugs": {
-    "url": "https://github.com/gnosis/pm-contracts/issues"
+    "url": "https://github.com/gnosis/gnosis-contracts/issues"
   },
-  "homepage": "https://github.com/gnosis/pm-contracts#readme"
+  "homepage": "https://github.com/gnosis/gnosis-contracts#readme"
 }

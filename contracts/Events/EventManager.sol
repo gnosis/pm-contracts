@@ -47,6 +47,8 @@ contract EventManager is OracleConsumer {
                 payout := calldataload(add(0x64, mul(0x20, i)))
             }
             payoutDenominator[outcomeTokenSetId] = payoutDenominator[outcomeTokenSetId].add(payout);
+
+            require(payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] == 0, "payout already set");
             payoutForOutcomeToken[outcomeTokens[outcomeTokenSetId][i]] = payout;
         }
         require(payoutDenominator[outcomeTokenSetId] > 0, "payout is all zeroes");
@@ -76,7 +78,6 @@ contract EventManager is OracleConsumer {
     }
 
     function redeemPayout(bytes32 outcomeTokenSetId) public {
-        require(payoutDenominator[outcomeTokenSetId] > 0, "The resolution for this event hasn't happened yet");
         uint totalPayout = 0;
         for(uint i = 0; i < outcomeTokens[outcomeTokenSetId].length; i++) {
             OutcomeToken ot = outcomeTokens[outcomeTokenSetId][i];
@@ -86,13 +87,14 @@ contract EventManager is OracleConsumer {
             if(otAmount > senderBalance) otAmount = senderBalance;
             if(otAmount > 0) {
                 ot.burnFrom(msg.sender, otAmount);
-                if (payoutNumerator > 0) {
-                    totalPayout = totalPayout.add(otAmount.mul(payoutNumerator).div(payoutDenominator[outcomeTokenSetId]));
+                if(payoutNumerator > 0) {
+                    uint payout = otAmount.mul(payoutNumerator)
+                        .div(payoutDenominator[outcomeTokenSetId]);
+                    require(collateralToken.transfer(msg.sender, payout),
+                        "could not transfer payout to message sender");
+                    totalPayout += payout;
                 }
             }
-        }
-        if (totalPayout > 0) {
-            require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");               
         }
         emit PayoutRedemption(msg.sender, totalPayout);
     }
