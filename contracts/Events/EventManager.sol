@@ -88,8 +88,7 @@ contract EventManager is OracleConsumer {
             if(otAmount > 0) {
                 ot.burnFrom(msg.sender, otAmount);
                 if (payoutNumerator > 0) {
-                    uint payout = otAmount.mul(payoutNumerator).div(payoutDenominator[outcomeTokenSetId]);
-                    totalPayout += payout;
+                    totalPayout = totalPayout.add(otAmount.mul(payoutNumerator).div(payoutDenominator[outcomeTokenSetId]));
                 }
             }
         }
