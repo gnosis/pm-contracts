@@ -2,6 +2,7 @@ language: node_js
 node_js:
 - '8'
 - '7'
+- '10'
 before_install:
 - npm install -g npm codecov greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
