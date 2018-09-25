@@ -52,12 +52,12 @@ contract('EventManager', function (accounts) {
 
         await etherToken.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
         for(let i = 0; i < 10; i++)
-            await eventManager.mintOutcomeTokenSet(eventId, collateralTokenCount / 10, { from: accounts[buyer] })
+            await eventManager.mintOutcomeTokenSet(0, eventId, collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(eventManager.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = OutcomeToken.at(await eventManager.getOutcomeToken.call(eventId, 0))
-        const outcomeToken2 = OutcomeToken.at(await eventManager.getOutcomeToken.call(eventId, 1))
+        const outcomeToken1 = OutcomeToken.at(await eventManager.getOutcomeToken.call(0, eventId, 0))
+        const outcomeToken2 = OutcomeToken.at(await eventManager.getOutcomeToken.call(0, eventId, 1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -67,7 +67,7 @@ contract('EventManager', function (accounts) {
         // Burn all outcomes
         await outcomeToken1.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
         await outcomeToken2.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
-        await eventManager.burnOutcomeTokenSet(eventId, collateralTokenCount, { from: accounts[buyer] })
+        await eventManager.burnOutcomeTokenSet(0, eventId, collateralTokenCount, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(eventManager.address), 0)
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), 0)
@@ -82,12 +82,12 @@ contract('EventManager', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
-        await eventManager.mintOutcomeTokenSet(eventId, collateralTokenCount, { from: accounts[buyer] })
+        await eventManager.mintOutcomeTokenSet(0, eventId, collateralTokenCount, { from: accounts[buyer] })
         assert.equal((await etherToken.balanceOf.call(eventManager.address)).valueOf(), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        const outcomeToken1 = OutcomeToken.at(await eventManager.getOutcomeToken.call(eventId, 0))
-        const outcomeToken2 = OutcomeToken.at(await eventManager.getOutcomeToken.call(eventId, 1))
+        const outcomeToken1 = OutcomeToken.at(await eventManager.getOutcomeToken.call(0, eventId, 0))
+        const outcomeToken2 = OutcomeToken.at(await eventManager.getOutcomeToken.call(0, eventId, 1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -105,7 +105,7 @@ contract('EventManager', function (accounts) {
         // Redeem payout for buyer account
         await outcomeToken2.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
         const buyerPayout = utils.getParamFromTxEvent(
-            await eventManager.redeemPayout(eventId, { from: accounts[buyer] }),
+            await eventManager.redeemPayout(0, eventId, { from: accounts[buyer] }),
             'payout')
         assert.equal(buyerPayout.valueOf(), collateralTokenCount * 7 / 10)
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
@@ -131,7 +131,7 @@ contract('EventManager', function (accounts) {
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
             // before we Mint, we have to approve() the collateralTokens
             await etherToken.approve(eventManager.address, collateralTokenCounts[i], { from: accounts[buyers[i]]});
-            await eventManager.mintOutcomeTokenSet(_eventId, collateralTokenCounts[i], { from: accounts[buyers[i]]} );
+            await eventManager.mintOutcomeTokenSet(0, _eventId, collateralTokenCounts[i], { from: accounts[buyers[i]]} );
         }
 
         // resolve the event
@@ -149,7 +149,7 @@ contract('EventManager', function (accounts) {
         // assert correct payouts for outcome tokens 
         const payoutsForOutcomeTokens = [333, 666, 1, 0];
         for (var i=0; i<buyers.length; i++) {
-            let individualOutcomeToken = OutcomeToken.at(await eventManager.getOutcomeToken(_eventId, i));
+            let individualOutcomeToken = OutcomeToken.at(await eventManager.getOutcomeToken(0, _eventId, i));
             assert.equal(await individualOutcomeToken.balanceOf(accounts[buyers[i]]).valueOf(), collateralTokenCounts[i]);
             assert(await eventManager.payoutForOutcomeToken(individualOutcomeToken.address), payoutsForOutcomeTokens[i]);
         }
@@ -158,10 +158,10 @@ contract('EventManager', function (accounts) {
         for (var i=0; i<buyers.length; i++) {
             var denominator = await eventManager.payoutDenominator(_eventId);
             for (var j=0; j<_outcomeTokenCount; j++) {
-                let individualOutcomeToken = OutcomeToken.at(await eventManager.getOutcomeToken(_eventId, j));
+                let individualOutcomeToken = OutcomeToken.at(await eventManager.getOutcomeToken(0, _eventId, j));
                 await individualOutcomeToken.approve(eventManager.address, await individualOutcomeToken.balanceOf(accounts[buyers[i]]), { from: accounts[buyers[i]] });
             }
-            await eventManager.redeemPayout(_eventId, { from: accounts[buyers[i]] });
+            await eventManager.redeemPayout(0, _eventId, { from: accounts[buyers[i]] });
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);
         }
     });

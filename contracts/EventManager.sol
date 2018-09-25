@@ -31,10 +31,16 @@ contract EventManager is OracleConsumer {
         outcomeTokenCounts[eventId] = outcomeTokenCount;
         for(uint i = 0; i < outcomeTokenCount; i++) {
             bytes32 outcomeTokenId = keccak256(abi.encodePacked(eventId, i));
-            require(outcomeTokens[outcomeTokenId] == OutcomeToken(0), "outcome token already created");
-            outcomeTokens[outcomeTokenId] = new OutcomeToken();
+            if(outcomeTokens[outcomeTokenId] == OutcomeToken(0)) {
+                createOutcomeToken(outcomeTokenId);
+            }
         }
         emit EventCreation(eventId, oracle, questionId, outcomeTokenCount);
+    }
+
+    function createOutcomeToken(bytes32 outcomeTokenId) public {
+        require(outcomeTokens[outcomeTokenId] == OutcomeToken(0), "outcome token already created");
+        outcomeTokens[outcomeTokenId] = new OutcomeToken();
     }
 
     function receiveResult(bytes32 questionId, bytes result) external {
@@ -51,7 +57,7 @@ contract EventManager is OracleConsumer {
             }
             payoutDenominator[eventId] = payoutDenominator[eventId].add(payout);
 
-            OutcomeToken outcomeToken = getOutcomeToken(eventId, i);
+            OutcomeToken outcomeToken = getOutcomeToken(bytes32(0), eventId, i);
             require(payoutForOutcomeToken[outcomeToken] == 0, "payout already set");
             payoutForOutcomeToken[outcomeToken] = payout;
         }
@@ -59,37 +65,52 @@ contract EventManager is OracleConsumer {
         emit EventResolution(eventId, msg.sender, questionId, outcomeTokenCount, result);
     }
 
-    function mintOutcomeTokenSet(bytes32 eventId, uint amount) public {
+    function mintOutcomeTokenSet(bytes32 parentTokenId, bytes32 eventId, uint amount) public {
         uint outcomeTokenCount = outcomeTokenCounts[eventId];
         require(outcomeTokenCount > 0, "event not prepared yet");
-        require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
+
+        if(parentTokenId == bytes32(0)) {
+            require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
+        } else {
+            revert("not yet implemented");
+        }
 
         for(uint i = 0; i < outcomeTokenCount; i++) {
-            require(getOutcomeToken(eventId, i).mint(msg.sender, amount), "could not mint outcome tokens");
+            OutcomeToken outcomeToken = getOutcomeToken(parentTokenId, eventId, i);
+            require(outcomeToken != OutcomeToken(0), "required outcome token contract not yet created");
+            require(outcomeToken.mint(msg.sender, amount), "could not mint outcome tokens");
         }
         emit OutcomeTokenSetMinting(eventId, amount);
     }
 
-    function burnOutcomeTokenSet(bytes32 eventId, uint amount) public {
+    function burnOutcomeTokenSet(bytes32 parentTokenId, bytes32 eventId, uint amount) public {
         uint outcomeTokenCount = outcomeTokenCounts[eventId];
         require(outcomeTokenCount > 0, "event not prepared yet");
         for(uint i = 0; i < outcomeTokenCount; i++) {
-            getOutcomeToken(eventId, i).burnFrom(msg.sender, amount);
+            OutcomeToken outcomeToken = getOutcomeToken(parentTokenId, eventId, i);
+            require(outcomeToken != OutcomeToken(0), "required outcome token contract not yet created");
+            outcomeToken.burnFrom(msg.sender, amount);
         }
-        require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
+
+        if(parentTokenId == bytes32(0)) {
+            require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
+        } else {
+            revert("not yet implemented");
+        }
+
         emit OutcomeTokenSetBurning(eventId, amount);
     }
 
-    function getOutcomeToken(bytes32 eventId, uint index) public view returns (OutcomeToken) {
-        return outcomeTokens[keccak256(abi.encodePacked(eventId, index))];
+    function getOutcomeToken(bytes32 parentTokenId, bytes32 eventId, uint index) public view returns (OutcomeToken) {
+        return outcomeTokens[bytes32(uint(parentTokenId) + uint(keccak256(abi.encodePacked(eventId, index))))];
     }
 
-    function redeemPayout(bytes32 eventId) public {
+    function redeemPayout(bytes32 parentTokenId, bytes32 eventId) public {
         uint totalPayout = 0;
         uint outcomeTokenCount = outcomeTokenCounts[eventId];
         require(outcomeTokenCount > 0, "event not prepared yet");
         for(uint i = 0; i < outcomeTokenCount; i++) {
-            OutcomeToken ot = getOutcomeToken(eventId, i);
+            OutcomeToken ot = getOutcomeToken(parentTokenId, eventId, i);
             uint payoutNumerator = payoutForOutcomeToken[ot];
             uint otAmount = ot.allowance(msg.sender, this);
             uint senderBalance = ot.balanceOf(msg.sender);
@@ -102,7 +123,11 @@ contract EventManager is OracleConsumer {
             }
         }
         if (totalPayout > 0) {
-            require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
+            if(parentTokenId == bytes32(0)) {
+                require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
+            } else {
+                revert("not yet implemented");
+            }
         }
         emit PayoutRedemption(msg.sender, totalPayout);
     }
