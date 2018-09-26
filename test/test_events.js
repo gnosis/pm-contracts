@@ -1,18 +1,24 @@
+const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
+
 const utils = require('./utils')
 const NewWeb3 = require('web3')
 const EventManager = artifacts.require('EventManager')
 const EventManagerFactory = artifacts.require('EventManagerFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
 const WETH9 = artifacts.require('WETH9')
+const contracts = [EventManager, EventManagerFactory, OutcomeToken]
 
 contract('EventManager', function (accounts) {
     let eventManagerFactory
-    let individualOutcomeToken
+    let etherToken
     let oracle, questionId, numOutcomes, eventManager
     let outcomeTokenSetId
 
+    before(testGas.createGasStatCollectorBeforeHook(contracts))
+    after(testGas.createGasStatCollectorAfterHook(contracts))
+
     before(async () => {
-        const { toHex, padLeft, keccak256, assertRejects } = NewWeb3.utils;
+        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         eventManagerFactory = await EventManagerFactory.deployed()
         etherToken = await WETH9.deployed()
 
@@ -30,46 +36,11 @@ contract('EventManager', function (accounts) {
         outcomeTokenSetId = keccak256(oracle + [questionId, numOutcomes].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
     })
 
-    it('should target the right event manager', async () => {
-        const eventManager = await eventManagerFactory.eventManagers(etherToken.address);
-        assert.equal(await EventManager.at(eventManager).collateralToken(), etherToken.address);    
-    });
-
-    it('should not be creatable when the collateralToken already exists', async () => {
-        try {
-            await eventManagerFactory.createEventManager(etherToken.address);
-            assert.fail();
-        } catch (e) {
-            assert.ok(/revert/.test(e.message));
-        }
-    });
+    it('should target the right event manager');
+    it('should be creatable when nonexistent');
 
     it('should have obtainable outcomeTokenSetIds if in possession of oracle, questionId, and numOutcomes', async () => {
         assert.equal((await eventManager.getOutcomeTokenSetLength(outcomeTokenSetId)).valueOf(), numOutcomes)
-    });
-
-    it('should revert if receiveResult reports all outcomes equal to 0', async () => {
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
-        
-        const _oracle = accounts[1];
-        const _questionId = 999123; 
-        const _numOutcomes = 4;
-        await eventManager.prepareEvent(_oracle, _questionId, _numOutcomes);
-        
-        try {
-            await eventManager.receiveResult(_questionId, 
-                '0x' + [
-                    padLeft('0', 64),
-                    padLeft('0', 64),
-                    padLeft('0', 64),
-                    padLeft('0', 64)
-                ].join(''),
-                { from: _oracle }
-            );
-            assert.fail();
-        } catch (e) {
-           assert.ok(/revert/.test(e.message)); 
-        }
     });
 
     it('should mint and burn outcome tokens', async () => {
@@ -104,7 +75,6 @@ contract('EventManager', function (accounts) {
     })
 
     it('should mint and set outcome tokens and redeem payouts for events', async () => {
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         // Mint outcome tokens
         const buyer = 2
         const collateralTokenCount = 10
@@ -124,8 +94,8 @@ contract('EventManager', function (accounts) {
         // Set outcome in event
         await eventManager.receiveResult(questionId,
             '0x' + [
-                padLeft('3', 64),
-                padLeft('7', 64),
+                NewWeb3.utils.padLeft('3', 64),
+                NewWeb3.utils.padLeft('7', 64),
             ].join(''),
             { from: oracle })
         assert.equal(await eventManager.payoutDenominator.call(outcomeTokenSetId), 10)
