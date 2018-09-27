@@ -1,3 +1,3 @@
 module.exports = function (deployer) {
-    deployer.deploy(artifacts.require('EventManagerFactory'))
+    deployer.deploy(artifacts.require('ConditionalPaymentProcessorFactory'))
 }
