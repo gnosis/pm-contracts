@@ -40,7 +40,7 @@ contract('EventManager', function (accounts) {
     it('should be creatable when nonexistent');
 
     it('should have obtainable eventIds if in possession of oracle, questionId, and outcomeTokenCount', async () => {
-        assert.equal((await eventManager.outcomeTokenCounts(eventId)).valueOf(), outcomeTokenCount)
+        assert.equal((await eventManager.getOutcomeTokenCount(eventId)).valueOf(), outcomeTokenCount)
     });
 
     it('should mint and burn outcome tokens', async () => {
@@ -62,7 +62,7 @@ contract('EventManager', function (accounts) {
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         // Validate getters
-        assert.equal(await eventManager.outcomeTokenCounts.call(eventId), 2)
+        assert.equal(await eventManager.getOutcomeTokenCount.call(eventId), 2)
 
         // Burn all outcomes
         await outcomeToken1.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
@@ -99,8 +99,8 @@ contract('EventManager', function (accounts) {
             ].join(''),
             { from: oracle })
         assert.equal(await eventManager.payoutDenominator.call(eventId), 10)
-        assert.equal(await eventManager.payoutForOutcomeToken.call(outcomeToken1.address), 3)
-        assert.equal(await eventManager.payoutForOutcomeToken.call(outcomeToken2.address), 7)
+        assert.equal(await eventManager.payoutNumerators.call(eventId, 0), 3)
+        assert.equal(await eventManager.payoutNumerators.call(eventId, 1), 7)
 
         // Redeem payout for buyer account
         await outcomeToken2.approve(eventManager.address, collateralTokenCount, { from: accounts[buyer] })
@@ -121,7 +121,7 @@ contract('EventManager', function (accounts) {
         const _outcomeTokenCount = 4;
         await eventManager.prepareEvent(_oracle, _questionId, _outcomeTokenCount);
         const _eventId = keccak256(_oracle + [_questionId, _outcomeTokenCount].map(v => padLeft(toHex(v), 64).slice(2)).join(''));
-        assert.equal(await eventManager.outcomeTokenCounts(_eventId), 4);
+        assert.equal(await eventManager.getOutcomeTokenCount(_eventId), 4);
 
         // create some buyers and purchase collateralTokens and then some outcomeTokens
         const buyers = [3, 4, 5, 6];
@@ -151,7 +151,7 @@ contract('EventManager', function (accounts) {
         for (var i=0; i<buyers.length; i++) {
             let individualOutcomeToken = OutcomeToken.at(await eventManager.getOutcomeToken(0, _eventId, i));
             assert.equal(await individualOutcomeToken.balanceOf(accounts[buyers[i]]).valueOf(), collateralTokenCounts[i]);
-            assert(await eventManager.payoutForOutcomeToken(individualOutcomeToken.address), payoutsForOutcomeTokens[i]);
+            assert(await eventManager.payoutNumerators(_eventId, i), payoutsForOutcomeTokens[i]);
         }
 
         // assert payout redemption

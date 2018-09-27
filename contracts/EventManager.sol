@@ -16,10 +16,13 @@ contract EventManager is OracleConsumer {
     event PayoutRedemption(address indexed redeemer, uint payout);
 
     ERC20 public collateralToken;
-    mapping(bytes32 => uint) public outcomeTokenCounts;
-    mapping(bytes32 => OutcomeToken) internal outcomeTokens;
+
+    /// Mapping key is an eventId
+    mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
-    mapping(address => uint) public payoutForOutcomeToken;
+
+    /// Mapping key is an outcomeTokenId, composed of (eventId, index) pair
+    mapping(bytes32 => OutcomeToken) internal outcomeTokens;
 
     constructor(ERC20 _collateralToken) public {
         collateralToken = _collateralToken;
@@ -27,8 +30,8 @@ contract EventManager is OracleConsumer {
 
     function prepareEvent(address oracle, bytes32 questionId, uint outcomeTokenCount) public {
         bytes32 eventId = keccak256(abi.encodePacked(oracle, questionId, outcomeTokenCount));
-        require(outcomeTokenCounts[eventId] == 0, "outcome token set already created");
-        outcomeTokenCounts[eventId] = outcomeTokenCount;
+        require(payoutNumerators[eventId].length == 0, "event already prepared");
+        payoutNumerators[eventId] = new uint[](outcomeTokenCount);
         for(uint i = 0; i < outcomeTokenCount; i++) {
             bytes32 outcomeTokenId = keccak256(abi.encodePacked(eventId, i));
             if(outcomeTokens[outcomeTokenId] == OutcomeToken(0)) {
@@ -48,7 +51,7 @@ contract EventManager is OracleConsumer {
         require(result.length % 32 == 0, "results not 32-byte aligned");
         uint outcomeTokenCount = result.length / 32;
         bytes32 eventId = keccak256(abi.encodePacked(msg.sender, questionId, outcomeTokenCount));
-        require(outcomeTokenCounts[eventId] == outcomeTokenCount, "number of outcomes mismatch");
+        require(payoutNumerators[eventId].length == outcomeTokenCount, "number of outcomes mismatch");
         require(payoutDenominator[eventId] == 0, "payout denominator already set");
         for(uint i = 0; i < outcomeTokenCount; i++) {
             uint payout;
@@ -57,22 +60,23 @@ contract EventManager is OracleConsumer {
             }
             payoutDenominator[eventId] = payoutDenominator[eventId].add(payout);
 
-            OutcomeToken outcomeToken = getOutcomeToken(bytes32(0), eventId, i);
-            require(payoutForOutcomeToken[outcomeToken] == 0, "payout already set");
-            payoutForOutcomeToken[outcomeToken] = payout;
+            require(payoutNumerators[eventId][i] == 0, "payout already set");
+            payoutNumerators[eventId][i] = payout;
         }
         require(payoutDenominator[eventId] > 0, "payout is all zeroes");
         emit EventResolution(eventId, msg.sender, questionId, outcomeTokenCount, result);
     }
 
     function mintOutcomeTokenSet(bytes32 parentTokenId, bytes32 eventId, uint amount) public {
-        uint outcomeTokenCount = outcomeTokenCounts[eventId];
+        uint outcomeTokenCount = payoutNumerators[eventId].length;
         require(outcomeTokenCount > 0, "event not prepared yet");
 
         if(parentTokenId == bytes32(0)) {
             require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
         } else {
-            revert("not yet implemented");
+            OutcomeToken parentToken = outcomeTokens[parentTokenId];
+            require(outcomeToken != OutcomeToken(0), "required parent token contract not yet created");
+            parentToken.burnFrom(msg.sender, amount);
         }
 
         for(uint i = 0; i < outcomeTokenCount; i++) {
@@ -84,7 +88,7 @@ contract EventManager is OracleConsumer {
     }
 
     function burnOutcomeTokenSet(bytes32 parentTokenId, bytes32 eventId, uint amount) public {
-        uint outcomeTokenCount = outcomeTokenCounts[eventId];
+        uint outcomeTokenCount = payoutNumerators[eventId].length;
         require(outcomeTokenCount > 0, "event not prepared yet");
         for(uint i = 0; i < outcomeTokenCount; i++) {
             OutcomeToken outcomeToken = getOutcomeToken(parentTokenId, eventId, i);
@@ -95,28 +99,38 @@ contract EventManager is OracleConsumer {
         if(parentTokenId == bytes32(0)) {
             require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
         } else {
-            revert("not yet implemented");
+            OutcomeToken parentToken = outcomeTokens[parentTokenId];
+            require(parentToken != OutcomeToken(0), "required parent token contract not yet created");
+            require(parentToken.mint(msg.sender, amount), "could not mint parent tokens");
         }
 
         emit OutcomeTokenSetBurning(eventId, amount);
     }
 
+    function getOutcomeTokenCount(bytes32 eventId) public view returns (uint) {
+        return payoutNumerators[eventId].length;
+    }
+
     function getOutcomeToken(bytes32 parentTokenId, bytes32 eventId, uint index) public view returns (OutcomeToken) {
-        return outcomeTokens[bytes32(uint(parentTokenId) + uint(keccak256(abi.encodePacked(eventId, index))))];
+        return outcomeTokens[bytes32(
+            uint(parentTokenId) +
+            uint(keccak256(abi.encodePacked(eventId, index)))
+        )];
     }
 
     function redeemPayout(bytes32 parentTokenId, bytes32 eventId) public {
+        require(payoutDenominator[eventId] > 0, "result for event not received yet");
         uint totalPayout = 0;
-        uint outcomeTokenCount = outcomeTokenCounts[eventId];
+        uint outcomeTokenCount = payoutNumerators[eventId].length;
         require(outcomeTokenCount > 0, "event not prepared yet");
         for(uint i = 0; i < outcomeTokenCount; i++) {
-            OutcomeToken ot = getOutcomeToken(parentTokenId, eventId, i);
-            uint payoutNumerator = payoutForOutcomeToken[ot];
-            uint otAmount = ot.allowance(msg.sender, this);
-            uint senderBalance = ot.balanceOf(msg.sender);
+            OutcomeToken outcomeToken = getOutcomeToken(parentTokenId, eventId, i);
+            uint payoutNumerator = payoutNumerators[eventId][i];
+            uint otAmount = outcomeToken.allowance(msg.sender, this);
+            uint senderBalance = outcomeToken.balanceOf(msg.sender);
             if(otAmount > senderBalance) otAmount = senderBalance;
             if(otAmount > 0) {
-                ot.burnFrom(msg.sender, otAmount);
+                outcomeToken.burnFrom(msg.sender, otAmount);
                 if (payoutNumerator > 0) {
                     totalPayout = totalPayout.add(otAmount.mul(payoutNumerator).div(payoutDenominator[eventId]));
                 }
@@ -126,7 +140,9 @@ contract EventManager is OracleConsumer {
             if(parentTokenId == bytes32(0)) {
                 require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
             } else {
-                revert("not yet implemented");
+                OutcomeToken parentToken = outcomeTokens[parentTokenId];
+                require(parentToken != OutcomeToken(0), "required parent token contract not yet created");
+                require(parentToken.mint(msg.sender, totalPayout), "could not mint payout");
             }
         }
         emit PayoutRedemption(msg.sender, totalPayout);
