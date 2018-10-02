@@ -42,7 +42,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal((await conditionalPaymentProcessor.getPayoutSlotCount(conditionId)).valueOf(), payoutSlotCount)
     });
 
-    it('should mint and burn payout slots', async () => {
+    it('should split and merge positions on payout slots', async () => {
         // Mint all outcomes
         const buyer = 0
         const collateralTokenCount = 1e19
@@ -73,7 +73,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), 0)
     })
 
-    it('should mint and set payout slots and redeem payouts for conditions', async () => {
+    it('should split positions, set payout values, and redeem payouts for conditions', async () => {
         // Mint payout slots
         const buyer = 2
         const collateralTokenCount = 10
