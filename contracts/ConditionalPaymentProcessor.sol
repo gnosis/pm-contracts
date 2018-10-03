@@ -8,24 +8,18 @@ contract ConditionalPaymentProcessor is OracleConsumer {
 
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, bytes result);
-    event PositionSplit(address indexed stakeholder, bytes32 indexed splitSlotId, bytes32 indexed conditionId, uint amount);
-    event PositionMerge(address indexed stakeholder, bytes32 indexed mergedSlotId, bytes32 indexed conditionId, uint amount);
-    event PayoutRedemption(address indexed redeemer, uint payout);
-
-    ERC20 public collateralToken;
+    event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed splitSlotId, bytes32 indexed conditionId, uint amount);
+    event PositionMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed mergedSlotId, bytes32 indexed conditionId, uint amount);
+    event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed redeemedSlotId, uint payout);
 
     /// Mapping key is an conditionId
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
 
     /// First key is the address of an account holder who has a stake in some payout slot for a condition.
-    /// Second key is an payoutSlotId, composed of (conditionId, index) pair.
-    /// The result of the mapping is the amount of stake held in a corresponding payout slot by the account holder.
+    /// Second key is H(collateralToken . payoutSlotId), where payoutSlotId is made by summing up H(conditionId . index).
+    /// The result of the mapping is the amount of stake held in a corresponding payout slot by the account holder, where the stake is backed by collateralToken.
     mapping(address => mapping(bytes32 => uint)) internal positions;
-
-    constructor(ERC20 _collateralToken) public {
-        collateralToken = _collateralToken;
-    }
 
     function prepareCondition(address oracle, bytes32 questionId, uint payoutSlotCount) public {
         bytes32 conditionId = keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount));
@@ -55,39 +49,43 @@ contract ConditionalPaymentProcessor is OracleConsumer {
         emit ConditionResolution(conditionId, msg.sender, questionId, payoutSlotCount, result);
     }
 
-    function splitPosition(bytes32 splitSlotId, bytes32 conditionId, uint amount) public {
+    function splitPosition(ERC20 collateralToken, bytes32 splitSlotId, bytes32 conditionId, uint amount) public {
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
 
+        bytes32 key;
         if(splitSlotId == bytes32(0)) {
             require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
         } else {
-            positions[msg.sender][splitSlotId] = positions[msg.sender][splitSlotId].sub(amount);
+            key = keccak256(abi.encodePacked(collateralToken, splitSlotId));
+            positions[msg.sender][key] = positions[msg.sender][key].sub(amount);
         }
 
         for(uint i = 0; i < payoutSlotCount; i++) {
-            bytes32 slotId = getPayoutSlotId(splitSlotId, conditionId, i);
-            positions[msg.sender][slotId] = positions[msg.sender][slotId].add(amount);
+            key = keccak256(abi.encodePacked(collateralToken, getPayoutSlotId(splitSlotId, conditionId, i)));
+            positions[msg.sender][key] = positions[msg.sender][key].add(amount);
         }
-        emit PositionSplit(msg.sender, splitSlotId, conditionId, amount);
+        emit PositionSplit(msg.sender, collateralToken, splitSlotId, conditionId, amount);
     }
 
-    function mergePosition(bytes32 mergedSlotId, bytes32 conditionId, uint amount) public {
+    function mergePosition(ERC20 collateralToken, bytes32 mergedSlotId, bytes32 conditionId, uint amount) public {
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
 
+        bytes32 key;
         for(uint i = 0; i < payoutSlotCount; i++) {
-            bytes32 slotId = getPayoutSlotId(mergedSlotId, conditionId, i);
-            positions[msg.sender][slotId] = positions[msg.sender][slotId].sub(amount);
+            key = keccak256(abi.encodePacked(collateralToken, getPayoutSlotId(mergedSlotId, conditionId, i)));
+            positions[msg.sender][key] = positions[msg.sender][key].sub(amount);
         }
 
         if(mergedSlotId == bytes32(0)) {
             require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
         } else {
-            positions[msg.sender][mergedSlotId] = positions[msg.sender][mergedSlotId].add(amount);
+            key = keccak256(abi.encodePacked(collateralToken, mergedSlotId));
+            positions[msg.sender][key] = positions[msg.sender][key].add(amount);
         }
 
-        emit PositionMerge(msg.sender, mergedSlotId, conditionId, amount);
+        emit PositionMerge(msg.sender, collateralToken, mergedSlotId, conditionId, amount);
     }
 
     function getPayoutSlotCount(bytes32 conditionId) public view returns (uint) {
@@ -101,27 +99,29 @@ contract ConditionalPaymentProcessor is OracleConsumer {
         );
     }
 
-    function redeemPayout(bytes32 redeemedSlotId, bytes32 conditionId) public {
+    function redeemPayout(ERC20 collateralToken, bytes32 redeemedSlotId, bytes32 conditionId) public {
         require(payoutDenominator[conditionId] > 0, "result for condition not received yet");
         uint totalPayout = 0;
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
+        bytes32 key;
         for(uint i = 0; i < payoutSlotCount; i++) {
-            bytes32 slotId = getPayoutSlotId(redeemedSlotId, conditionId, i);
+            key = keccak256(abi.encodePacked(collateralToken, getPayoutSlotId(redeemedSlotId, conditionId, i)));
             uint payoutNumerator = payoutNumerators[conditionId][i];
-            uint payoutStake = positions[msg.sender][slotId];
+            uint payoutStake = positions[msg.sender][key];
             if(payoutStake > 0) {
                 totalPayout = totalPayout.add(payoutStake.mul(payoutNumerator).div(payoutDenominator[conditionId]));
-                positions[msg.sender][slotId] = 0;
+                positions[msg.sender][key] = 0;
             }
         }
         if (totalPayout > 0) {
             if(redeemedSlotId == bytes32(0)) {
                 require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
             } else {
-                positions[msg.sender][redeemedSlotId] = positions[msg.sender][redeemedSlotId].add(totalPayout);
+                key = keccak256(abi.encodePacked(collateralToken, redeemedSlotId));
+                positions[msg.sender][key] = positions[msg.sender][key].add(totalPayout);
             }
         }
-        emit PayoutRedemption(msg.sender, totalPayout);
+        emit PayoutRedemption(msg.sender, collateralToken, redeemedSlotId, totalPayout);
     }
 }
