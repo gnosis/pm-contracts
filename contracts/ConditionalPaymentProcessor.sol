@@ -7,7 +7,7 @@ contract ConditionalPaymentProcessor is OracleConsumer {
     using SafeMath for uint;
 
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
-    event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, bytes result);
+    event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, uint[] payoutNumerators);
     event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed splitSlotId, bytes32 indexed conditionId, uint amount);
     event PositionMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed mergedSlotId, bytes32 indexed conditionId, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed redeemedSlotId, uint payout);
@@ -46,7 +46,7 @@ contract ConditionalPaymentProcessor is OracleConsumer {
             payoutNumerators[conditionId][i] = payout;
         }
         require(payoutDenominator[conditionId] > 0, "payout is all zeroes");
-        emit ConditionResolution(conditionId, msg.sender, questionId, payoutSlotCount, result);
+        emit ConditionResolution(conditionId, msg.sender, questionId, payoutSlotCount, payoutNumerators[conditionId]);
     }
 
     function splitPosition(ERC20 collateralToken, bytes32 splitSlotId, bytes32 conditionId, uint amount) public {
