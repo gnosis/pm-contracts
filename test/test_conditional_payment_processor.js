@@ -45,7 +45,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
 
         await etherToken.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
         for(let i = 0; i < 10; i++)
-            await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, conditionId, collateralTokenCount / 10, { from: accounts[buyer] })
+            await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, conditionId, [0b01, 0b10], collateralTokenCount / 10, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(conditionalPaymentProcessor.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
@@ -60,7 +60,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         // Burn all outcomes
         // await payoutSlot1.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
         // await payoutSlot2.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
-        await conditionalPaymentProcessor.mergePosition(etherToken.address, 0, conditionId, collateralTokenCount, { from: accounts[buyer] })
+        await conditionalPaymentProcessor.mergePosition(etherToken.address, 0, conditionId, [0b01, 0b10], collateralTokenCount, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(conditionalPaymentProcessor.address), 0)
         // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), 0)
@@ -75,7 +75,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
         await etherToken.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
-        await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, conditionId, collateralTokenCount, { from: accounts[buyer] })
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, conditionId, [0b01, 0b10], collateralTokenCount, { from: accounts[buyer] })
         assert.equal((await etherToken.balanceOf.call(conditionalPaymentProcessor.address)).valueOf(), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
@@ -98,9 +98,9 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         // Redeem payout for buyer account
         // await payoutSlot2.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
         const buyerPayout = utils.getParamFromTxEvent(
-            await conditionalPaymentProcessor.redeemPayout(etherToken.address, 0, conditionId, { from: accounts[buyer] }),
+            await conditionalPaymentProcessor.redeemPayout(etherToken.address, 0, conditionId, [0b10], { from: accounts[buyer] }),
             'payout')
-        // assert.equal(buyerPayout.valueOf(), collateralTokenCount * 7 / 10)
+        assert.equal(buyerPayout.valueOf(), collateralTokenCount * 7 / 10)
         // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), 0)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), buyerPayout.valueOf())
@@ -124,7 +124,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
             // before we Mint, we have to approve() the collateralTokens
             await etherToken.approve(conditionalPaymentProcessor.address, collateralTokenCounts[i], { from: accounts[buyers[i]]});
-            await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, _conditionId, collateralTokenCounts[i], { from: accounts[buyers[i]]} );
+            await conditionalPaymentProcessor.splitPosition(etherToken.address, 0, _conditionId, [0b0001, 0b0010, 0b0100, 0b1000], collateralTokenCounts[i], { from: accounts[buyers[i]]} );
         }
 
         // resolve the condition
@@ -149,11 +149,10 @@ contract('ConditionalPaymentProcessor', function (accounts) {
 
         // assert payout redemption
         for (var i=0; i<buyers.length; i++) {
-            var denominator = await conditionalPaymentProcessor.payoutDenominator(_conditionId);
-            await conditionalPaymentProcessor.redeemPayout(etherToken.address, 0, _conditionId, { from: accounts[buyers[i]] });
+            await conditionalPaymentProcessor.redeemPayout(etherToken.address, 0, _conditionId, [0b0001, 0b0010, 0b0100, 0b1000], { from: accounts[buyers[i]] });
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);
         }
     });
 
-    it('should not be able to merge a partial payout set');
+    it('should be able to merge a partial payout set');
 })
