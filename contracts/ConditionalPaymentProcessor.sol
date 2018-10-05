@@ -12,7 +12,7 @@ contract ConditionalPaymentProcessor is OracleConsumer {
     event PositionMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed mergedCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed redeemedCollectionId, uint payout);
 
-    /// Mapping key is an conditionId
+    /// Mapping key is an conditionId, where conditionId is made by H(oracle . questionId . payoutSlotCount)
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
 
@@ -22,6 +22,7 @@ contract ConditionalPaymentProcessor is OracleConsumer {
     mapping(address => mapping(bytes32 => uint)) internal positions;
 
     function prepareCondition(address oracle, bytes32 questionId, uint payoutSlotCount) public {
+        require(payoutSlotCount <= 256, "too many payout slots");
         bytes32 conditionId = keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount));
         require(payoutNumerators[conditionId].length == 0, "condition already prepared");
         payoutNumerators[conditionId] = new uint[](payoutSlotCount);
