@@ -17,8 +17,8 @@ contract ConditionalPaymentProcessor is OracleConsumer {
     mapping(bytes32 => uint) public payoutDenominator;
 
     /// First key is the address of an account holder who has a stake in some payout slot for a condition.
-    /// Second key is H(collateralToken . payoutSlotId), where payoutSlotId is made by summing up H(conditionId . index).
-    /// The result of the mapping is the amount of stake held in a corresponding payout slot by the account holder, where the stake is backed by collateralToken.
+    /// Second key is H(collateralToken . payoutCollectionId), where payoutCollectionId is made by summing up H(conditionId . indexSet).
+    /// The result of the mapping is the amount of stake held in a corresponding payout collection by the account holder, where the stake is backed by collateralToken.
     mapping(address => mapping(bytes32 => uint)) internal positions;
 
     function prepareCondition(address oracle, bytes32 questionId, uint payoutSlotCount) public {
