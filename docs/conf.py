@@ -12,7 +12,7 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -23,11 +23,14 @@ project = 'Gnosis Prediction Market Contracts'
 copyright = '2018, Gnosis Ltd'
 author = 'Gnosis'
 
-# The short X.Y version
-version = ''
 # The full version, including alpha/beta/rc tags
-release = ''
-
+import json
+with open(os.path.join(os.path.dirname(__file__), '..', 'package.json')) as package_json_file:
+    release = json.load(package_json_file)['version']
+# The short X.Y version
+(major, _, rest_of_version) = release.partition('.')
+(minor, _, _) = rest_of_version.partition('.')
+version = major + '.' + minor
 
 # -- General configuration ---------------------------------------------------
 
