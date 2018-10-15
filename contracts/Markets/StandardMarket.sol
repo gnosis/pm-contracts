@@ -152,7 +152,7 @@ contract StandardMarket is Proxied, Market, StandardMarketData {
         eventContract.buyAllOutcomes(outcomeTokenCount);
         // Short sell selected outcome
         eventContract.outcomeTokens(outcomeTokenIndex).approve(this, outcomeTokenCount);
-        uint profit = sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
+        uint profit = this.sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
         cost = outcomeTokenCount - profit;
         // Transfer outcome tokens to buyer
         uint8 outcomeCount = eventContract.getOutcomeCount();
