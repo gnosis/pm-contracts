@@ -2,6 +2,7 @@ const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
 const utils = require('./utils')
 const NewWeb3 = require('web3')
+const { toHex, padLeft, keccak256 } = NewWeb3.utils;
 const ConditionalPaymentProcessor = artifacts.require('ConditionalPaymentProcessor')
 const WETH9 = artifacts.require('WETH9')
 const contracts = [ConditionalPaymentProcessor]
@@ -16,7 +17,6 @@ contract('ConditionalPaymentProcessor', function (accounts) {
     after(testGas.createGasStatCollectorAfterHook(contracts))
 
     before(async () => {
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed()
         etherToken = await WETH9.deployed()
 
@@ -49,27 +49,41 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(conditionalPaymentProcessor.address), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        // const payoutSlot1 = PayoutSlot.at(await conditionalPaymentProcessor.getPayoutSlot.call(0, conditionId, 0))
-        // const payoutSlot2 = PayoutSlot.at(await conditionalPaymentProcessor.getPayoutSlot.call(0, conditionId, 1))
-        // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), collateralTokenCount)
-        // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), collateralTokenCount)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            collateralTokenCount)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b10), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            collateralTokenCount)
 
         // Validate getters
         assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount.call(conditionId), 2)
 
         // Burn all outcomes
-        // await payoutSlot1.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
-        // await payoutSlot2.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
         await conditionalPaymentProcessor.mergePosition(etherToken.address, 0, conditionId, [0b01, 0b10], collateralTokenCount, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(conditionalPaymentProcessor.address), 0)
-        // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), 0)
-        // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), 0)
+
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            0)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b10), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            0)
     })
 
     it('should split positions, set payout values, and redeem payouts for conditions', async () => {
         // Mint payout slots
         const buyer = 2
+        const recipient = 7
         const collateralTokenCount = 10
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
@@ -79,10 +93,16 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal((await etherToken.balanceOf.call(conditionalPaymentProcessor.address)).valueOf(), collateralTokenCount)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0)
 
-        // const payoutSlot1 = PayoutSlot.at(await conditionalPaymentProcessor.getPayoutSlot.call(0, conditionId, 0))
-        // const payoutSlot2 = PayoutSlot.at(await conditionalPaymentProcessor.getPayoutSlot.call(0, conditionId, 1))
-        // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), collateralTokenCount)
-        // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), collateralTokenCount)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            collateralTokenCount)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b10), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            collateralTokenCount)
 
         // Set outcome in condition
         await conditionalPaymentProcessor.receiveResult(questionId,
@@ -96,18 +116,28 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal(await conditionalPaymentProcessor.payoutNumerators.call(conditionId, 1), 7)
 
         // Redeem payout for buyer account
-        // await payoutSlot2.approve(conditionalPaymentProcessor.address, collateralTokenCount, { from: accounts[buyer] })
+        await conditionalPaymentProcessor.transferFrom(accounts[buyer], accounts[recipient],
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
+            collateralTokenCount, { from: accounts[buyer] })
         const buyerPayout = utils.getParamFromTxEvent(
             await conditionalPaymentProcessor.redeemPayout(etherToken.address, 0, conditionId, [0b10], { from: accounts[buyer] }),
             'payout')
         assert.equal(buyerPayout.valueOf(), collateralTokenCount * 7 / 10)
-        // assert.equal(await payoutSlot1.balanceOf.call(accounts[buyer]), collateralTokenCount)
-        // assert.equal(await payoutSlot2.balanceOf.call(accounts[buyer]), 0)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
+                accounts[recipient]),
+            collateralTokenCount)
+        assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+            keccak256(
+                etherToken.address + keccak256(conditionId + padLeft(toHex(0b10), 64).slice(2)).slice(2)),
+                accounts[buyer]),
+            0)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), buyerPayout.valueOf())
     })
 
     it('should redeem payouts in more complex scenarios', async () => {
-        const { toHex, padLeft, keccak256 } = NewWeb3.utils;
         // Setup a more complex scenario
         const _oracle = accounts[1];
         const _questionId = '0x1234567812345678123456781234567812345678123456781234567812345678'; 
@@ -142,8 +172,11 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         // assert correct payouts for payout slots
         const payoutsForPayoutSlots = [333, 666, 1, 0];
         for (var i=0; i<buyers.length; i++) {
-            // let individualPayoutSlot = PayoutSlot.at(await conditionalPaymentProcessor.getPayoutSlot(0, _conditionId, i));
-            // assert.equal(await individualPayoutSlot.balanceOf(accounts[buyers[i]]).valueOf(), collateralTokenCounts[i]);
+            assert.equal(await conditionalPaymentProcessor.balanceOf.call(
+                keccak256(
+                    etherToken.address + keccak256(_conditionId + padLeft(toHex(1 << i), 64).slice(2)).slice(2)),
+                    accounts[buyers[i]]),
+                collateralTokenCounts[i])
             assert(await conditionalPaymentProcessor.payoutNumerators(_conditionId, i), payoutsForPayoutSlots[i]);
         }
 

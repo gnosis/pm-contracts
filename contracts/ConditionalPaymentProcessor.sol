@@ -1,10 +1,13 @@
 pragma solidity ^0.4.24;
+import "openzeppelin-solidity/contracts/AddressUtils.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "erc-1155/contracts/IERC1155.sol";
 import "./OracleConsumer.sol";
 
-contract ConditionalPaymentProcessor is OracleConsumer {
+contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     using SafeMath for uint;
+    using AddressUtils for address;
 
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, uint[] payoutNumerators);
@@ -163,5 +166,58 @@ contract ConditionalPaymentProcessor is OracleConsumer {
             }
         }
         emit PayoutRedemption(msg.sender, collateralToken, redeemedCollectionId, totalPayout);
+    }
+
+    mapping (uint256 => mapping(address => mapping(address => uint256))) internal allowances;
+
+    function transferFrom(address _from, address _to, uint256 _id, uint256 _value) external {
+        if(_from != msg.sender) {
+            allowances[_id][_from][msg.sender] = allowances[_id][_from][msg.sender].sub(_value);
+        }
+
+        positions[_from][bytes32(_id)] = positions[_from][bytes32(_id)].sub(_value);
+        positions[_to][bytes32(_id)] = _value.add(positions[_to][bytes32(_id)]);
+
+        emit Transfer(msg.sender, _from, _to, _id, _value);
+    }
+
+    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes _data) external {
+        this.transferFrom(_from, _to, _id, _value);
+
+        require(_checkAndCallSafeTransfer(_from, _to, _id, _value, _data));
+    }
+
+    function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) external {
+        // if the allowance isn't 0, it can only be updated to 0 to prevent an allowance change immediately after withdrawal
+        require(_value == 0 || allowances[_id][msg.sender][_spender] == _currentValue);
+        allowances[_id][msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _id, _currentValue, _value);
+    }
+
+    function balanceOf(uint256 _id, address _owner) external view returns (uint256) {
+        return positions[_owner][bytes32(_id)];
+    }
+
+    function allowance(uint256 _id, address _owner, address _spender) external view returns (uint256) {
+        return allowances[_id][_owner][_spender];
+    }
+
+    bytes4 constant private ERC1155_RECEIVED = 0xf23a6e61;
+    function _checkAndCallSafeTransfer(
+        address _from,
+        address _to,
+        uint256 _id,
+        uint256 _value,
+        bytes _data
+    )
+    internal
+    returns (bool)
+    {
+        if (!_to.isContract()) {
+            return true;
+        }
+        bytes4 retval = IERC1155TokenReceiver(_to).onERC1155Received(
+            msg.sender, _from, _id, _value, _data);
+        return (retval == ERC1155_RECEIVED);
     }
 }
