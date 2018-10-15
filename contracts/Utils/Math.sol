@@ -46,7 +46,7 @@ library Math {
     /// @return estimate of 2**x in fixed point
     function pow2(int x, EstimationMode estimationMode)
         public
-        constant
+        pure
         returns (uint)
     {
         var (lower, upper) = pow2Bounds(x);
@@ -70,7 +70,7 @@ library Math {
     /// }
     function pow2Bounds(int x)
         public
-        constant
+        pure
         returns (uint lower, uint upper)
     {
         // revert if x is > MAX_POWER, where
@@ -181,7 +181,7 @@ library Math {
     /// @return estimate of log2(x) in fixed point
     function log2(uint x, EstimationMode estimationMode)
         public
-        constant
+        pure
         returns (int)
     {
         var (lower, upper) = log2Bounds(x);
@@ -205,7 +205,7 @@ library Math {
     /// }
     function log2Bounds(uint x)
         public
-        constant
+        pure
         returns (int lower, int upper)
     {
         require(x > 0);

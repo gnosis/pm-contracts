@@ -32,7 +32,7 @@ contract LMSRMarketMaker is MarketMaker {
         // Calculate cost level based on net outcome token balances
         int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(logN, netOutcomeTokensSold, funding);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
 
         // Change amounts based on outcomeTokenAmounts passed in
         require(netOutcomeTokensSold.length == outcomeTokenAmounts.length);
@@ -41,7 +41,7 @@ contract LMSRMarketMaker is MarketMaker {
         }
 
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(logN, netOutcomeTokensSold, funding);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
 
         // Calculate net cost as cost level difference and use the ceil
         netCost = costLevelAfter.sub(costLevelBefore);
@@ -54,13 +54,77 @@ contract LMSRMarketMaker is MarketMaker {
         }
     }
 
+    /// @dev Returns cost to buy given number of outcome tokens
+    /// @param market Market contract
+    /// @param outcomeTokenIndex Index of outcome to buy
+    /// @param outcomeTokenCount Number of outcome tokens to buy
+    /// @return Cost
+    function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
+        public
+        constant
+        returns (uint cost)
+    {
+        require(market.eventContract().getOutcomeCount() > 1);
+        int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
+        // Calculate cost level based on net outcome token balances
+        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        uint funding = market.funding();
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        // Add outcome token count to net outcome token balance
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
+        // Calculate cost level after balance was updated
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        // Calculate cost as cost level difference
+        if(costLevelAfter < costLevelBefore)
+            costLevelAfter = costLevelBefore;
+        cost = uint(costLevelAfter - costLevelBefore);
+        // Take the ceiling to account for rounding
+        if (cost / ONE * ONE == cost)
+            cost /= ONE;
+        else
+            // Integer division by ONE ensures there is room to (+ 1)
+            cost = cost / ONE + 1;
+        // Make sure cost is not bigger than 1 per share
+        if (cost > outcomeTokenCount)
+            cost = outcomeTokenCount;
+    }
+
+    /// @dev Returns profit for selling given number of outcome tokens
+    /// @param market Market contract
+    /// @param outcomeTokenIndex Index of outcome to sell
+    /// @param outcomeTokenCount Number of outcome tokens to sell
+    /// @return Profit
+    function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
+        public
+        constant
+        returns (uint profit)
+    {
+        require(market.eventContract().getOutcomeCount() > 1);
+        int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
+        // Calculate cost level based on net outcome token balances
+        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        uint funding = market.funding();
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        // Subtract outcome token count from the net outcome token balance
+        require(int(outcomeTokenCount) >= 0);
+        netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
+        // Calculate cost level after balance was updated
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        // Calculate profit as cost level difference
+        if(costLevelBefore <= costLevelAfter)
+            costLevelBefore = costLevelAfter;
+        // Take the floor
+        profit = uint(costLevelBefore - costLevelAfter) / ONE;
+    }
+
     /// @dev Returns marginal price of an outcome
     /// @param market Market contract
     /// @param outcomeTokenIndex Index of outcome to determine marginal price of
     /// @return Marginal price of an outcome as a fixed point number
     function calcMarginalPrice(Market market, uint8 outcomeTokenIndex)
         public
-        view
+        constant
         returns (uint price)
     {
         require(market.eventContract().getOutcomeCount() > 1);
@@ -85,7 +149,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Cost level
     function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding, Math.EstimationMode estimationMode)
         private
-        pure
+        constant
         returns(int costLevel)
     {
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)).
@@ -106,7 +170,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
     function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Math.EstimationMode estimationMode)
         private
-        pure
+        constant
         returns (uint sum, int offset, uint outcomeExpTerm)
     {
         // Naive calculation of this causes an overflow
@@ -145,7 +209,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Net outcome tokens sold by market
     function getNetOutcomeTokensSold(Market market)
         private
-        view
+        constant
         returns (int[] quantities)
     {
         quantities = new int[](market.eventContract().getOutcomeCount());

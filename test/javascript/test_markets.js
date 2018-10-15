@@ -257,7 +257,7 @@ contract('StandardMarket', function (accounts) {
         await campaign.closeMarket()
         const finalBalance = await campaign.finalBalance()
 
-        assert.isAbove(finalBalance, funding)
+        assert(finalBalance.gt(funding))
 
         assert.equal(
             getParamFromTxEvent(

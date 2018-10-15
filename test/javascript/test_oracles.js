@@ -201,7 +201,7 @@ contract('Oracle', function (accounts) {
 
         // Close winning market and transfer collateral tokens to creator
         await futarchyOracle.close({ from: accounts[creator] })
-        assert.isAbove(await etherToken.balanceOf.call(accounts[creator]), funding)
+        assert((await etherToken.balanceOf.call(accounts[creator])).gt(funding))
     })
 
     it('should test majority oracle', async () => {

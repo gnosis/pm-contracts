@@ -94,6 +94,76 @@ contract StandardMarket is Proxied, Market, StandardMarketData {
         FeeWithdrawal(fees);
     }
 
+    /// @dev Allows to buy outcome tokens from market maker
+    /// @param outcomeTokenIndex Index of the outcome token to buy
+    /// @param outcomeTokenCount Amount of outcome tokens to buy
+    /// @param maxCost The maximum cost in collateral tokens to pay for outcome tokens
+    /// @return Cost in collateral tokens
+    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost)
+        public
+        atStage(Stages.MarketFunded)
+        returns (uint cost)
+    {
+        require(int(outcomeTokenCount) >= 0 && int(maxCost) > 0);
+        uint8 outcomeCount = eventContract.getOutcomeCount();
+        require(outcomeTokenIndex >= 0 && outcomeTokenIndex < outcomeCount);
+        int[] memory outcomeTokenAmounts = new int[](outcomeCount);
+        outcomeTokenAmounts[outcomeTokenIndex] = int(outcomeTokenCount);
+        (int netCost, int outcomeTokenNetCost, uint fees) = tradeImpl(outcomeCount, outcomeTokenAmounts, int(maxCost));
+        require(netCost >= 0 && outcomeTokenNetCost >= 0);
+        cost = uint(netCost);
+        OutcomeTokenPurchase(msg.sender, outcomeTokenIndex, outcomeTokenCount, uint(outcomeTokenNetCost), fees);
+    }
+
+    /// @dev Allows to sell outcome tokens to market maker
+    /// @param outcomeTokenIndex Index of the outcome token to sell
+    /// @param outcomeTokenCount Amount of outcome tokens to sell
+    /// @param minProfit The minimum profit in collateral tokens to earn for outcome tokens
+    /// @return Profit in collateral tokens
+    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
+        public
+        atStage(Stages.MarketFunded)
+        returns (uint profit)
+    {
+        require(-int(outcomeTokenCount) <= 0 && -int(minProfit) < 0);
+        uint8 outcomeCount = eventContract.getOutcomeCount();
+        require(outcomeTokenIndex >= 0 && outcomeTokenIndex < outcomeCount);
+        int[] memory outcomeTokenAmounts = new int[](outcomeCount);
+        outcomeTokenAmounts[outcomeTokenIndex] = -int(outcomeTokenCount);
+        (int netCost, int outcomeTokenNetCost, uint fees) = tradeImpl(outcomeCount, outcomeTokenAmounts, -int(minProfit));
+        require(netCost <= 0 && outcomeTokenNetCost <= 0);
+        profit = uint(-netCost);
+        OutcomeTokenSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, uint(-outcomeTokenNetCost), fees);
+    }
+
+    /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
+    ///      shares of all other outcome tokens.
+    /// @param outcomeTokenIndex Index of the outcome token to short sell
+    /// @param outcomeTokenCount Amount of outcome tokens to short sell
+    /// @param minProfit The minimum profit in collateral tokens to earn for short sold outcome tokens
+    /// @return Cost to short sell outcome in collateral tokens
+    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
+        public
+        returns (uint cost)
+    {
+        // Buy all outcomes
+        require(   eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
+                && eventContract.collateralToken().approve(eventContract, outcomeTokenCount));
+        eventContract.buyAllOutcomes(outcomeTokenCount);
+        // Short sell selected outcome
+        eventContract.outcomeTokens(outcomeTokenIndex).approve(this, outcomeTokenCount);
+        uint profit = sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
+        cost = outcomeTokenCount - profit;
+        // Transfer outcome tokens to buyer
+        uint8 outcomeCount = eventContract.getOutcomeCount();
+        for (uint8 i = 0; i < outcomeCount; i++)
+            if (i != outcomeTokenIndex)
+                require(eventContract.outcomeTokens(i).transfer(msg.sender, outcomeTokenCount));
+        // Send change back to buyer
+        require(eventContract.collateralToken().transfer(msg.sender, profit));
+        OutcomeTokenShortSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, cost);
+    }
+
     /// @dev Allows to trade outcome tokens and collateral with the market maker
     /// @param outcomeTokenAmounts Amounts of each outcome token to buy or sell. If positive, will buy this amount of outcome token from the market. If negative, will sell this amount back to the market instead.
     /// @param collateralLimit If positive, this is the limit for the amount of collateral tokens which will be sent to the market to conduct the trade. If negative, this is the minimum amount of collateral tokens which will be received from the market for the trade. If zero, there is no limit.
@@ -106,16 +176,26 @@ contract StandardMarket is Proxied, Market, StandardMarketData {
         uint8 outcomeCount = eventContract.getOutcomeCount();
         require(outcomeTokenAmounts.length == outcomeCount);
 
-        // Calculate net cost for executing trade
-        int outcomeTokenNetCost = marketMaker.calcNetCost(this, outcomeTokenAmounts);
-        int fees;
-        if(outcomeTokenNetCost < 0)
-            fees = int(calcMarketFee(uint(-outcomeTokenNetCost)));
-        else
-            fees = int(calcMarketFee(uint(outcomeTokenNetCost)));
+        int outcomeTokenNetCost;
+        uint fees;
+        (netCost, outcomeTokenNetCost, fees) = tradeImpl(outcomeCount, outcomeTokenAmounts, collateralLimit);
 
-        require(fees >= 0);
-        netCost = outcomeTokenNetCost.add(fees);
+        OutcomeTokenTrade(msg.sender, outcomeTokenAmounts, outcomeTokenNetCost, fees);
+    }
+
+    function tradeImpl(uint8 outcomeCount, int[] outcomeTokenAmounts, int collateralLimit)
+        private
+        returns (int netCost, int outcomeTokenNetCost, uint fees)
+    {
+        // Calculate net cost for executing trade
+        outcomeTokenNetCost = marketMaker.calcNetCost(this, outcomeTokenAmounts);
+        if(outcomeTokenNetCost < 0)
+            fees = calcMarketFee(uint(-outcomeTokenNetCost));
+        else
+            fees = calcMarketFee(uint(outcomeTokenNetCost));
+
+        require(int(fees) >= 0);
+        netCost = outcomeTokenNetCost.add(int(fees));
 
         require(
             (collateralLimit != 0 && netCost <= collateralLimit) ||
@@ -152,8 +232,6 @@ contract StandardMarket is Proxied, Market, StandardMarketData {
                 require(eventContract.collateralToken().transfer(msg.sender, uint(-netCost)));
             }
         }
-
-        OutcomeTokenTrade(msg.sender, outcomeTokenAmounts, outcomeTokenNetCost, uint(fees));
     }
 
     /// @dev Calculates fee to be paid to market maker
