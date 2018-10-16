@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Utils/Proxy.sol";
 

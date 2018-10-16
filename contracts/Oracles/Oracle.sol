@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Utils/Proxy.sol";
 
 /// @title Abstract oracle contract - Functions to be implemented by oracles
