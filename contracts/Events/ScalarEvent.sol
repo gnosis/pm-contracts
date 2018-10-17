@@ -43,7 +43,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < 2; i++) {
-            OutcomeToken outcomeToken = new OutcomeToken();
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
             outcomeTokens.push(outcomeToken);
             emit OutcomeTokenCreation(outcomeToken, i);
         }
