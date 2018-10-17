@@ -1,8 +1,11 @@
 pragma solidity ^0.4.24;
-import "../Tokens/StandardToken.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 
 
-contract OutcomeTokenData {
+/// @title Outcome token contract - Issuing and revoking outcome tokens
+/// @author Stefan George - <stefan@gnosis.pm>
+contract OutcomeToken is StandardToken {
+    using SafeMath for *;
 
     /*
      *  Events
@@ -23,28 +26,17 @@ contract OutcomeTokenData {
         require(msg.sender == eventContract);
         _;
     }
-}
-
-contract OutcomeTokenProxy is Proxy, StandardTokenData, OutcomeTokenData {
-
-    /// @dev Constructor sets events contract address
-    function OutcomeTokenProxy(address proxied)
-        Proxy(proxied)
-        public
-    {
-        eventContract = msg.sender;
-    }
-}
-
-
-/// @title Outcome token contract - Issuing and revoking outcome tokens
-/// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
-    using Math for *;
 
     /*
      *  Public functions
      */
+    /// @dev Constructor sets events contract address
+    constructor()
+        public
+    {
+        eventContract = msg.sender;
+    }
+
     /// @dev Events contract issues new tokens for address. Returns success
     /// @param _for Address of receiver
     /// @param outcomeTokenCount Number of tokens to issue
@@ -53,7 +45,7 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
         isEventContract
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
-        totalTokens = totalTokens.add(outcomeTokenCount);
+        totalSupply_ = totalSupply_.add(outcomeTokenCount);
         Issuance(_for, outcomeTokenCount);
     }
 
@@ -65,7 +57,7 @@ contract OutcomeToken is Proxied, StandardToken, OutcomeTokenData {
         isEventContract
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
-        totalTokens = totalTokens.sub(outcomeTokenCount);
+        totalSupply_ = totalSupply_.sub(outcomeTokenCount);
         Revocation(_for, outcomeTokenCount);
     }
 }

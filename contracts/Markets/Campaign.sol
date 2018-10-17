@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
-import "../Utils/Math.sol";
-import "../Utils/Proxy.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 contract CampaignData {
 
@@ -97,7 +97,7 @@ contract CampaignProxy is Proxy, CampaignData {
 /// @title Campaign contract - Allows to crowdfund a market
 /// @author Stefan George - <stefan@gnosis.pm>
 contract Campaign is Proxied, CampaignData {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Public functions

@@ -12,7 +12,7 @@ contract FutarchyOracleFactory {
     event FutarchyOracleCreation(
         address indexed creator,
         FutarchyOracle futarchyOracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,
@@ -57,7 +57,7 @@ contract FutarchyOracleFactory {
     /// @param startDate Start date for price logging
     /// @return Oracle contract
     function createFutarchyOracle(
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,

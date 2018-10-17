@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
-import "../Utils/Proxy.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
 contract MajorityOracleData {

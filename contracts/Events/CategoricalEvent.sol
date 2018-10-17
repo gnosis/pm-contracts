@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Events/Event.sol";
-import "../Utils/Proxy.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
 contract CategoricalEventProxy is Proxy, EventData {
@@ -9,7 +9,7 @@ contract CategoricalEventProxy is Proxy, EventData {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    function CategoricalEventProxy(address proxied, address outcomeTokenMasterCopy, Token _collateralToken, Oracle _oracle, uint8 outcomeCount)
+    function CategoricalEventProxy(address proxied, address outcomeTokenMasterCopy, ERC20 _collateralToken, Oracle _oracle, uint8 outcomeCount)
         Proxy(proxied)
         public
     {
@@ -19,7 +19,7 @@ contract CategoricalEventProxy is Proxy, EventData {
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < outcomeCount; i++) {
-            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            OutcomeToken outcomeToken = new OutcomeToken();
             outcomeTokens.push(outcomeToken);
             OutcomeTokenCreation(outcomeToken, i);
         }

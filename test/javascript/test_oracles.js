@@ -1,9 +1,8 @@
 const utils = require('./utils')
 const { getBlock } = utils
 const { wait } = require('@digix/tempo')(web3)
-const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const DifficultyOracle = artifacts.require('DifficultyOracle')
@@ -20,7 +19,6 @@ const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const OutcomeToken = artifacts.require('OutcomeToken')
 
-const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, DifficultyOracle, DifficultyOracleFactory, MajorityOracle, MajorityOracleFactory, UltimateOracle, UltimateOracleFactory, FutarchyOracle, FutarchyOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, OutcomeToken]
 
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
@@ -34,8 +32,6 @@ contract('Oracle', function (accounts) {
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
     let fee, deadline, funding, startDate
 
-    before(testGas.createGasStatCollectorBeforeHook(contracts))
-    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         // deployed factory contracts
@@ -45,7 +41,7 @@ contract('Oracle', function (accounts) {
         ultimateOracleFactory = await UltimateOracleFactory.deployed()
         futarchyOracleFactory = await FutarchyOracleFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
 
         // ipfs hashes
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'

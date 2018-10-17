@@ -13,7 +13,7 @@ contract UltimateOracleFactory {
         address indexed creator,
         UltimateOracle ultimateOracle,
         Oracle oracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         uint8 spreadMultiplier,
         uint challengePeriod,
         uint challengeAmount,
@@ -44,7 +44,7 @@ contract UltimateOracleFactory {
     /// @return Oracle contract
     function createUltimateOracle(
         Oracle oracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         uint8 spreadMultiplier,
         uint challengePeriod,
         uint challengeAmount,

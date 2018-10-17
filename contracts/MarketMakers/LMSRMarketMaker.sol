@@ -1,12 +1,13 @@
 pragma solidity ^0.4.24;
-import "../Utils/Math.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@gnosis.pm/util-contracts/contracts/Fixed192x64Math.sol";
 import "../MarketMakers/MarketMaker.sol";
 
 
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
 /// @author Alan Lu - <alan.lu@gnosis.pm>
 contract LMSRMarketMaker is MarketMaker {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Constants
@@ -30,9 +31,9 @@ contract LMSRMarketMaker is MarketMaker {
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
 
         // Calculate cost level based on net outcome token balances
-        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        int log2N = Fixed192x64Math.binaryLog(netOutcomeTokensSold.length * ONE, Fixed192x64Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.LowerBound);
 
         // Change amounts based on outcomeTokenAmounts passed in
         require(netOutcomeTokensSold.length == outcomeTokenAmounts.length);
@@ -41,7 +42,7 @@ contract LMSRMarketMaker is MarketMaker {
         }
 
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.UpperBound);
 
         // Calculate net cost as cost level difference and use the ceil
         netCost = costLevelAfter.sub(costLevelBefore);
@@ -67,14 +68,14 @@ contract LMSRMarketMaker is MarketMaker {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         // Calculate cost level based on net outcome token balances
-        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        int log2N = Fixed192x64Math.binaryLog(netOutcomeTokensSold.length * ONE, Fixed192x64Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.LowerBound);
         // Add outcome token count to net outcome token balance
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].add(int(outcomeTokenCount));
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.UpperBound);
         // Calculate cost as cost level difference
         if(costLevelAfter < costLevelBefore)
             costLevelAfter = costLevelBefore;
@@ -103,14 +104,14 @@ contract LMSRMarketMaker is MarketMaker {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
         // Calculate cost level based on net outcome token balances
-        int log2N = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.UpperBound);
+        int log2N = Fixed192x64Math.binaryLog(netOutcomeTokensSold.length * ONE, Fixed192x64Math.EstimationMode.UpperBound);
         uint funding = market.funding();
-        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.LowerBound);
+        int costLevelBefore = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.LowerBound);
         // Subtract outcome token count from the net outcome token balance
         require(int(outcomeTokenCount) >= 0);
         netOutcomeTokensSold[outcomeTokenIndex] = netOutcomeTokensSold[outcomeTokenIndex].sub(int(outcomeTokenCount));
         // Calculate cost level after balance was updated
-        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Math.EstimationMode.UpperBound);
+        int costLevelAfter = calcCostLevel(log2N, netOutcomeTokensSold, funding, Fixed192x64Math.EstimationMode.UpperBound);
         // Calculate profit as cost level difference
         if(costLevelBefore <= costLevelAfter)
             costLevelBefore = costLevelAfter;
@@ -129,12 +130,12 @@ contract LMSRMarketMaker is MarketMaker {
     {
         require(market.eventContract().getOutcomeCount() > 1);
         int[] memory netOutcomeTokensSold = getNetOutcomeTokensSold(market);
-        int logN = Math.log2(netOutcomeTokensSold.length * ONE, Math.EstimationMode.Midpoint);
+        int logN = Fixed192x64Math.binaryLog(netOutcomeTokensSold.length * ONE, Fixed192x64Math.EstimationMode.Midpoint);
         uint funding = market.funding();
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        var (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex, Math.EstimationMode.Midpoint);
+        var (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex, Fixed192x64Math.EstimationMode.Midpoint);
         return outcomeExpTerm / (sum / ONE);
     }
 
@@ -147,7 +148,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
     /// @return Cost level
-    function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding, Math.EstimationMode estimationMode)
+    function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding, Fixed192x64Math.EstimationMode estimationMode)
         private
         constant
         returns(int costLevel)
@@ -156,7 +157,7 @@ contract LMSRMarketMaker is MarketMaker {
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
         var (sum, offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0, estimationMode);
-        costLevel = Math.log2(sum, estimationMode);
+        costLevel = Fixed192x64Math.binaryLog(sum, estimationMode);
         costLevel = costLevel.add(offset);
         costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));
     }
@@ -168,7 +169,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param funding Initial funding for market
     /// @param outcomeIndex Index of exponential term to extract (for use by marginal price function)
     /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
-    function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Math.EstimationMode estimationMode)
+    function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Fixed192x64Math.EstimationMode estimationMode)
         private
         constant
         returns (uint sum, int offset, uint outcomeExpTerm)
@@ -189,12 +190,12 @@ contract LMSRMarketMaker is MarketMaker {
         // causing the associated exponentials to vanish.
 
         require(logN >= 0 && int(funding) >= 0);
-        offset = Math.max(netOutcomeTokensSold);
+        offset = Fixed192x64Math.max(netOutcomeTokensSold);
         offset = offset.mul(logN) / int(funding);
         offset = offset.sub(EXP_LIMIT);
         uint term;
         for (uint8 i = 0; i < netOutcomeTokensSold.length; i++) {
-            term = Math.pow2((netOutcomeTokensSold[i].mul(logN) / int(funding)).sub(offset), estimationMode);
+            term = Fixed192x64Math.pow2((netOutcomeTokensSold[i].mul(logN) / int(funding)).sub(offset), estimationMode);
             if (i == outcomeIndex)
                 outcomeExpTerm = term;
             sum = sum.add(term);

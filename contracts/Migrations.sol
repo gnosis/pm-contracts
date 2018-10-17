@@ -1,4 +1,5 @@
-pragma solidity ^0.4.2;
+pragma solidity ^0.4.24;
+import "canonical-weth/contracts/WETH9.sol";
 
 contract Migrations {
     address public owner;

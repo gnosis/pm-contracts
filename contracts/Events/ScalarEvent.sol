@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Events/Event.sol";
-import "../Utils/Proxy.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
 contract ScalarEventData {
@@ -29,7 +29,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
     function ScalarEventProxy(
         address proxied,
         address outcomeTokenMasterCopy,
-        Token _collateralToken,
+        ERC20 _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound
@@ -43,7 +43,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < 2; i++) {
-            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            OutcomeToken outcomeToken = new OutcomeToken();
             outcomeTokens.push(outcomeToken);
             OutcomeTokenCreation(outcomeToken, i);
         }
@@ -58,7 +58,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
 /// @title Scalar event contract - Scalar events resolve to a number within a range
 /// @author Stefan George - <stefan@gnosis.pm>
 contract ScalarEvent is Proxied, Event, ScalarEventData {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Public functions

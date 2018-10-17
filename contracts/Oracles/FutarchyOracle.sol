@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
-import "../Utils/Proxy.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
 contract FutarchyOracleData {
@@ -58,7 +58,7 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
         address proxied,
         address _creator,
         EventFactory eventFactory,
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,
@@ -94,7 +94,7 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
 /// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
 /// @author Stefan George - <stefan@gnosis.pm>
 contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
-    using Math for *;
+    using SafeMath for *;
 
     /*
      *  Public functions
