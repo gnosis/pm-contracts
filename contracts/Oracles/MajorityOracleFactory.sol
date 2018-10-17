@@ -19,7 +19,7 @@ contract MajorityOracleFactory {
     /*
      *  Public functions
      */
-    function MajorityOracleFactory(MajorityOracle _majorityOracleMasterCopy)
+    constructor(MajorityOracle _majorityOracleMasterCopy)
         public
     {
         majorityOracleMasterCopy = _majorityOracleMasterCopy;
@@ -33,6 +33,6 @@ contract MajorityOracleFactory {
         returns (MajorityOracle majorityOracle)
     {
         majorityOracle = MajorityOracle(new MajorityOracleProxy(majorityOracleMasterCopy, oracles));
-        MajorityOracleCreation(msg.sender, majorityOracle, oracles);
+        emit MajorityOracleCreation(msg.sender, majorityOracle, oracles);
     }
 }

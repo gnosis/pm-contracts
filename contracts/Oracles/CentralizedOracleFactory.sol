@@ -19,7 +19,7 @@ contract CentralizedOracleFactory {
     /*
      *  Public functions
      */
-    function CentralizedOracleFactory(CentralizedOracle _centralizedOracleMasterCopy)
+    constructor(CentralizedOracle _centralizedOracleMasterCopy)
         public
     {
         centralizedOracleMasterCopy = _centralizedOracleMasterCopy;
@@ -33,6 +33,6 @@ contract CentralizedOracleFactory {
         returns (CentralizedOracle centralizedOracle)
     {
         centralizedOracle = CentralizedOracle(new CentralizedOracleProxy(centralizedOracleMasterCopy, msg.sender, ipfsHash));
-        CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
+        emit CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
     }
 }

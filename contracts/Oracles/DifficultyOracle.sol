@@ -22,7 +22,7 @@ contract DifficultyOracle is Oracle {
      */
     /// @dev Contract constructor validates and sets target block number
     /// @param _blockNumber Target block number
-    function DifficultyOracle(uint _blockNumber)
+    constructor(uint _blockNumber)
         public
     {
         // Block has to be in the future
@@ -37,7 +37,7 @@ contract DifficultyOracle is Oracle {
         // Block number was reached and outcome was not set yet
         require(block.number >= blockNumber && difficulty == 0);
         difficulty = block.difficulty;
-        OutcomeAssignment(difficulty);
+        emit OutcomeAssignment(difficulty);
     }
 
     /// @dev Returns if difficulty is set

@@ -62,7 +62,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Cost
     function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
         public
-        constant
+        view
         returns (uint cost)
     {
         require(market.eventContract().getOutcomeCount() > 1);
@@ -98,7 +98,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Profit
     function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
         public
-        constant
+        view
         returns (uint profit)
     {
         require(market.eventContract().getOutcomeCount() > 1);
@@ -125,7 +125,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Marginal price of an outcome as a fixed point number
     function calcMarginalPrice(Market market, uint8 outcomeTokenIndex)
         public
-        constant
+        view
         returns (uint price)
     {
         require(market.eventContract().getOutcomeCount() > 1);
@@ -135,7 +135,7 @@ contract LMSRMarketMaker is MarketMaker {
         // The price function is exp(quantities[i]/b) / sum(exp(q/b) for q in quantities)
         // To avoid overflow, calculate with
         // exp(quantities[i]/b - offset) / sum(exp(q/b - offset) for q in quantities)
-        var (sum, , outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex, Fixed192x64Math.EstimationMode.Midpoint);
+        (uint sum, , uint outcomeExpTerm) = sumExpOffset(logN, netOutcomeTokensSold, funding, outcomeTokenIndex, Fixed192x64Math.EstimationMode.Midpoint);
         return outcomeExpTerm / (sum / ONE);
     }
 
@@ -150,13 +150,13 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Cost level
     function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding, Fixed192x64Math.EstimationMode estimationMode)
         private
-        constant
+        pure
         returns(int costLevel)
     {
         // The cost function is C = b * log(sum(exp(q/b) for q in quantities)).
         // To avoid overflow, we need to calc with an exponent offset:
         // C = b * (offset + log(sum(exp(q/b - offset) for q in quantities)))
-        var (sum, offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0, estimationMode);
+        (uint sum, int offset, ) = sumExpOffset(logN, netOutcomeTokensSold, funding, 0, estimationMode);
         costLevel = Fixed192x64Math.binaryLog(sum, estimationMode);
         costLevel = costLevel.add(offset);
         costLevel = (costLevel.mul(int(ONE)) / logN).mul(int(funding));
@@ -171,7 +171,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
     function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Fixed192x64Math.EstimationMode estimationMode)
         private
-        constant
+        pure
         returns (uint sum, int offset, uint outcomeExpTerm)
     {
         // Naive calculation of this causes an overflow
@@ -210,7 +210,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @return Net outcome tokens sold by market
     function getNetOutcomeTokensSold(Market market)
         private
-        constant
+        view
         returns (int[] quantities)
     {
         quantities = new int[](market.eventContract().getOutcomeCount());

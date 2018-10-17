@@ -19,7 +19,7 @@ contract CampaignFactory {
     /*
      *  Public functions
      */
-    function CampaignFactory(Campaign _campaignMasterCopy)
+    constructor(Campaign _campaignMasterCopy)
         public
     {
         campaignMasterCopy = _campaignMasterCopy;
@@ -46,6 +46,6 @@ contract CampaignFactory {
     {
         campaign = Campaign(new CampaignProxy(
             campaignMasterCopy, eventContract, marketFactory, marketMaker, fee, funding, deadline));
-        CampaignCreation(msg.sender, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
+        emit CampaignCreation(msg.sender, campaign, eventContract, marketFactory, marketMaker, fee, funding, deadline);
     }
 }

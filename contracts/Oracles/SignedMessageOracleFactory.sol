@@ -19,7 +19,7 @@ contract SignedMessageOracleFactory {
     /*
      *  Public functions
      */
-    function SignedMessageOracleFactory(SignedMessageOracle _signedMessageOracleMasterCopy)
+    constructor(SignedMessageOracle _signedMessageOracleMasterCopy)
         public
     {
         signedMessageOracleMasterCopy = _signedMessageOracleMasterCopy;
@@ -37,6 +37,6 @@ contract SignedMessageOracleFactory {
     {
         signedMessageOracle = SignedMessageOracle(new SignedMessageOracleProxy(signedMessageOracleMasterCopy, descriptionHash, v, r, s));
         address oracle = ecrecover(descriptionHash, v, r, s);
-        SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
+        emit SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
     }
 }

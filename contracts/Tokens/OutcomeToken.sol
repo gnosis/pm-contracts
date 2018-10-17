@@ -46,7 +46,7 @@ contract OutcomeToken is StandardToken {
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
         totalSupply_ = totalSupply_.add(outcomeTokenCount);
-        Issuance(_for, outcomeTokenCount);
+        emit Issuance(_for, outcomeTokenCount);
     }
 
     /// @dev Events contract revokes tokens for address. Returns success
@@ -58,6 +58,6 @@ contract OutcomeToken is StandardToken {
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
         totalSupply_ = totalSupply_.sub(outcomeTokenCount);
-        Revocation(_for, outcomeTokenCount);
+        emit Revocation(_for, outcomeTokenCount);
     }
 }

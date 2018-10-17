@@ -19,7 +19,7 @@ contract StandardMarketFactory {
     /*
      *  Public functions
      */
-    function StandardMarketFactory(StandardMarket _standardMarketMasterCopy) public {
+    constructor(StandardMarket _standardMarketMasterCopy) public {
         standardMarketMasterCopy = _standardMarketMasterCopy;
     }
 
@@ -33,6 +33,6 @@ contract StandardMarketFactory {
         returns (StandardMarket market)
     {
         market = StandardMarket(new StandardMarketProxy(standardMarketMasterCopy, msg.sender, eventContract, marketMaker, fee));
-        StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
+        emit StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

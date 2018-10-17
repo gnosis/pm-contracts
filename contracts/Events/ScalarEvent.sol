@@ -26,7 +26,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
     /// @param _oracle Oracle contract used to resolve the event
     /// @param _lowerBound Lower bound for event outcome
     /// @param _upperBound Lower bound for event outcome
-    function ScalarEventProxy(
+    constructor(
         address proxied,
         address outcomeTokenMasterCopy,
         ERC20 _collateralToken,
@@ -45,7 +45,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
         for (uint8 i = 0; i < 2; i++) {
             OutcomeToken outcomeToken = new OutcomeToken();
             outcomeTokens.push(outcomeToken);
-            OutcomeTokenCreation(outcomeToken, i);
+            emit OutcomeTokenCreation(outcomeToken, i);
         }
 
         // Validate bounds
@@ -92,7 +92,7 @@ contract ScalarEvent is Proxied, Event, ScalarEventData {
         outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);
         // Payout winnings to sender
         require(collateralToken.transfer(msg.sender, winnings));
-        WinningsRedemption(msg.sender, winnings);
+        emit WinningsRedemption(msg.sender, winnings);
     }
 
     /// @dev Calculates and returns event hash
@@ -102,6 +102,6 @@ contract ScalarEvent is Proxied, Event, ScalarEventData {
         view
         returns (bytes32)
     {
-        return keccak256(collateralToken, oracle, lowerBound, upperBound);
+        return keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
     }
 }

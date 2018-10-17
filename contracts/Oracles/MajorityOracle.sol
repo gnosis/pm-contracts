@@ -15,7 +15,7 @@ contract MajorityOracleProxy is Proxy, MajorityOracleData {
 
     /// @dev Allows to create an oracle for a majority vote based on other oracles
     /// @param _oracles List of oracles taking part in the majority vote
-    function MajorityOracleProxy(address proxied, Oracle[] _oracles)
+    constructor(address proxied, Oracle[] _oracles)
         Proxy(proxied)
         public
     {
@@ -81,7 +81,7 @@ contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
         view
         returns (bool)
     {
-        var (outcomeSet, ) = getStatusAndOutcome();
+        (bool outcomeSet, ) = getStatusAndOutcome();
         return outcomeSet;
     }
 
@@ -92,7 +92,7 @@ contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
         view
         returns (int)
     {
-        var (, winningOutcome) = getStatusAndOutcome();
+        (, int winningOutcome) = getStatusAndOutcome();
         return winningOutcome;
     }
 }

@@ -27,7 +27,7 @@ contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy, StandardMark
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
-    function StandardMarketWithPriceLoggerProxy(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
+    constructor(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
         public
         StandardMarketProxy(proxied, _creator, _eventContract, _marketMaker, _fee)
     {

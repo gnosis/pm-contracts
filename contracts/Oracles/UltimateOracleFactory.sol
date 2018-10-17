@@ -28,7 +28,7 @@ contract UltimateOracleFactory {
     /*
      *  Public functions
      */
-    function UltimateOracleFactory(UltimateOracle _ultimateOracleMasterCopy)
+    constructor(UltimateOracle _ultimateOracleMasterCopy)
         public
     {
         ultimateOracleMasterCopy = _ultimateOracleMasterCopy;
@@ -62,7 +62,7 @@ contract UltimateOracleFactory {
             challengeAmount,
             frontRunnerPeriod
         ));
-        UltimateOracleCreation(
+        emit UltimateOracleCreation(
             msg.sender,
             ultimateOracle,
             oracle,
