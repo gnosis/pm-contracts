@@ -1,16 +1,5 @@
 const config = {
     networks: {
-        development: {
-            host: "localhost",
-            port: 8545,
-            network_id: "*",
-        },
-        testing: {
-            host: "localhost",
-            port: 8545,
-            network_id: "*",
-            gas: 2e7,
-        },
         coverage: {
             host: "localhost",
             network_id: "*",

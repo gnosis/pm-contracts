@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/UltimateOracle.sol";
 
 
@@ -13,7 +13,7 @@ contract UltimateOracleFactory {
         address indexed creator,
         UltimateOracle ultimateOracle,
         Oracle oracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         uint8 spreadMultiplier,
         uint challengePeriod,
         uint challengeAmount,
@@ -21,8 +21,19 @@ contract UltimateOracleFactory {
     );
 
     /*
+     *  Storage
+     */
+    UltimateOracle public ultimateOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    constructor(UltimateOracle _ultimateOracleMasterCopy)
+        public
+    {
+        ultimateOracleMasterCopy = _ultimateOracleMasterCopy;
+    }
+
     /// @dev Creates a new ultimate Oracle contract
     /// @param oracle Oracle address
     /// @param collateralToken Collateral token address
@@ -33,7 +44,7 @@ contract UltimateOracleFactory {
     /// @return Oracle contract
     function createUltimateOracle(
         Oracle oracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         uint8 spreadMultiplier,
         uint challengePeriod,
         uint challengeAmount,
@@ -42,15 +53,16 @@ contract UltimateOracleFactory {
         public
         returns (UltimateOracle ultimateOracle)
     {
-        ultimateOracle = new UltimateOracle(
+        ultimateOracle = UltimateOracle(new UltimateOracleProxy(
+            ultimateOracleMasterCopy,
             oracle,
             collateralToken,
             spreadMultiplier,
             challengePeriod,
             challengeAmount,
             frontRunnerPeriod
-        );
-        UltimateOracleCreation(
+        ));
+        emit UltimateOracleCreation(
             msg.sender,
             ultimateOracle,
             oracle,

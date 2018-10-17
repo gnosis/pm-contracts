@@ -1,13 +1,10 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
-import "../Utils/Math.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
-
-/// @title Campaign contract - Allows to crowdfund a market
-/// @author Stefan George - <stefan@gnosis.pm>
-contract Campaign {
-    using Math for *;
+contract CampaignData {
 
     /*
      *  Events
@@ -59,10 +56,9 @@ contract Campaign {
             stage = Stages.AuctionFailed;
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract CampaignProxy is Proxy, CampaignData {
     /// @dev Constructor validates and sets campaign properties
     /// @param _eventContract Event contract
     /// @param _marketFactory Market factory contract
@@ -70,7 +66,8 @@ contract Campaign {
     /// @param _fee Market fee
     /// @param _funding Initial funding for market
     /// @param _deadline Campaign deadline
-    function Campaign(
+    constructor(
+        address proxied,
         Event _eventContract,
         StandardMarketFactory _marketFactory,
         MarketMaker _marketMaker,
@@ -78,6 +75,7 @@ contract Campaign {
         uint _funding,
         uint _deadline
     )
+        Proxy(proxied)
         public
     {
         // Validate input
@@ -94,7 +92,16 @@ contract Campaign {
         funding = _funding;
         deadline = _deadline;
     }
+}
 
+/// @title Campaign contract - Allows to crowdfund a market
+/// @author Stefan George - <stefan@gnosis.pm>
+contract Campaign is Proxied, CampaignData {
+    using SafeMath for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows to contribute to required market funding
     /// @param amount Amount of collateral tokens
     function fund(uint amount)
@@ -111,7 +118,7 @@ contract Campaign {
         contributions[msg.sender] = contributions[msg.sender].add(amount);
         if (amount == maxAmount)
             stage = Stages.AuctionSuccessful;
-        CampaignFunding(msg.sender, amount);
+        emit CampaignFunding(msg.sender, amount);
     }
 
     /// @dev Withdraws refund amount
@@ -126,7 +133,7 @@ contract Campaign {
         contributions[msg.sender] = 0;
         // Refund collateral tokens
         require(eventContract.collateralToken().transfer(msg.sender, refundAmount));
-        CampaignRefund(msg.sender, refundAmount);
+        emit CampaignRefund(msg.sender, refundAmount);
     }
 
     /// @dev Allows to create market after successful funding
@@ -141,7 +148,7 @@ contract Campaign {
         require(eventContract.collateralToken().approve(market, funding));
         market.fund(funding);
         stage = Stages.MarketCreated;
-        MarketCreation(market);
+        emit MarketCreation(market);
         return market;
     }
 
@@ -158,7 +165,7 @@ contract Campaign {
         eventContract.redeemWinnings();
         finalBalance = eventContract.collateralToken().balanceOf(this);
         stage = Stages.MarketClosed;
-        MarketClosing();
+        emit MarketClosing();
     }
 
     /// @dev Allows to withdraw fees from campaign contract to contributor
@@ -172,6 +179,6 @@ contract Campaign {
         contributions[msg.sender] = 0;
         // Send fee share to contributor
         require(eventContract.collateralToken().transfer(msg.sender, fees));
-        FeeWithdrawal(msg.sender, fees);
+        emit FeeWithdrawal(msg.sender, fees);
     }
 }

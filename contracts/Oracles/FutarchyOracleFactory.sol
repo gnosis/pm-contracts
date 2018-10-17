@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/FutarchyOracle.sol";
 
 
@@ -12,7 +12,7 @@ contract FutarchyOracleFactory {
     event FutarchyOracleCreation(
         address indexed creator,
         FutarchyOracle futarchyOracle,
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,
@@ -28,6 +28,7 @@ contract FutarchyOracleFactory {
      */
     EventFactory eventFactory;
     StandardMarketWithPriceLoggerFactory marketFactory;
+    FutarchyOracle public futarchyOracleMasterCopy;
 
     /*
      *  Public functions
@@ -35,10 +36,11 @@ contract FutarchyOracleFactory {
     /// @dev Constructor sets event factory contract
     /// @param _eventFactory Event factory contract
     /// @param _marketFactory Market factory contract
-    function FutarchyOracleFactory(EventFactory _eventFactory, StandardMarketWithPriceLoggerFactory _marketFactory)
+    constructor(FutarchyOracle _futarchyOracleMasterCopy, EventFactory _eventFactory, StandardMarketWithPriceLoggerFactory _marketFactory)
         public
     {
         require(address(_eventFactory) != 0 && address(_marketFactory) != 0);
+        futarchyOracleMasterCopy = _futarchyOracleMasterCopy;
         eventFactory = _eventFactory;
         marketFactory = _marketFactory;
     }
@@ -55,7 +57,7 @@ contract FutarchyOracleFactory {
     /// @param startDate Start date for price logging
     /// @return Oracle contract
     function createFutarchyOracle(
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,
@@ -68,7 +70,8 @@ contract FutarchyOracleFactory {
         public
         returns (FutarchyOracle futarchyOracle)
     {
-        futarchyOracle = new FutarchyOracle(
+        futarchyOracle = FutarchyOracle(new FutarchyOracleProxy(
+            futarchyOracleMasterCopy,
             msg.sender,
             eventFactory,
             collateralToken,
@@ -81,8 +84,8 @@ contract FutarchyOracleFactory {
             fee,
             tradingPeriod,
             startDate
-        );
-        FutarchyOracleCreation(
+        ));
+        emit FutarchyOracleCreation(
             msg.sender,
             futarchyOracle,
             collateralToken,

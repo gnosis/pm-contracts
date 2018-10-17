@@ -1,13 +1,11 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-/// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
-/// @author Stefan George - <stefan@gnosis.pm>
-contract FutarchyOracle is Oracle {
-    using Math for *;
+contract FutarchyOracleData {
 
     /*
      *  Events
@@ -39,10 +37,10 @@ contract FutarchyOracle is Oracle {
         require(msg.sender == creator);
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
+
     /// @dev Constructor creates events and markets for futarchy oracle
     /// @param _creator Oracle creator
     /// @param eventFactory Event factory contract
@@ -56,10 +54,11 @@ contract FutarchyOracle is Oracle {
     /// @param fee Market fee
     /// @param _tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
-    function FutarchyOracle(
+    constructor(
+        address proxied,
         address _creator,
         EventFactory eventFactory,
-        Token collateralToken,
+        ERC20 collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,
@@ -69,14 +68,14 @@ contract FutarchyOracle is Oracle {
         uint24 fee,
         uint _tradingPeriod,
         uint startDate
-
     )
+        Proxy(proxied)
         public
     {
         // trading period is at least a second
         require(_tradingPeriod > 0);
         // Create decision event
-        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, this, outcomeCount);
+        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, Oracle(this), outcomeCount);
         // Create outcome events
         for (uint8 i = 0; i < categoricalEvent.getOutcomeCount(); i++) {
             ScalarEvent scalarEvent = eventFactory.createScalarEvent(
@@ -90,7 +89,16 @@ contract FutarchyOracle is Oracle {
         creator = _creator;
         tradingPeriod = _tradingPeriod;
     }
+}
 
+/// @title Futarchy oracle contract - Allows to create an oracle based on market behaviour
+/// @author Stefan George - <stefan@gnosis.pm>
+contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
+    using SafeMath for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Funds all markets with equal amount of funding
     /// @param funding Amount of funding
     function fund(uint funding)
@@ -108,7 +116,7 @@ contract FutarchyOracle is Oracle {
             require(market.eventContract().collateralToken().approve(market, funding));
             market.fund(funding);
         }
-        FutarchyFunding(funding);
+        emit FutarchyFunding(funding);
     }
 
     /// @dev Closes market for winning outcome and redeems winnings and sends all collateral tokens to creator
@@ -126,7 +134,7 @@ contract FutarchyOracle is Oracle {
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
         require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
-        FutarchyClosing();
+        emit FutarchyClosing();
     }
 
     /// @dev Allows to set the oracle outcome based on the market with largest long position
@@ -147,14 +155,14 @@ contract FutarchyOracle is Oracle {
         }
         winningMarketIndex = highestIndex;
         isSet = true;
-        OutcomeAssignment(winningMarketIndex);
+        emit OutcomeAssignment(winningMarketIndex);
     }
 
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         return isSet;
@@ -164,7 +172,7 @@ contract FutarchyOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         return int(winningMarketIndex);

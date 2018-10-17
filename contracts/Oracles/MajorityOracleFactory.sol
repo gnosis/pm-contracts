@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/MajorityOracle.sol";
 
 
@@ -12,8 +12,19 @@ contract MajorityOracleFactory {
     event MajorityOracleCreation(address indexed creator, MajorityOracle majorityOracle, Oracle[] oracles);
 
     /*
+     *  Storage
+     */
+    MajorityOracle public majorityOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    constructor(MajorityOracle _majorityOracleMasterCopy)
+        public
+    {
+        majorityOracleMasterCopy = _majorityOracleMasterCopy;
+    }
+
     /// @dev Creates a new majority oracle contract
     /// @param oracles List of oracles taking part in the majority vote
     /// @return Oracle contract
@@ -21,7 +32,7 @@ contract MajorityOracleFactory {
         public
         returns (MajorityOracle majorityOracle)
     {
-        majorityOracle = new MajorityOracle(oracles);
-        MajorityOracleCreation(msg.sender, majorityOracle, oracles);
+        majorityOracle = MajorityOracle(new MajorityOracleProxy(majorityOracleMasterCopy, oracles));
+        emit MajorityOracleCreation(msg.sender, majorityOracle, oracles);
     }
 }

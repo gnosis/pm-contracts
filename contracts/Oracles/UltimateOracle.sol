@@ -1,13 +1,11 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
-import "../Tokens/Token.sol";
-import "../Utils/Math.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-/// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
-/// @author Stefan George - <stefan@gnosis.pm>
-contract UltimateOracle is Oracle {
-    using Math for *;
+contract UltimateOracleData {
 
     /*
      *  Events
@@ -21,7 +19,7 @@ contract UltimateOracle is Oracle {
      *  Storage
      */
     Oracle public forwardedOracle;
-    Token public collateralToken;
+    ERC20 public collateralToken;
     uint8 public spreadMultiplier;
     uint public challengePeriod;
     uint public challengeAmount;
@@ -35,10 +33,10 @@ contract UltimateOracle is Oracle {
     uint public totalAmount;
     mapping (int => uint) public totalOutcomeAmounts;
     mapping (address => mapping (int => uint)) public outcomeAmounts;
+}
 
-    /*
-     *  Public functions
-     */
+contract UltimateOracleProxy is Proxy, UltimateOracleData {
+
     /// @dev Constructor sets ultimate oracle properties
     /// @param _forwardedOracle Oracle address
     /// @param _collateralToken Collateral token address
@@ -46,14 +44,16 @@ contract UltimateOracle is Oracle {
     /// @param _challengePeriod Time to challenge oracle outcome
     /// @param _challengeAmount Amount to challenge the outcome
     /// @param _frontRunnerPeriod Time to overbid the front-runner
-    function UltimateOracle(
+    constructor(
+        address proxied,
         Oracle _forwardedOracle,
-        Token _collateralToken,
+        ERC20 _collateralToken,
         uint8 _spreadMultiplier,
         uint _challengePeriod,
         uint _challengeAmount,
         uint _frontRunnerPeriod
     )
+        Proxy(proxied)
         public
     {
         // Validate inputs
@@ -70,7 +70,16 @@ contract UltimateOracle is Oracle {
         challengeAmount = _challengeAmount;
         frontRunnerPeriod = _frontRunnerPeriod;
     }
+}
 
+/// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
+/// @author Stefan George - <stefan@gnosis.pm>
+contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
+    using SafeMath for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Allows to set oracle outcome
     function setForwardedOutcome()
         public
@@ -81,7 +90,7 @@ contract UltimateOracle is Oracle {
                 && forwardedOracle.isOutcomeSet());
         forwardedOutcome = forwardedOracle.getOutcome();
         forwardedOutcomeSetTimestamp = now;
-        ForwardedOracleOutcomeAssignment(forwardedOutcome);
+        emit ForwardedOracleOutcomeAssignment(forwardedOutcome);
     }
 
     /// @dev Allows to challenge the oracle outcome
@@ -98,7 +107,7 @@ contract UltimateOracle is Oracle {
         totalAmount = challengeAmount;
         frontRunner = _outcome;
         frontRunnerSetTimestamp = now;
-        OutcomeChallenge(msg.sender, _outcome);
+        emit OutcomeChallenge(msg.sender, _outcome);
     }
 
     /// @dev Allows to challenge the oracle outcome
@@ -128,7 +137,7 @@ contract UltimateOracle is Oracle {
             frontRunner = _outcome;
             frontRunnerSetTimestamp = now;
         }
-        OutcomeVote(msg.sender, _outcome, amount);
+        emit OutcomeVote(msg.sender, _outcome, amount);
     }
 
     /// @dev Withdraws winnings for user
@@ -143,13 +152,14 @@ contract UltimateOracle is Oracle {
         outcomeAmounts[msg.sender][frontRunner] = 0;
         // Transfer earnings to contributor
         require(collateralToken.transfer(msg.sender, amount));
-        Withdrawal(msg.sender, amount);
+        emit Withdrawal(msg.sender, amount);
     }
 
     /// @dev Checks if time to challenge the outcome is over
     /// @return Is challenge period over?
     function isChallengePeriodOver()
         public
+        view
         returns (bool)
     {
         return forwardedOutcomeSetTimestamp != 0 && now.sub(forwardedOutcomeSetTimestamp) > challengePeriod;
@@ -159,6 +169,7 @@ contract UltimateOracle is Oracle {
     /// @return Is front runner period over?
     function isFrontRunnerPeriodOver()
         public
+        view
         returns (bool)
     {
         return frontRunnerSetTimestamp != 0 && now.sub(frontRunnerSetTimestamp) > frontRunnerPeriod;
@@ -168,6 +179,7 @@ contract UltimateOracle is Oracle {
     /// @return Is challenged?
     function isChallenged()
         public
+        view
         returns (bool)
     {
         return frontRunnerSetTimestamp != 0;
@@ -177,7 +189,7 @@ contract UltimateOracle is Oracle {
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         return    isChallengePeriodOver() && !isChallenged()
@@ -188,7 +200,7 @@ contract UltimateOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         if (isFrontRunnerPeriodOver())

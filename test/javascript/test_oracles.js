@@ -1,9 +1,8 @@
 const utils = require('./utils')
-
+const { getBlock } = utils
 const { wait } = require('@digix/tempo')(web3)
-const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
 
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 const DifficultyOracle = artifacts.require('DifficultyOracle')
@@ -20,7 +19,6 @@ const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const OutcomeToken = artifacts.require('OutcomeToken')
 
-const contracts = [EtherToken, CentralizedOracle, CentralizedOracleFactory, DifficultyOracle, DifficultyOracleFactory, MajorityOracle, MajorityOracleFactory, UltimateOracle, UltimateOracleFactory, FutarchyOracle, FutarchyOracleFactory, StandardMarketWithPriceLogger, LMSRMarketMaker, CategoricalEvent, ScalarEvent, OutcomeToken]
 
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
@@ -34,8 +32,6 @@ contract('Oracle', function (accounts) {
     let spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod
     let fee, deadline, funding, startDate
 
-    before(testGas.createGasStatCollectorBeforeHook(contracts))
-    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         // deployed factory contracts
@@ -45,7 +41,7 @@ contract('Oracle', function (accounts) {
         ultimateOracleFactory = await UltimateOracleFactory.deployed()
         futarchyOracleFactory = await FutarchyOracleFactory.deployed()
         lmsrMarketMaker = await LMSRMarketMaker.deployed.call()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
 
         // ipfs hashes
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
@@ -91,7 +87,7 @@ contract('Oracle', function (accounts) {
 
     it('should test difficulty oracle', async () => {
         // Create difficulty oracle
-        const targetBlock = (await web3.eth.getBlock('latest')).number + 100
+        const targetBlock = (await getBlock('latest')).number + 100
         const difficultyOracle = utils.getParamFromTxEvent(
             await difficultyOracleFactory.createDifficultyOracle(targetBlock),
             'difficultyOracle', DifficultyOracle
@@ -118,7 +114,7 @@ contract('Oracle', function (accounts) {
             'centralizedOracle', CentralizedOracle
         )
 
-        let now = web3.eth.getBlock('pending').timestamp
+        let now = (await getBlock('pending')).timestamp
         utils.getParamFromTxEvent(
             await futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,
@@ -126,7 +122,7 @@ contract('Oracle', function (accounts) {
             'futarchyOracle', FutarchyOracle
         )
 
-        now = web3.eth.getBlock('pending').timestamp
+        now = (await getBlock('pending')).timestamp
         await utils.assertRejects(
             futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,
@@ -162,7 +158,8 @@ contract('Oracle', function (accounts) {
         const outcome = 1
         const tokenCount = 1e15
 
-        const outcomeTokenCost = await lmsrMarketMaker.calcCost.call(market.address, outcome, tokenCount)
+        let outcomeTokenAmounts = Array.from({length: 2}, (v, i) => i === outcome ? tokenCount : 0)
+        const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
         let marketfee = await market.calcMarketFee.call(outcomeTokenCost)
         const cost = marketfee.add(outcomeTokenCost)
 
@@ -177,7 +174,7 @@ contract('Oracle', function (accounts) {
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
         assert.equal(utils.getParamFromTxEvent(
-            await market.buy(outcome, tokenCount, cost, { from: accounts[buyer] }), 'outcomeTokenCost'
+            await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost'
         ), outcomeTokenCost.valueOf())
 
         // Set outcome of futarchy oracle
@@ -200,7 +197,7 @@ contract('Oracle', function (accounts) {
 
         // Close winning market and transfer collateral tokens to creator
         await futarchyOracle.close({ from: accounts[creator] })
-        assert.isAbove(await etherToken.balanceOf.call(accounts[creator]), funding)
+        assert((await etherToken.balanceOf.call(accounts[creator])).gt(funding))
     })
 
     it('should test majority oracle', async () => {

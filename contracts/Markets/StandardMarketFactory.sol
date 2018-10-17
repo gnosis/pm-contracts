@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Markets/StandardMarket.sol";
 
 
@@ -12,8 +12,17 @@ contract StandardMarketFactory {
     event StandardMarketCreation(address indexed creator, Market market, Event eventContract, MarketMaker marketMaker, uint24 fee);
 
     /*
+     *  Storage
+     */
+    StandardMarket public standardMarketMasterCopy;
+
+    /*
      *  Public functions
      */
+    constructor(StandardMarket _standardMarketMasterCopy) public {
+        standardMarketMasterCopy = _standardMarketMasterCopy;
+    }
+
     /// @dev Creates a new market contract
     /// @param eventContract Event contract
     /// @param marketMaker Market maker contract
@@ -23,7 +32,7 @@ contract StandardMarketFactory {
         public
         returns (StandardMarket market)
     {
-        market = new StandardMarket(msg.sender, eventContract, marketMaker, fee);
-        StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
+        market = StandardMarket(new StandardMarketProxy(standardMarketMasterCopy, msg.sender, eventContract, marketMaker, fee));
+        emit StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

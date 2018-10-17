@@ -1,11 +1,10 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-/// @title Abstract market contract - Functions to be implemented by market contracts
-contract Market {
-
+contract MarketData {
     /*
      *  Events
      */
@@ -15,6 +14,7 @@ contract Market {
     event OutcomeTokenPurchase(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint outcomeTokenCost, uint marketFees);
     event OutcomeTokenSale(address indexed seller, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint outcomeTokenProfit, uint marketFees);
     event OutcomeTokenShortSale(address indexed buyer, uint8 outcomeTokenIndex, uint outcomeTokenCount, uint cost);
+    event OutcomeTokenTrade(address indexed transactor, int[] outcomeTokenAmounts, int outcomeTokenNetCost, uint marketFees);
 
     /*
      *  Storage
@@ -33,7 +33,10 @@ contract Market {
         MarketFunded,
         MarketClosed
     }
+}
 
+/// @title Abstract market contract - Functions to be implemented by market contracts
+contract Market is MarketData {
     /*
      *  Public functions
      */
@@ -43,5 +46,6 @@ contract Market {
     function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost) public returns (uint);
     function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
     function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function calcMarketFee(uint outcomeTokenCost) public constant returns (uint);
+    function trade(int[] outcomeTokenAmounts, int costLimit) public returns (int);
+    function calcMarketFee(uint outcomeTokenCost) public view returns (uint);
 }

@@ -1,8 +1,7 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Markets/StandardMarket.sol";
 
-
-contract StandardMarketWithPriceLogger is StandardMarket {
+contract StandardMarketWithPriceLoggerData {
 
     /*
      *  Constants
@@ -18,19 +17,19 @@ contract StandardMarketWithPriceLogger is StandardMarket {
     uint public lastTradeDate;
     uint public lastTradePrice;
     uint public priceIntegral;
+}
 
-    /*
-     *  Public functions
-     */
+contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy, StandardMarketWithPriceLoggerData {
+
     /// @dev Constructor validates and sets market properties
     /// @param _creator Market creator
     /// @param _eventContract Event contract
     /// @param _marketMaker Market maker contract
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
-    function StandardMarketWithPriceLogger(address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
+    constructor(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
         public
-        StandardMarket(_creator, _eventContract, _marketMaker, _fee)
+        StandardMarketProxy(proxied, _creator, _eventContract, _marketMaker, _fee)
     {
         require(eventContract.getOutcomeCount() == 2);
 
@@ -46,15 +45,12 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         // initialize lastTradePrice to assuming uniform probabilities of outcomes
         lastTradePrice = ONE / 2;
     }
+}
 
-    /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
-    function close()
-        public
-    {
-        endDate = now;
-        super.close();
-    }
-
+contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPriceLoggerData {
+    /*
+     *  Public functions
+     */
     /// @dev Allows to buy outcome tokens from market maker
     /// @param outcomeTokenIndex Index of the outcome token to buy
     /// @param outcomeTokenCount Amount of outcome tokens to buy
@@ -98,10 +94,33 @@ contract StandardMarketWithPriceLogger is StandardMarket {
         logPriceAfter();
     }
 
+    /// @dev Allows to trade outcome tokens with market maker
+    /// @param outcomeTokenAmounts Amounts of outcome tokens to trade
+    /// @param collateralLimit The maximum cost or minimum profit in collateral tokens
+    /// @return Cost/profit in collateral tokens
+    function trade(int[] outcomeTokenAmounts, int collateralLimit)
+        public
+        returns (int netCost)
+    {
+        logPriceBefore();
+        netCost = super.trade(outcomeTokenAmounts, collateralLimit);
+        logPriceAfter();
+    }
+
+
+    /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
+    function close()
+        public
+    {
+        endDate = now;
+        super.close();
+    }
+
     /// @dev Calculates average price for long tokens based on price integral
     /// @return Average price for long tokens over time
     function getAvgPrice()
         public
+        view
         returns (uint)
     {
         if(endDate > 0)

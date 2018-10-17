@@ -1,16 +1,13 @@
-const testGas = require('@gnosis.pm/truffle-nice-tools').testGas
-
 const utils = require('./utils')
 
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const EventFactory = artifacts.require('EventFactory')
 const OutcomeToken = artifacts.require('OutcomeToken')
-const EtherToken = artifacts.require('EtherToken')
+const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
 const CentralizedOracleFactory = artifacts.require('CentralizedOracleFactory')
 
-const contracts = [CategoricalEvent, ScalarEvent, EventFactory, OutcomeToken, EtherToken, CentralizedOracle, CentralizedOracleFactory]
 
 contract('Event', function (accounts) {
     let centralizedOracleFactory
@@ -18,13 +15,11 @@ contract('Event', function (accounts) {
     let etherToken
     let ipfsHash, oracle, event
 
-    before(testGas.createGasStatCollectorBeforeHook(contracts))
-    after(testGas.createGasStatCollectorAfterHook(contracts))
 
     beforeEach(async () => {
         centralizedOracleFactory = await CentralizedOracleFactory.deployed()
         eventFactory = await EventFactory.deployed()
-        etherToken = await EtherToken.deployed()
+        etherToken = await WETH9.deployed()
 
         // create event
         ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'

@@ -1,11 +1,36 @@
-pragma solidity ^0.4.15;
-import "../Tokens/StandardToken.sol";
+pragma solidity ^0.4.24;
+import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
+
+contract OutcomeTokenProxy is Proxy {
+    /*
+     *  Storage
+     */
+
+    // HACK: Lining up storage with StandardToken and OutcomeToken
+    mapping(address => uint256) balances;
+    uint256 totalSupply_;
+    mapping (address => mapping (address => uint256)) internal allowed;
+
+    address internal eventContract;
+
+    /*
+     *  Public functions
+     */
+    /// @dev Constructor sets events contract address
+    constructor(address proxied)
+        public
+        Proxy(proxied)
+    {
+        eventContract = msg.sender;
+    }
+}
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is StandardToken {
-    using Math for *;
+contract OutcomeToken is Proxied, StandardToken {
+    using SafeMath for *;
 
     /*
      *  Events
@@ -30,13 +55,6 @@ contract OutcomeToken is StandardToken {
     /*
      *  Public functions
      */
-    /// @dev Constructor sets events contract address
-    function OutcomeToken()
-        public
-    {
-        eventContract = msg.sender;
-    }
-    
     /// @dev Events contract issues new tokens for address. Returns success
     /// @param _for Address of receiver
     /// @param outcomeTokenCount Number of tokens to issue
@@ -45,8 +63,8 @@ contract OutcomeToken is StandardToken {
         isEventContract
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
-        totalTokens = totalTokens.add(outcomeTokenCount);
-        Issuance(_for, outcomeTokenCount);
+        totalSupply_ = totalSupply_.add(outcomeTokenCount);
+        emit Issuance(_for, outcomeTokenCount);
     }
 
     /// @dev Events contract revokes tokens for address. Returns success
@@ -57,7 +75,7 @@ contract OutcomeToken is StandardToken {
         isEventContract
     {
         balances[_for] = balances[_for].sub(outcomeTokenCount);
-        totalTokens = totalTokens.sub(outcomeTokenCount);
-        Revocation(_for, outcomeTokenCount);
+        totalSupply_ = totalSupply_.sub(outcomeTokenCount);
+        emit Revocation(_for, outcomeTokenCount);
     }
 }

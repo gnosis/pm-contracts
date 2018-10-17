@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Markets/StandardMarketWithPriceLogger.sol";
 
 
@@ -12,8 +12,19 @@ contract StandardMarketWithPriceLoggerFactory {
     event StandardMarketWithPriceLoggerCreation(address indexed creator, Market market, Event eventContract, MarketMaker marketMaker, uint24 fee, uint startDate);
 
     /*
+     *  Storage
+     */
+    StandardMarketWithPriceLogger public standardMarketWithPriceLoggerMasterCopy;
+
+    /*
      *  Public functions
      */
+    constructor(StandardMarketWithPriceLogger _standardMarketWithPriceLoggerMasterCopy)
+        public
+    {
+        standardMarketWithPriceLoggerMasterCopy = _standardMarketWithPriceLoggerMasterCopy;
+    }
+
     /// @dev Creates a new market contract
     /// @param eventContract Event contract
     /// @param marketMaker Market maker contract
@@ -24,7 +35,8 @@ contract StandardMarketWithPriceLoggerFactory {
         public
         returns (StandardMarketWithPriceLogger market)
     {
-        market = new StandardMarketWithPriceLogger(msg.sender, eventContract, marketMaker, fee, startDate);
-        StandardMarketWithPriceLoggerCreation(msg.sender, market, eventContract, marketMaker, fee, startDate);
+        market = StandardMarketWithPriceLogger(new StandardMarketWithPriceLoggerProxy(
+            standardMarketWithPriceLoggerMasterCopy, msg.sender, eventContract, marketMaker, fee, startDate));
+        emit StandardMarketWithPriceLoggerCreation(msg.sender, market, eventContract, marketMaker, fee, startDate);
     }
 }

@@ -1,10 +1,9 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-/// @title Centralized oracle contract - Allows the contract owner to set an outcome
-/// @author Stefan George - <stefan@gnosis.pm>
-contract CentralizedOracle is Oracle {
+contract CentralizedOracleData {
 
     /*
      *  Events
@@ -28,21 +27,30 @@ contract CentralizedOracle is Oracle {
         require(msg.sender == owner);
         _;
     }
+}
 
-    /*
-     *  Public functions
-     */
+contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
+
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
-    function CentralizedOracle(address _owner, bytes _ipfsHash)
+    constructor(address proxied, address _owner, bytes _ipfsHash)
         public
+        Proxy(proxied)
     {
         // Description hash cannot be null
         require(_ipfsHash.length == 46);
         owner = _owner;
         ipfsHash = _ipfsHash;
     }
+}
 
+/// @title Centralized oracle contract - Allows the contract owner to set an outcome
+/// @author Stefan George - <stefan@gnosis.pm>
+contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
+
+    /*
+     *  Public functions
+     */
     /// @dev Replaces owner
     /// @param newOwner New owner
     function replaceOwner(address newOwner)
@@ -52,7 +60,7 @@ contract CentralizedOracle is Oracle {
         // Result is not set yet
         require(!isSet);
         owner = newOwner;
-        OwnerReplacement(newOwner);
+        emit OwnerReplacement(newOwner);
     }
 
     /// @dev Sets event outcome
@@ -65,14 +73,14 @@ contract CentralizedOracle is Oracle {
         require(!isSet);
         isSet = true;
         outcome = _outcome;
-        OutcomeAssignment(_outcome);
+        emit OutcomeAssignment(_outcome);
     }
 
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
         public
-        constant
+        view
         returns (bool)
     {
         return isSet;
@@ -82,7 +90,7 @@ contract CentralizedOracle is Oracle {
     /// @return Outcome
     function getOutcome()
         public
-        constant
+        view
         returns (int)
     {
         return outcome;

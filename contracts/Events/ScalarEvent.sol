@@ -1,11 +1,9 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Events/Event.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-/// @title Scalar event contract - Scalar events resolve to a number within a range
-/// @author Stefan George - <stefan@gnosis.pm>
-contract ScalarEvent is Event {
-    using Math for *;
+contract ScalarEventData {
 
     /*
      *  Constants
@@ -19,30 +17,52 @@ contract ScalarEvent is Event {
      */
     int public lowerBound;
     int public upperBound;
+}
 
-    /*
-     *  Public functions
-     */
+contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
+
     /// @dev Contract constructor validates and sets basic event properties
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param _lowerBound Lower bound for event outcome
     /// @param _upperBound Lower bound for event outcome
-    function ScalarEvent(
-        Token _collateralToken,
+    constructor(
+        address proxied,
+        address outcomeTokenMasterCopy,
+        ERC20 _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound
     )
+        Proxy(proxied)
         public
-        Event(_collateralToken, _oracle, 2)
     {
+        // Validate input
+        require(address(_collateralToken) != 0 && address(_oracle) != 0);
+        collateralToken = _collateralToken;
+        oracle = _oracle;
+        // Create an outcome token for each outcome
+        for (uint8 i = 0; i < 2; i++) {
+            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            outcomeTokens.push(outcomeToken);
+            emit OutcomeTokenCreation(outcomeToken, i);
+        }
+
         // Validate bounds
         require(_upperBound > _lowerBound);
         lowerBound = _lowerBound;
         upperBound = _upperBound;
     }
+}
 
+/// @title Scalar event contract - Scalar events resolve to a number within a range
+/// @author Stefan George - <stefan@gnosis.pm>
+contract ScalarEvent is Proxied, Event, ScalarEventData {
+    using SafeMath for *;
+
+    /*
+     *  Public functions
+     */
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
     function redeemWinnings()
@@ -72,16 +92,16 @@ contract ScalarEvent is Event {
         outcomeTokens[LONG].revoke(msg.sender, longOutcomeTokenCount);
         // Payout winnings to sender
         require(collateralToken.transfer(msg.sender, winnings));
-        WinningsRedemption(msg.sender, winnings);
+        emit WinningsRedemption(msg.sender, winnings);
     }
 
     /// @dev Calculates and returns event hash
     /// @return Event hash
     function getEventHash()
         public
-        constant
+        view
         returns (bytes32)
     {
-        return keccak256(collateralToken, oracle, lowerBound, upperBound);
+        return keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
     }
 }

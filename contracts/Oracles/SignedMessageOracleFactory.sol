@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.24;
 import "../Oracles/SignedMessageOracle.sol";
 
 
@@ -12,8 +12,19 @@ contract SignedMessageOracleFactory {
     event SignedMessageOracleCreation(address indexed creator, SignedMessageOracle signedMessageOracle, address oracle);
 
     /*
+     *  Storage
+     */
+    SignedMessageOracle public signedMessageOracleMasterCopy;
+
+    /*
      *  Public functions
      */
+    constructor(SignedMessageOracle _signedMessageOracleMasterCopy)
+        public
+    {
+        signedMessageOracleMasterCopy = _signedMessageOracleMasterCopy;
+    }
+
     /// @dev Creates a new signed message oracle contract
     /// @param descriptionHash Hash identifying off chain event description
     /// @param v Signature parameter
@@ -24,8 +35,8 @@ contract SignedMessageOracleFactory {
         public
         returns (SignedMessageOracle signedMessageOracle)
     {
-        signedMessageOracle = new SignedMessageOracle(descriptionHash, v, r, s);
+        signedMessageOracle = SignedMessageOracle(new SignedMessageOracleProxy(signedMessageOracleMasterCopy, descriptionHash, v, r, s));
         address oracle = ecrecover(descriptionHash, v, r, s);
-        SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
+        emit SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
     }
 }
