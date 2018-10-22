@@ -33,7 +33,7 @@ try {
     _.merge(config, require('./truffle-local'))
 }
 catch(e) {
-    if(e.code === 'MODULE_NOT_FOUND') {
+    if(e.code === 'MODULE_NOT_FOUND' && e.message.includes('truffle-local')) {
         // eslint-disable-next-line no-console
         console.log('No local truffle config found. Using all defaults...')
     } else {

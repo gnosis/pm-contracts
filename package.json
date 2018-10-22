@@ -27,6 +27,7 @@
   "dependencies": {
     "@gnosis.pm/util-contracts": "^2.0.0-alpha",
     "canonical-weth": "^1.1.0",
+    "erc-1155": "github:enjin/erc-1155",
     "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath"
   },
   "devDependencies": {
@@ -37,7 +38,7 @@
     "eslint-plugin-babel": "^5.1.0",
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
-    "solhint": "^1.1.10",
+    "solhint": "1.2.1",
     "truffle": "^4.0.4",
     "web3": "^1.0.0-beta.35"
   },
