@@ -1,9 +1,8 @@
-const StandardMarket = artifacts.require('StandardMarket')
-const StandardMarketWithPriceLogger = artifacts.require('StandardMarketWithPriceLogger')
-
 module.exports = function (deployer) {
-    deployer.deploy([
-        StandardMarket,
-        StandardMarketWithPriceLogger,
-    ])
+    for(const contractName of [
+        'StandardMarket',
+        'StandardMarketWithPriceLogger',
+    ]) {
+        deployer.deploy(artifacts.require(contractName))
+    }
 }

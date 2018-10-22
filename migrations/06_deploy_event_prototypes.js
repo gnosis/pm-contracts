@@ -1,11 +1,9 @@
-const CategoricalEvent = artifacts.require('CategoricalEvent')
-const ScalarEvent = artifacts.require('ScalarEvent')
-const OutcomeToken = artifacts.require('OutcomeToken')
-
 module.exports = function (deployer) {
-    deployer.deploy([
-        CategoricalEvent,
-        ScalarEvent,
-        OutcomeToken,
-    ])
+    for(const contractName of [
+        'CategoricalEvent',
+        'ScalarEvent',
+        'OutcomeToken',
+    ]) {
+        deployer.deploy(artifacts.require(contractName))
+    }
 }
