@@ -29,7 +29,7 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "@gnosis.pm/util-contracts": "^2.0.0-alpha",
-    "canonical-weth": "^1.1.0",
+    "canonical-weth": "^1.2.0",
     "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath"
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "decimal.js": "^10.0.0",
     "eslint": "^5.7.0",
     "eslint-plugin-babel": "^5.2.1",
+    "fs-extra": "^7.0.0",
     "lodash": "^4.17.11",
     "npm-prepublish": "^1.2.3",
     "solhint": "^1.4.0",
