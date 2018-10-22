@@ -460,23 +460,29 @@
     }
   },
   "WETH9": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "transactionHash": "0xb95343413e459a0f97461812111254163ae53467855c0d73e0f1e7c5b8442fa3"
+    },
     "3": {
       "events": {},
       "links": {},
-      "address": "0xd0a14ee7990801f6c8bdb0df58003f383a5404aa",
-      "transactionHash": "0x4172d73cf9058735d88f8fa1b44e88b457682ba5f0a8a17d9517abf9597dd848"
+      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
+      "transactionHash": "0x19ae7fb1bd96c6f623741f76573a3e97d8a863358dafb1d773a8f9ad98b424b4"
     },
     "4": {
       "events": {},
       "links": {},
-      "address": "0xda6831f282c752854efe514568387f6144d28bd8",
-      "transactionHash": "0x997fb590f11373a3ed2c0c717bd896bd6039eb378f22be6296cd5f9c056d5386"
+      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
+      "transactionHash": "0x7bc8e85f99556aa23a41dd3c107e92ec76f057e4cea39f376ffb1b15d514b11f"
     },
     "42": {
       "events": {},
       "links": {},
-      "address": "0x559345a66c50fea0aecff2fcceab2bae7435b556",
-      "transactionHash": "0x52684075b29b6baf54b68448a2e1058821470892d682daf7b5f1a60dd7cc819e"
+      "address": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
+      "transactionHash": "0x0e8d602b350e2a896134d79b48b8a59488a0a70933d46c5736c47b468877be35"
     }
   }
 }
