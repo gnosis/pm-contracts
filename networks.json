@@ -52,6 +52,12 @@
     }
   },
   "CategoricalEvent": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x5dc430e0ee8b5b8670024dcf6e51fa5704dfa1b4",
+      "transactionHash": "0x6206446d860b879e7f99353d4b38b815057ad97c075ca681a3164c657c7336a5"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -78,6 +84,12 @@
     }
   },
   "CentralizedOracle": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x3dda43f4e13815767eb9649bf611fcb48533eb5a",
+      "transactionHash": "0x66a74fd323a0f35f0527cc0034ecf77b4eeb7f3a3f2cda271bd9a145c7cedd76"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -104,6 +116,12 @@
     }
   },
   "CentralizedOracleFactory": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xfb60b8ffdb16420b8afc3b77a9a3186bc905ef1f",
+      "transactionHash": "0x8ce4d0a8b29dcc78a4f59521c35c56020600d972926e4817aeb0fb7dddacad90"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -182,6 +200,12 @@
     }
   },
   "EventFactory": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xc113873694e254c75bfa1dc6667f0d57b3e2e1e3",
+      "transactionHash": "0x12e8d20e98347849c61dc55da18434afbaec75862c49e5eeaf9860728b2bc535"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -208,6 +232,12 @@
     }
   },
   "Fixed192x64Math": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x11c59b10ebe450cf403e1a07255da5cd2aef2084",
+      "transactionHash": "0xb48594ae3ae78f626d260421db309789e00fd9859da95cd4188a13ba3685ba5f"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -280,6 +310,14 @@
     }
   },
   "LMSRMarketMaker": {
+    "1": {
+      "events": {},
+      "links": {
+        "Fixed192x64Math": "0x11c59b10ebe450cf403e1a07255da5cd2aef2084"
+      },
+      "address": "0xad5c33f474239d9a7da38730f5837e7c7db3cb98",
+      "transactionHash": "0xa3f88100fea3ee1aa25e1fd9d6179851c306af618b1cd8f8546a3ecff5dc69f0"
+    },
     "3": {
       "events": {},
       "links": {
@@ -386,6 +424,12 @@
     }
   },
   "OutcomeToken": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xf69f02bd90eac7bc36b517f9f673bdada3cd3ea5",
+      "transactionHash": "0x9b083bd8beba12b8ea47f75696576f8d2ce21ebe331d1a1bb7b37a9f41e17da9"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -412,6 +456,12 @@
     }
   },
   "ScalarEvent": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x447d897a16c8da9bcb3dbfb26959f285b6622efe",
+      "transactionHash": "0x32885f760df2465ef299a795c43d50bbc01493c5912ad54260396d187746cdb7"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -490,6 +540,12 @@
     }
   },
   "StandardMarket": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0xa3681c65b5043a8799966a5b3ce87d0968191f73",
+      "transactionHash": "0x4c00f17b52f12566cabda223211b7a81a877cf5106dcf53b0dca2719174a2b67"
+    },
     "3": {
       "events": {},
       "links": {},
@@ -516,6 +572,12 @@
     }
   },
   "StandardMarketFactory": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x87443cf156a34459d86737c055beb80071f537cc",
+      "transactionHash": "0x1c5c2044833dbfb36af5e7dbde0820538cb20eb4d353362965c003af29dbb955"
+    },
     "3": {
       "events": {},
       "links": {},
