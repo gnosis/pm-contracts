@@ -27,6 +27,11 @@ const config = {
             port: 8545,
             network_id: "4",
         },
+        quickstart: {
+            host: "localhost",
+            port: 8545,
+            network_id: "437894314312",
+        },
     },
     mocha: {
         enableTimeouts: false,

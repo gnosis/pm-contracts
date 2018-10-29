@@ -14,8 +14,9 @@
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
     "resetnetinfo": "truffle networks --clean && tnt iN",
+    "ensurebc": "node ensurebc.js",
     "measuregasstats": "cross-env TESTDIR=test/javascript/ tnt measureGas -f inheritanceMap.json -o build/gas-stats.json",
-    "prepublishOnly": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN"
+    "prepack": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN && node ensurebc.js"
   },
   "keywords": [
     "Ethereum",
@@ -28,7 +29,7 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "@gnosis.pm/util-contracts": "^2.0.0-alpha",
-    "canonical-weth": "^1.1.0",
+    "canonical-weth": "^1.2.0",
     "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath"
   },
   "devDependencies": {
@@ -39,10 +40,10 @@
     "decimal.js": "^10.0.0",
     "eslint": "^5.7.0",
     "eslint-plugin-babel": "^5.2.1",
+    "fs-extra": "^7.0.0",
     "lodash": "^4.17.11",
     "npm-prepublish": "^1.2.3",
     "solhint": "^1.4.0",
-    "solmd": "github:cag/solmd",
     "truffle": "^4.1.14"
   },
   "repository": {

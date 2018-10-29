@@ -105,18 +105,15 @@ Contributors
    CentralizedOracle
    DifficultyOracleFactory
    DifficultyOracle
-   EtherToken
    EventFactory
    Event
    FutarchyOracleFactory
    FutarchyOracle
-   HumanFriendlyToken
    LMSRMarketMaker
    MajorityOracleFactory
    MajorityOracle
    MarketMaker
    Market
-   Math
    Oracle
    OutcomeToken
    ScalarEvent
@@ -126,8 +123,6 @@ Contributors
    StandardMarket
    StandardMarketWithPriceLoggerFactory
    StandardMarketWithPriceLogger
-   StandardToken
-   Token
    UltimateOracleFactory
    UltimateOracle
 

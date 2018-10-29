@@ -1,5 +1,6 @@
 pragma solidity ^0.4.24;
 import "canonical-weth/contracts/WETH9.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/DetailedERC20.sol";
 
 contract Migrations {
     address public owner;
