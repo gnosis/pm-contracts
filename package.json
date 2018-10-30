@@ -8,7 +8,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
-    "test": "truffle test",
+    "test": "truffle compile && truffle test",
     "lint-contracts": "solhint contracts/**/*.sol",
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
@@ -39,7 +39,7 @@
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
     "solhint": "1.2.1",
-    "truffle": "^4.0.4",
+    "truffle": "^5.0.0-gnosis.1",
     "web3": "^1.0.0-beta.35"
   },
   "repository": {
