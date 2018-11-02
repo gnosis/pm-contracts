@@ -1,6 +1,6 @@
 const utils = require('./utils')
 const NewWeb3 = require('web3')
-const { toHex, padLeft, keccak256, asciiToHex } = NewWeb3.utils;
+const { toHex, padLeft, keccak256, asciiToHex, hexToAscii, hexToNumber, toBN } = NewWeb3.utils;
 const ConditionalPaymentProcessor = artifacts.require('ConditionalPaymentProcessor')
 const WETH9 = artifacts.require('WETH9')
 
@@ -297,22 +297,97 @@ contract('ConditionalPaymentProcessor', function (accounts) {
     it("Should be able to split and merge in more complex scenarios", async () => {
         await conditionalPaymentProcessor.splitPosition(etherToken.address, asciiToHex(0), conditionId1, [0b01, 0b10], 1000, { from: player1 });
 
-        let collectionId1 = keccak256(etherToken.address + keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2)).slice(2))
-        const collectionId2 = keccak256(etherToken.address + keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2)).slice(2))
+        const collectionId1 = keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2))
+        const collectionId2 = keccak256(conditionId1 + padLeft(toHex(0b10), 64).slice(2))
+        const positionId1 = keccak256(etherToken.address + collectionId1.slice(2))
+        const positionId2 = keccak256(etherToken.address + collectionId2.slice(2))
 
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId1, player1).then(r => r.toNumber()), 1000)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId2, player1).then(r => r.toNumber()), 1000)
+        assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount(conditionId2).valueOf(), 3)
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, collectionId1, conditionId2, [0b10, 0b01, 0b100], 100, { from: player1 })
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId1, player1).then(r => r.toNumber()), 900)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId2, player1).then(r => r.toNumber()), 1000)
 
-        assert.equal(await conditionalPaymentProcessor.balanceOf(collectionId1, player1), 1000);
-        assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount(conditionId2).valueOf(), 3); 
-        // await conditionalPaymentProcessor.splitPosition.call(etherToken.address, toHex(collectionId1), conditionId2, [0b10, 0b01], 1000, { from: player1 }).then(res => {
-        //     console.log(res);
-        // })
-       
+        // const collectionId3 = toHex(toBN(parseInt(collectionId1, 16)) + toBN(parseInt(keccak256(conditionId2 + padLeft(toHex(0b10), 64).slice(2)), 16)))
+        const collectionId3 = toHex(toBN(collectionId1).add(toBN(keccak256(conditionId2 + padLeft(toHex(0b10), 64).slice(2)))))
+        const collectionId4 = toHex(toBN(collectionId1).add(toBN(keccak256(conditionId2 + padLeft(toHex(0b01), 64).slice(2)))))
+        
+        // THIS IS REALLY REALLY WEIRD, WHY DOES IT ADD THE 1 HERE TO THE HASH??? (When it isn't sliced out there's a random 1 in here.)
+        const collectionId5part1 = toHex(toBN(collectionId1).add(toBN(keccak256(conditionId2 + padLeft(toHex(0b100), 64).slice(2))))).substr(0, 2);
+        const collectionId5part2 = toHex(toBN(collectionId1).add(toBN(keccak256(conditionId2 + padLeft(toHex(0b100), 64).slice(2))))).substr(3, this.length);
+        const collectionId5 = collectionId5part1 + collectionId5part2;
 
-        // const collectionId3 = keccak256(etherToken.address + collectionId1 + keccak256(conditionId2, padLeft(toHex(0b001), 64).slice(2)).slice(2));
-        // const collectionId4 = keccak256(etherToken.address + collectionId1 + keccak256(conditionId2, padLeft(toHex(0b110), 64).slice(2)).slice(2));
+        const positionId3 = keccak256(etherToken.address + collectionId3.slice(2))
+        const positionId4 = keccak256(etherToken.address + collectionId4.slice(2))
+        const positionId5 = keccak256(etherToken.address + collectionId5.slice(2))
+        
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId3, player1).then(r => r.toNumber()), 100)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId4, player1).then(r => r.toNumber()), 100)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId5, player1).then(r => r.toNumber()), 100)
 
-        // assert.equal(await conditionalPaymentProcessor.balanceOf(collectionId1, player1).then(r => r.toNumber()), 900);
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b100, 0b1000], 100, { from: player1 });
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId3, player1).then(r => r.toNumber()), 0)
+        
+        // I CANT FIGURE OUT WHY, THE ONLY PATTERN THAT I'VE FOUND IS LAST ROUND THE 1 SHOWED UP ON 0b100, WHICH IN THIS ROUND IS THE ONLY SPLIT THAT IT DIDN'T SHOW UP ON 
+        const collectionId6part1 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b10), 64).slice(2))))).substr(0, 2)
+        const collectionId6part2 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b10), 64).slice(2))))).substr(3, this.length)
+        const collectionId6 = collectionId6part1 + collectionId6part2
 
+        const collectionId7part1 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b01), 64).slice(2))))).substr(0, 2)
+        const collectionId7part2 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b01), 64).slice(2))))).substr(3, this.length)
+        const collectionId7 = collectionId7part1 + collectionId7part2
+        
+        const collectionId8 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b100), 64).slice(2)))))
+
+        const collectionId9part1 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b1000), 64).slice(2))))).substr(0, 2)
+        const collectionId9part2 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b1000), 64).slice(2))))).substr(3, this.length)
+        const collectionId9 = collectionId9part1 + collectionId9part2;
+
+        const positionId6 = keccak256(etherToken.address + collectionId6.slice(2))
+        const positionId7 = keccak256(etherToken.address + collectionId7.slice(2))
+        const positionId8 = keccak256(etherToken.address + collectionId8.slice(2))
+        const positionId9 = keccak256(etherToken.address + collectionId9.slice(2))
+
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId6, player1).then(r => r.toNumber()), 100)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId7, player1).then(r => r.toNumber()), 100)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId8, player1).then(r => r.toNumber()), 100)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId9, player1).then(r => r.toNumber()), 100)
+
+        await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b100, 0b1000], 50, { from: player1 });
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId6, player1).then(r => r.toNumber()), 50)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId7, player1).then(r => r.toNumber()), 50)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId8, player1).then(r => r.toNumber()), 50)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId9, player1).then(r => r.toNumber()), 50)
+
+        try {
+            await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b100, 0b1000], 100, { from: player1 });
+            assert.fail('The test didn\'t correctly fail when presented with an invalid merging of more tokens than the positions held');
+        } catch(e) {
+            assert(e);
+        }
+
+        try {
+        await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b1000], 100, { from: player1 });
+            assert.fail('The test didn\'t correctly fail when presented with an invalid merging of more tokens than the positions held');
+        } catch(e) {
+            assert(e);
+        }
+
+        // AGAIN HERE
+        await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b1000], 50, { from: player1 })
+        const collectionId10part1 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b1011), 64).slice(2))))).substr(0, 2)
+        const collectionId10part2 = toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b1011), 64).slice(2))))).substr(3, this.length)
+        const collectionId10 = collectionId10part1 + collectionId10part2;
+        console.log(collectionId10);
+        const positionId10 = keccak256(etherToken.address + collectionId10.slice(2))
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId10, player1).then(r => r.toNumber()), 50);
+
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId6, player1).then(r => r.toNumber()), 0)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId7, player1).then(r => r.toNumber()), 0)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId8, player1).then(r => r.toNumber()), 50)
+        assert.equal(await conditionalPaymentProcessor.balanceOf(positionId9, player1).then(r => r.toNumber()), 0)
     })
 
 });
+
