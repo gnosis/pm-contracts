@@ -535,5 +535,86 @@ contract('Should be able to partially split and merge in complex scenarios. #2',
         const positionId7 = keccak256(etherToken.address + collectionId7.slice(2))
         assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId7, player1), 'ether'), 10)
     })
+})
 
+contract('The same positions in different orders should equal each other.', function (accounts) {
+    let conditionalPaymentProcessor, etherToken, 
+    oracle1, oracle2, oracle3,
+    questionId1, questionId2, questionId3,
+    payoutSlotCount1, payoutSlotCount2, payoutSlotCount3,
+    player1, player2, player3,
+    conditionId1, conditionId2, conditionId3
+
+    before(async () => {
+        conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed()
+        etherToken = await WETH9.deployed()
+
+        // prepare condition
+        oracle1 = accounts[1]
+        oracle2 = accounts[2]
+        oracle3 = accounts[3]
+
+        questionId1 = '0x1234987612349876123498761234987612349876123498761234987612349876'
+        questionId2 = '0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe'
+        questionId3 = '0xab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12'
+
+        payoutSlotCount1 = 2 
+        payoutSlotCount2 = 3 
+        payoutSlotCount3 = 4 
+
+        player1 = accounts[4]
+        player2 = accounts[5]
+        player3 = accounts[6]
+
+        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, payoutSlotCount1)
+        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, payoutSlotCount2)
+        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, payoutSlotCount3)
+
+        conditionId1 = keccak256(oracle1 + [questionId1, payoutSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId2 = keccak256(oracle2 + [questionId2, payoutSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId3 = keccak256(oracle3 + [questionId3, payoutSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+
+        await etherToken.deposit({value: 1e19, from: player1 })
+        await etherToken.approve(conditionalPaymentProcessor.address, 1e19, { from: player1 })        
+        await etherToken.deposit({value: 1e19, from: player2 }) 
+        await etherToken.approve(conditionalPaymentProcessor.address, 1e19, { from: player2 })        
+        await etherToken.deposit({value: 1e19, from: player3 })
+        await etherToken.approve(conditionalPaymentProcessor.address, 1e19, { from: player3 })   
+    })
+
+    it('Should create positions in opposite orders that equal each others values', async () => {
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, asciiToHex(0), conditionId1, [0b01, 0b10], 1e18, { from: player1 })
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, asciiToHex(0), conditionId2, [0b01, 0b10, 0b100], 1e18, { from: player1 })
+        
+        const collectionId1 = keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2))
+        const collectionId2 = keccak256(conditionId1 + padLeft(toHex(0b10), 64).slice(2))
+        const positionId1 = keccak256(etherToken.address + collectionId1.slice(2))
+        const positionId2 = keccak256(etherToken.address + collectionId2.slice(2))
+
+        const collectionId3 = keccak256(conditionId2 + padLeft(toHex(0b01), 64).slice(2))
+        const collectionId4 = keccak256(conditionId2 + padLeft(toHex(0b10), 64).slice(2))
+        const collectionId5 = keccak256(conditionId2 + padLeft(toHex(0b100), 64).slice(2))
+        const positionId3 = keccak256(etherToken.address + collectionId3.slice(2))
+        const positionId4 = keccak256(etherToken.address + collectionId4.slice(2))
+        const positionId5 = keccak256(etherToken.address + collectionId5.slice(2))
+        
+        assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId1, player1), 'ether'), 1)
+        assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId2, player1), 'ether'), 1)
+        assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId3, player1), 'ether'), 1)
+        assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId4, player1), 'ether'), 1)
+        assert.equal(fromWei(await conditionalPaymentProcessor.balanceOf(positionId5, player1), 'ether'), 1)
+
+        assert.equal(fromWei(await etherToken.balanceOf(player1), 'ether'), 8)
+        
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, collectionId1, conditionId2, [0b10, 0b01, 0b100], 1e18, { from: player1 })
+        await conditionalPaymentProcessor.splitPosition(etherToken.address, collectionId4, conditionId1, [0b10, 0b01], 1e18, { from: player1 })
+        // PositionId1 split on (PositionId4) should equal (PositionId4) split on PositionId1
+        const collectionId6 = toHex(toBN(collectionId1).add(toBN(keccak256(conditionId2 + padLeft(toHex(0b10), 64).slice(2)))))
+        const positionId6 = keccak256(etherToken.address + collectionId6.slice(2))
+
+        const collectionId7 = toHex(toBN(collectionId4).add(toBN(keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2)))))
+        const positionId7 = keccak256(etherToken.address + collectionId7.slice(2))
+
+        assert.equal(positionId6, positionId7);        
+    })
 })
