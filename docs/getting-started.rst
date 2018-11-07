@@ -33,6 +33,18 @@ Before predictive assets can exist in the system, a *condition* must be prepared
 
 .. autosolfunction:: ConditionalPaymentProcessor.prepareCondition
 
+.. note:: It is up to the consumer of the contract to interpret the question ID correctly. For example, a client may interpret the question ID as an IPFS hash which can be used to retrieve a document specifying the question more fully. The meaning of the question ID is left up to clients.
+
+If the function succeeds, the following event will be emitted, signifying the preparation of a condition:
+
+.. autosolevent:: ConditionalPaymentProcessor.ConditionPreparation
+
+.. note:: The condition ID is different from the question ID, and their distinction is important.
+
+The successful preparation of a condition also initializes the following state variable:
+
+.. autosolstatevar:: ConditionalPaymentProcessor.payoutNumerators
+
 
 Getting Stake in Positions
 --------------------------

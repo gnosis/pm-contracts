@@ -9,13 +9,19 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     using SafeMath for uint;
     using AddressUtils for address;
 
+    /// @dev Emitted upon the successful preparation of a condition.
+    /// @param conditionId The condition's ID. This ID may be derived from the other three parameters via ``keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount))``.
+    /// @param oracle The account assigned to report the result for the prepared condition.
+    /// @param questionId An identifier for the question to be answered by the oracle.
+    /// @param payoutSlotCount The number of payout slots which should be used for this condition. Must not exceed 256.
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
+
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, uint[] payoutNumerators);
     event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
-    /// Mapping key is an conditionId, where conditionId is made by H(oracle . questionId . payoutSlotCount)
+    /// Mapping key is an condition ID.
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
 
@@ -24,6 +30,10 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     /// The result of the mapping is the amount of stake held in a corresponding payout collection by the account holder, where the stake is backed by collateralToken.
     mapping(address => mapping(bytes32 => uint)) internal positions;
 
+    /// @dev This function prepares a condition by initializing a payout vector associated with the condition.
+    /// @param oracle The account assigned to report the result for the prepared condition.
+    /// @param questionId An identifier for the question to be answered by the oracle.
+    /// @param payoutSlotCount The number of payout slots which should be used for this condition. Must not exceed 256.
     function prepareCondition(address oracle, bytes32 questionId, uint payoutSlotCount) public {
         require(payoutSlotCount <= 256, "too many payout slots");
         bytes32 conditionId = keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount));
