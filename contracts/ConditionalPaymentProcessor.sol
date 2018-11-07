@@ -12,7 +12,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, uint[] payoutNumerators);
     event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
-    event PositionMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
+    event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
     /// Mapping key is an conditionId, where conditionId is made by H(oracle . questionId . payoutSlotCount)
@@ -116,7 +116,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
             positions[msg.sender][key] = positions[msg.sender][key].add(amount);
         }
 
-        emit PositionMerge(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
+        emit PositionsMerge(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
     }
 
     function getPayoutSlotCount(bytes32 conditionId) public view returns (uint) {
@@ -130,7 +130,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         );
     }
 
-    function redeemPositions(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition) public {
+    function redeemPositions(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) public {
         require(payoutDenominator[conditionId] > 0, "result for condition not received yet");
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
@@ -139,8 +139,8 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         bytes32 key;
 
         uint fullIndexSet = (1 << payoutSlotCount) - 1;
-        for(uint i = 0; i < partition.length; i++) {
-            uint indexSet = partition[i];
+        for(uint i = 0; i < indexSets.length; i++) {
+            uint indexSet = indexSets[i];
             require(indexSet > 0 && indexSet < fullIndexSet, "got invalid index set");
             key = keccak256(abi.encodePacked(collateralToken, getPayoutCollectionId(parentCollectionId, conditionId, indexSet)));
 

@@ -1,11 +1,10 @@
 const utils = require('./utils')
 const NewWeb3 = require('web3')
-const { toHex, padLeft, keccak256, asciiToHex, hexToAscii, hexToNumber, toBN, toWei, fromWei } = NewWeb3.utils
+const { toHex, padLeft, keccak256, asciiToHex, toBN, fromWei } = NewWeb3.utils
 const ConditionalPaymentProcessor = artifacts.require('ConditionalPaymentProcessor')
 const WETH9 = artifacts.require('WETH9')
 
 contract('ConditionalPaymentProcessor', function (accounts) {
-    let conditionalPaymentProcessorFactory
     let etherToken
     let oracle, questionId, payoutSlotCount, conditionalPaymentProcessor
     let conditionId
@@ -440,7 +439,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         await conditionalPaymentProcessor.redeemPositions(etherToken.address, asciiToHex(0), conditionId1, [0b01], { from: player1 })
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId1, player1).then(r => r.toNumber()), 0)
 
-        // Missing 1 for the rounding of different outcomes, what should be done with those coins?
+        // Missing 1 for the rounding of different outcomes
         assert.equal(await etherToken.balanceOf(player1).then(r => r.toNumber()), 9999);
     })
 })

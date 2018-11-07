@@ -8,7 +8,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
-    "test": "truffle compile && truffle test",
+    "test": "truffle test",
     "lint-contracts": "solhint contracts/**/*.sol",
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
