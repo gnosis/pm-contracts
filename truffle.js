@@ -5,12 +5,6 @@ const config = {
             port: 8545,
             network_id: "1",
         },
-        development: {
-            host: 'localhost',
-            port: 7545,
-            network_id: '*', 
-            gasPrice: 20000000000 
-        },
         ropsten: {
             host: "localhost",
             port: 8545,
