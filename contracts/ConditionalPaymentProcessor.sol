@@ -9,13 +9,19 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     using SafeMath for uint;
     using AddressUtils for address;
 
+    /// @dev Emitted upon the successful preparation of a condition.
+    /// @param conditionId The condition's ID. This ID may be derived from the other three parameters via ``keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount))``.
+    /// @param oracle The account assigned to report the result for the prepared condition.
+    /// @param questionId An identifier for the question to be answered by the oracle.
+    /// @param payoutSlotCount The number of payout slots which should be used for this condition. Must not exceed 256.
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount);
+
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint payoutSlotCount, uint[] payoutNumerators);
     event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
-    /// Mapping key is an conditionId, where conditionId is made by H(oracle . questionId . payoutSlotCount)
+    /// Mapping key is an condition ID. Value represents numerators of the payout vector associated with the condition. This array is initialized with a length equal to the payout slot count.
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
 
@@ -24,6 +30,10 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     /// The result of the mapping is the amount of stake held in a corresponding payout collection by the account holder, where the stake is backed by collateralToken.
     mapping(address => mapping(bytes32 => uint)) internal positions;
 
+    /// @dev This function prepares a condition by initializing a payout vector associated with the condition.
+    /// @param oracle The account assigned to report the result for the prepared condition.
+    /// @param questionId An identifier for the question to be answered by the oracle.
+    /// @param payoutSlotCount The number of payout slots which should be used for this condition. Must not exceed 256.
     function prepareCondition(address oracle, bytes32 questionId, uint payoutSlotCount) public {
         require(payoutSlotCount <= 256, "too many payout slots");
         bytes32 conditionId = keccak256(abi.encodePacked(oracle, questionId, payoutSlotCount));
@@ -54,6 +64,12 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         emit ConditionResolution(conditionId, msg.sender, questionId, payoutSlotCount, payoutNumerators[conditionId]);
     }
 
+    /// @dev This function splits a position. If splitting from the collateral, this contract will attempt to transfer `amount` collateral from the message sender to itself. Otherwise, this contract will burn `amount` stake held by the message sender in the position being split. Regardless, if successful, `amount` stake will be minted in the split target positions. If any of the transfers, mints, or burns fail, the transaction will revert. The transaction will also revert if the given partition is trivial, invalid, or refers to more slots than the condition is prepared with.
+    /// @param collateralToken The address of the positions' backing collateral token.
+    /// @param parentCollectionId The ID of the payout collections common to the position being split and the split target positions. May be null, in which only the collateral is shared.
+    /// @param conditionId The ID of the condition to split on.
+    /// @param partition An array of disjoint index sets representing a nontrivial partition of the payout slots of the given condition.
+    /// @param amount The amount of collateral or stake to split.
     function splitPosition(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
