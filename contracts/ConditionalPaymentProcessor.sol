@@ -64,6 +64,12 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         emit ConditionResolution(conditionId, msg.sender, questionId, payoutSlotCount, payoutNumerators[conditionId]);
     }
 
+    /// @dev This function splits a position. If splitting from the collateral, this contract will attempt to transfer `amount` collateral from the message sender to itself. Otherwise, this contract will burn `amount` stake held by the message sender in the position being split. Regardless, if successful, `amount` stake will be minted in the split target positions. If any of the transfers, mints, or burns fail, the transaction will revert. The transaction will also revert if the given partition is trivial, invalid, or refers to more slots than the condition is prepared with.
+    /// @param collateralToken The address of the positions' backing collateral token.
+    /// @param parentCollectionId The ID of the payout collections common to the position being split and the split target positions. May be null, in which only the collateral is shared.
+    /// @param conditionId The ID of the condition to split on.
+    /// @param partition An array of disjoint index sets representing a nontrivial partition of the payout slots of the given condition.
+    /// @param amount The amount of collateral or stake to split.
     function splitPosition(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
         uint payoutSlotCount = payoutNumerators[conditionId].length;
         require(payoutSlotCount > 0, "condition not prepared yet");
