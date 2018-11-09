@@ -21,7 +21,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
-    /// Mapping key is an condition ID.
+    /// Mapping key is an condition ID. Value represents numerators of the payout vector associated with the condition. This array is initialized with a length equal to the payout slot count.
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
 
