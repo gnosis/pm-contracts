@@ -6,7 +6,7 @@ const WETH9 = artifacts.require('WETH9')
 
 contract('ConditionalPaymentProcessor', function (accounts) {
     let etherToken
-    let oracle, questionId, payoutSlotCount, conditionalPaymentProcessor
+    let oracle, questionId, outcomeSlotCount, conditionalPaymentProcessor
     let conditionId
 
     before(async () => {
@@ -17,22 +17,22 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         oracle = accounts[1]
 
         questionId = '0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe'
-        payoutSlotCount = 2
-        await conditionalPaymentProcessor.prepareCondition(oracle, questionId, payoutSlotCount)
+        outcomeSlotCount = 2
+        await conditionalPaymentProcessor.prepareCondition(oracle, questionId, outcomeSlotCount)
 
-        conditionId = keccak256(oracle + [questionId, payoutSlotCount].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId = keccak256(oracle + [questionId, outcomeSlotCount].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
     });
 
-    it('should have obtainable conditionIds if in possession of oracle, questionId, and payoutSlotCount', async () => {
-        assert.equal((await conditionalPaymentProcessor.getPayoutSlotCount(conditionId)).valueOf(), payoutSlotCount);
+    it('should have obtainable conditionIds if in possession of oracle, questionId, and outcomeSlotCount', async () => {
+        assert.equal((await conditionalPaymentProcessor.getOutcomeSlotCount(conditionId)).valueOf(), outcomeSlotCount);
         assert.equal((await conditionalPaymentProcessor.payoutDenominator(conditionId)).valueOf(), 0);
     });
 
     it('should not be able to prepare the same condition more than once', async () => {
-        await utils.assertRejects(conditionalPaymentProcessor.prepareCondition(oracle, questionId, payoutSlotCount), 'Transaction should have reverted.')
+        await utils.assertRejects(conditionalPaymentProcessor.prepareCondition(oracle, questionId, outcomeSlotCount), 'Transaction should have reverted.')
     })
 
-    it('should split and merge positions on payout slots', async () => {
+    it('should split and merge positions on outcome slots', async () => {
         const buyer = 0
         const collateralTokenCount = 1e19
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
@@ -59,7 +59,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
             collateralTokenCount)
 
         // Validate getters
-        assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount.call(conditionId), 2)
+        assert.equal(await conditionalPaymentProcessor.getOutcomeSlotCount.call(conditionId), 2)
 
         await conditionalPaymentProcessor.mergePositions(etherToken.address, asciiToHex(0), conditionId, [0b01, 0b10], collateralTokenCount, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
@@ -77,7 +77,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
             0)
     })
 
-    it('should split positions, set payout values, and redeem payouts for conditions', async () => {
+    it('should split positions, set outcome slot values, and redeem outcome tokens for conditions', async () => {
         // Mint payout slots
         const buyer = 2
         const recipient = 7
@@ -112,16 +112,14 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal(await conditionalPaymentProcessor.payoutNumerators.call(conditionId, 0), 3)
         assert.equal(await conditionalPaymentProcessor.payoutNumerators.call(conditionId, 1), 7)
 
-        // Redeem payout for buyer account
         await conditionalPaymentProcessor.transferFrom(accounts[buyer], accounts[recipient],
             keccak256(
                 etherToken.address + keccak256(conditionId + padLeft(toHex(0b01), 64).slice(2)).slice(2)),
-            collateralTokenCount, { from: accounts[buyer] })
-
+                collateralTokenCount, { from: accounts[buyer] })
+                
         const buyerPayout = utils.getParamFromTxEvent(
             await conditionalPaymentProcessor.redeemPositions(etherToken.address, asciiToHex(0), conditionId, [0b10], { from: accounts[buyer] }),
             'payout')
-
 
         assert.equal(buyerPayout.valueOf(), collateralTokenCount * 7 / 10)
         assert.equal(await conditionalPaymentProcessor.balanceOf.call(
@@ -142,28 +140,27 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         assert.equal((await etherToken.balanceOf.call(accounts[buyer])).toNumber(), buyerPayout.valueOf())
     })
 
-    it('should redeem payouts in more complex scenarios', async () => {
+    it('should redeem outcome tokens in more complex scenarios', async () => {
         // Setup a more complex scenario
         const _oracle = accounts[1];
         const _questionId = '0x1234567812345678123456781234567812345678123456781234567812345678'; 
-        const _payoutSlotCount = 4;
-        await conditionalPaymentProcessor.prepareCondition(_oracle, _questionId, _payoutSlotCount);
-        const _conditionId = keccak256(_oracle + [_questionId, _payoutSlotCount].map(v => padLeft(toHex(v), 64).slice(2)).join(''));
+        const _outcomeSlotCount = 4;
+        await conditionalPaymentProcessor.prepareCondition(_oracle, _questionId, _outcomeSlotCount);
+        const _conditionId = keccak256(_oracle + [_questionId, _outcomeSlotCount].map(v => padLeft(toHex(v), 64).slice(2)).join(''));
 
-        assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount(_conditionId), 4);
+        assert.equal(await conditionalPaymentProcessor.getOutcomeSlotCount(_conditionId), 4);
         for (var i=0; i<4; i++) {
             assert.equal((await conditionalPaymentProcessor.payoutNumerators(_conditionId, i)).valueOf(), 0);
         }
         assert.equal((await conditionalPaymentProcessor.payoutDenominator(_conditionId)).valueOf(), 0);
         assert.notEqual(conditionId, _conditionId);
 
-        // create some buyers and purchase collateralTokens and then some payoutSlots
+        // create some buyers and purchase collateralTokens and then some Outcome Slots
         const buyers = [3, 4, 5, 6];
         const collateralTokenCounts = [1e19, 1e9, 1e18, 1000];
         for (var i=0; i<buyers.length; i++) {
             await etherToken.deposit({ value: collateralTokenCounts[i], from: accounts[buyers[i]]});
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);        
-            // before we Mint, we have to approve() the collateralTokens
             await etherToken.approve(conditionalPaymentProcessor.address, collateralTokenCounts[i], { from: accounts[buyers[i]]});
             await conditionalPaymentProcessor.splitPosition(etherToken.address, asciiToHex(0), _conditionId, [0b0001, 0b0010, 0b0100, 0b1000], collateralTokenCounts[i], { from: accounts[buyers[i]]} );
         }
@@ -190,7 +187,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
         );
         assert.equal(await conditionalPaymentProcessor.payoutDenominator.call(_conditionId).then(res => res.toString()), 1000);
 
-        // assert correct payouts for payout slots
+        // assert correct payouts for Outcome Slots
         const payoutsForPayoutSlots = [333, 666, 1, 0];
         for (var i=0; i<buyers.length; i++) {
             assert.equal(await conditionalPaymentProcessor.balanceOf.call(
@@ -202,7 +199,7 @@ contract('ConditionalPaymentProcessor', function (accounts) {
             assert.equal(await conditionalPaymentProcessor.payoutDenominator(_conditionId), 1000);
         }
 
-        // assert payout redemption
+        // assert Outcome Token redemption
         for (var i=0; i<buyers.length; i++) {
             await conditionalPaymentProcessor.redeemPositions(etherToken.address, asciiToHex(0), _conditionId, [0b0001, 0b0010, 0b0100, 0b1000], { from: accounts[buyers[i]] });
             assert.equal(await etherToken.balanceOf(accounts[buyers[i]]).then(res => res.toString()), collateralTokenCounts[i]);
@@ -214,7 +211,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
     let conditionalPaymentProcessor, etherToken, 
     oracle1, oracle2, oracle3,
     questionId1, questionId2, questionId3,
-    payoutSlotCount1, payoutSlotCount2, payoutSlotCount3,
+    outcomeSlotCount1, outcomeSlotCount2, outcomeSlotCount3,
     player1, player2, player3,
     conditionId1, conditionId2, conditionId3
 
@@ -231,21 +228,21 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         questionId2 = '0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe'
         questionId3 = '0xab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12'
 
-        payoutSlotCount1 = 2 
-        payoutSlotCount2 = 3 
-        payoutSlotCount3 = 4 
+        outcomeSlotCount1 = 2 
+        outcomeSlotCount2 = 3 
+        outcomeSlotCount3 = 4 
 
         player1 = accounts[4]
         player2 = accounts[5]
         player3 = accounts[6]
 
-        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, payoutSlotCount1)
-        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, payoutSlotCount2)
-        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, payoutSlotCount3)
+        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, outcomeSlotCount1)
+        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, outcomeSlotCount2)
+        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, outcomeSlotCount3)
 
-        conditionId1 = keccak256(oracle1 + [questionId1, payoutSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId2 = keccak256(oracle2 + [questionId2, payoutSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId3 = keccak256(oracle3 + [questionId3, payoutSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId1 = keccak256(oracle1 + [questionId1, outcomeSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId2 = keccak256(oracle2 + [questionId2, outcomeSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId3 = keccak256(oracle3 + [questionId3, outcomeSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
 
         await etherToken.deposit({value: 10000, from: player1 })
         await etherToken.approve(conditionalPaymentProcessor.address, 10000, { from: player1 })        
@@ -255,7 +252,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         await etherToken.approve(conditionalPaymentProcessor.address, 10000, { from: player3 })   
     });
 
-    it('Invalid initial positions should not give any tokens', async () => {
+    it('Invalid initial positions should not give any outcome tokens', async () => {
         await conditionalPaymentProcessor.splitPosition(etherToken.address, asciiToHex(0), conditionId1, [0b01], 1e19, { from: player1 });
 
         assert.equal(await conditionalPaymentProcessor.balanceOf(
@@ -279,7 +276,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId2, player3).then(r => r.toNumber()), 0)
     })
 
-    it('should not be able to merge back into a collateral token from a position without any value', async () => {
+    it('should not be able to merge back into a collateral token from a position without any outcome tokens', async () => {
         await utils.assertRejects(conditionalPaymentProcessor.mergePositions(etherToken.address, asciiToHex(0), conditionId1, [0b01, 0b10], 1, { from: player3 }), 'If this didn\'t fail, the user is somehow able to withdraw ethereum from positions with none in it, or they have already ether in that position')
         
         const collectionId1 = keccak256(conditionId1 + padLeft(toHex(0b01), 64).slice(2))
@@ -302,7 +299,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
 
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId1, player1).then(r => r.toNumber()), 1000)
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId2, player1).then(r => r.toNumber()), 1000)
-        assert.equal(await conditionalPaymentProcessor.getPayoutSlotCount(conditionId2).valueOf(), 3)
+        assert.equal(await conditionalPaymentProcessor.getOutcomeSlotCount(conditionId2).valueOf(), 3)
         
         // Split on a non-root Collection Identifier and Condition
         await conditionalPaymentProcessor.splitPosition(etherToken.address, collectionId1, conditionId2, [0b10, 0b01, 0b100], 100, { from: player1 })
@@ -340,7 +337,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId8, player1).then(r => r.toNumber()), 100)
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId9, player1).then(r => r.toNumber()), 100)
 
-        // Merge a full set of Payout Slots back into conditionId3
+        // Merge a full set of Outcome Slots back into conditionId3
         await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b100, 0b1000], 50, { from: player1 });
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId6, player1).then(r => r.toNumber()), 50)
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId7, player1).then(r => r.toNumber()), 50)
@@ -348,7 +345,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId9, player1).then(r => r.toNumber()), 50)
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId3, player1).then(r => r.toNumber()), 50)
 
-        // Merge a partial set of Payout Slots back 
+        // Merge a partial set of Outcome Slots back 
         await conditionalPaymentProcessor.mergePositions(etherToken.address, collectionId3, conditionId3, [0b10, 0b01, 0b1000], 50, { from: player1 })
         const collectionId10 = '0x' + toHex(toBN(collectionId3).add(toBN(keccak256(conditionId3 + padLeft(toHex(0b1011), 64).slice(2))))).slice(-64)
         const positionId10 = keccak256(etherToken.address + collectionId10.slice(2))
@@ -413,7 +410,7 @@ contract('Complex splitting and merging scenario #1.', function (accounts) {
         
         await conditionalPaymentProcessor.redeemPositions(etherToken.address, collectionId3, conditionId3, [0b1011], { from: player1 })       
 
-        // We have to account for a small fraction of tokens getting stuck in the contrac there on payout
+        // We have to account for a small fraction of tokens getting stuck in the contract there on payout
         assert.equal(await conditionalPaymentProcessor.balanceOf(positionId3, player1).then(r => r.toNumber()), 25 + Math.floor(25 * (666/1000 + 334/1000)) - 1);   
 
         await conditionalPaymentProcessor.receiveResult(questionId2, '0x' + [
@@ -448,7 +445,7 @@ contract('Should be able to partially split and merge in complex scenarios. #2',
     let conditionalPaymentProcessor, etherToken, 
     oracle1, oracle2, oracle3,
     questionId1, questionId2, questionId3,
-    payoutSlotCount1, payoutSlotCount2, payoutSlotCount3,
+    outcomeSlotCount1, outcomeSlotCount2, outcomeSlotCount3,
     player1, player2, player3,
     conditionId1, conditionId2, conditionId3
 
@@ -465,21 +462,21 @@ contract('Should be able to partially split and merge in complex scenarios. #2',
         questionId2 = '0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe'
         questionId3 = '0xab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12'
 
-        payoutSlotCount1 = 2 
-        payoutSlotCount2 = 3 
-        payoutSlotCount3 = 4 
+        outcomeSlotCount1 = 2 
+        outcomeSlotCount2 = 3 
+        outcomeSlotCount3 = 4 
 
         player1 = accounts[4]
         player2 = accounts[5]
         player3 = accounts[6]
 
-        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, payoutSlotCount1)
-        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, payoutSlotCount2)
-        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, payoutSlotCount3)
+        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, outcomeSlotCount1)
+        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, outcomeSlotCount2)
+        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, outcomeSlotCount3)
 
-        conditionId1 = keccak256(oracle1 + [questionId1, payoutSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId2 = keccak256(oracle2 + [questionId2, payoutSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId3 = keccak256(oracle3 + [questionId3, payoutSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId1 = keccak256(oracle1 + [questionId1, outcomeSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId2 = keccak256(oracle2 + [questionId2, outcomeSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId3 = keccak256(oracle3 + [questionId3, outcomeSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
 
         await etherToken.deposit({value: 1e19, from: player1 })
         await etherToken.approve(conditionalPaymentProcessor.address, 1e19, { from: player1 })        
@@ -539,7 +536,7 @@ contract('The same positions in different orders should equal each other.', func
     let conditionalPaymentProcessor, etherToken, 
     oracle1, oracle2, oracle3,
     questionId1, questionId2, questionId3,
-    payoutSlotCount1, payoutSlotCount2, payoutSlotCount3,
+    outcomeSlotCount1, outcomeSlotCount2, outcomeSlotCount3,
     player1, player2, player3,
     conditionId1, conditionId2, conditionId3
 
@@ -556,21 +553,21 @@ contract('The same positions in different orders should equal each other.', func
         questionId2 = '0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe'
         questionId3 = '0xab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12ab12'
 
-        payoutSlotCount1 = 2 
-        payoutSlotCount2 = 3 
-        payoutSlotCount3 = 4 
+        outcomeSlotCount1 = 2 
+        outcomeSlotCount2 = 3 
+        outcomeSlotCount3 = 4 
 
         player1 = accounts[4]
         player2 = accounts[5]
         player3 = accounts[6]
 
-        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, payoutSlotCount1)
-        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, payoutSlotCount2)
-        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, payoutSlotCount3)
+        await conditionalPaymentProcessor.prepareCondition(oracle1, questionId1, outcomeSlotCount1)
+        await conditionalPaymentProcessor.prepareCondition(oracle2, questionId2, outcomeSlotCount2)
+        await conditionalPaymentProcessor.prepareCondition(oracle3, questionId3, outcomeSlotCount3)
 
-        conditionId1 = keccak256(oracle1 + [questionId1, payoutSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId2 = keccak256(oracle2 + [questionId2, payoutSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
-        conditionId3 = keccak256(oracle3 + [questionId3, payoutSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId1 = keccak256(oracle1 + [questionId1, outcomeSlotCount1].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId2 = keccak256(oracle2 + [questionId2, outcomeSlotCount2].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
+        conditionId3 = keccak256(oracle3 + [questionId3, outcomeSlotCount3].map(v => padLeft(toHex(v), 64).slice(2)).join(''))
 
         await etherToken.deposit({value: 1e19, from: player1 })
         await etherToken.approve(conditionalPaymentProcessor.address, 1e19, { from: player1 })        

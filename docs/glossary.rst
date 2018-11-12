@@ -1,76 +1,116 @@
 Glossary
 ========
 
+*********
 Condition
-    A question that a specific oracle reports on with a preset number of payout slots. Analogous to events from PM contracts v1.
+*********
+    A question that a specific oracle reports on with a preset number of outcome slots. Analogous to events from PM contracts v1.
 
-    For example, a condition with a categorical outcome, that is, one of N outcomes, may have N payout slots, where the resolution of the condition sets one of the slots to receive the full payout.
+    For example, a condition with a categorical outcome, that is, one of N outcomes, may have N outcome slots, where the resolution of the condition sets one of the outcome slots to receive the full payout.
 
-    Another example: a condition with a scalar outcome, that is an outcome X in some range [A, B], may have two payout slots which correspond to the ends of the range A and B. Both slots are set to receive a proportion of the payout according to how close the outcome X is to A or B.
+    Another example: a condition with a scalar outcome, that is an outcome X in some range [A, B], may have two outcome slots which correspond to the ends of the range A and B. Both slots are set to receive a proportion of the payout according to how close the outcome X is to A or B.
 
-    Identified by hash(oracle . questionId . payoutSlotCount)
+    *Identified by keccak256(oracle . questionId . outcomeSlotCount)*
 
-Outcome
-    In the context of a condition, the specified oracle’s answer to the question.
+    **Outcome Slot**
+        Defines the redemption rate of Outcome Tokens. Outcome Tokens convert to a proportion of collateral depending on the outcome resolution of a set of conditions. 
 
-Collateral Token
-    ERC20 token used to create stake in positions.
+        Outcome Slots can either be unresolved (when the condition hasn’t been reported on) or resolved (after condition resolution). 
 
-Condition Resolution
-    The process in which an oracle reports an outcome for a condition, setting the payout for each of the condition’s payout slots.
+        **Index Set**
+            A bit array that represents a subset of Outcome Slots in one condition.
 
-Payout Slot
-    Defines the redemption rate of payout stake. Payout stake converts to a proportion of collateral depending on the outcomes of a set of conditions. Analogous to outcome tokens from v1.
+            Example: Condition1 has Outcome Slots: A,B,C. It would have 7 possible indexSets: A, B, C, A|B, A|C, B|C, A|B,C
 
-Payout Collection
-    A set of conditions, along with a non-empty proper subset of payout slots for each condition. (Represents a combination of one or many payout slots from multiple conditions.)
+        **Partition**
+            A specific way to separate the subsets of the Outcome Slots in a condition, using a combination of indexSets.
 
-    This refers to potentially many conditions whereas a payout slot refers to one condition.
+    **Oracle**
+        The account which can report the results on the condition.
 
-    This is identified by a sum({ hash(conditionId . indexSet) for each pair of (condition, subsets of payout slots) }).
+    **Outcome Resolution**
+        The process in which an oracle reports results for the Outcome Slots in a condition, setting the Outcome Slot value for each of the condition’s Outcome Slots.
 
-Index Set
-    A bit array that represents a subset of payout slots in one condition.
-
-Root Payout Collection
-    A payout collection based off of only a single condition. Pays out depending on the outcome of the condition.
-
-Non-Root Payout Collection
-    A payout collection based off of multiple conditions. Pays out depending on all of the outcomes of the multiple conditions.
-
-Payout Collection Depth
-    The number of conditions a payout collection is based off of. Terminology is chosen because payout collections form a DAG which is very tree-like. Shallow payout collections have few conditions, and deep payout collections have many conditions.
-
-    Although a payout slot with depth zero is not defined, one may think of that slot as simply corresponding to the collateral token.
-
-Atomic Payout Collection
-    A payout collection is atomic with respect to a set of conditions if it is contingent on all of the conditions in that set. Equivalently, a payout collection is atomic if its depth equals the number of conditions in the set.
-
-Payout Stake
-    For a given payout collection, a stakeholder may express a belief in what that payout collection of payout slots represents by holding stake in that slot.
-
-    For non-root payout collections, redemption will convert stake into shallower stake.
-
-    For root payout collections, redemption will convert stake into collateral.
-
-    This is identified by the combination of collateralToken and collectionId ( h(collateralToken + payoutCollectionId)).
-
+*********
 Position
-    The combination of a collateralToken and a payoutCollectionId.
+*********
+    A set of conditions, along with a non-empty proper subset of Outcome Slots for each condition (represents a combination of one or many Outcome Slots from multiple conditions) represented as a DAG (Directed Acyclic Graph) and tied to a specific stakeholder, Collateral Token, and amount of Outcome Tokens. 
 
-Splitting a Position
-    Stakeholders can split a position on an optional payout collection and a condition.
+    Representing a specific stakeholders stake in a certain condition(s) Outcome Slots as an ERC1155 token.
 
-    If a payout collection is not given, the stakeholder puts up an amount of collateral to get an equal amount of stake in each of the condition’s root payout slots.
+    A position is made up of: 
+     1. Stakeholder
+        Collection Identifier
+        Condition(s)
+        IndexSet(s)
+        CollateralToken
+        Outcome Tokens
 
-    If a payout slot is given, the stakeholder gives up an amount of stake in a payout slot in exchange for an equal amount of stake in each child payout slot of the given payout slot and the condition’s payout slots.
+    *Identified by the hash of a H(Collateral Token, Collection Identifier)*
 
-Merging a Position
-    Basically the opposite of splitting a position. Stakeholders can merge a position on an optional payout slot and a condition.
+    **Collection Identifier**
+        An identifier used by positions to target Condition(s) and indexSet(s). 
 
-    If a payout slot is not given, the stakeholder puts up an equal amount of stake in each of the condition’s root payout slots to receive collateral.
+        Rather than target individual Conditions and IndexSets. The Condition Identifier can identify a DAG (Directed Acyclic Graph) of dependant Condition(s) and indexSet(s).
 
-    If a payout slot is given, the stakeholder gives up an equal amount of stake in each child payout slot of the given payout slot and the condition’s payout slots in exchange for that amount of stake in the given payout slot.
+        It is the abstract structure that identifies what Conditions and IndexSets, a position is representing, along with their heirarchy. Without being tied to any specific stakeholder or Collateral Token.
 
-Collection
-    A specific subset of the stakeholders position.
+        If the parentCollectionId is equal to 0, then it is a Root Position. 
+
+        Identified by a sum( parentCollectionIdentifier, hash(ConditionIdentifier . indexSet)
+
+    **Collateral Token**
+        An ERC20 token used to create stake in positions.
+
+    **Outcome Tokens**
+        For a given Collection Identifier, a stakeholder may express a belief in what that Collection Identifier of Outcome Slots represents by using a collateral token to create a position from the Collection Identifier and holding Outcome Tokens in that slot.
+
+        For non-root positions, redemption will convert Outcome Tokens into stake in a shallower position. For root positions, redemption will convert Outcome Tokens into Collateral Tokens.
+
+    **Position Depth**
+        The number of conditions a position is based off of. Terminology is chosen because positions form a DAG which is very tree-like. Shallow positions have few conditions, and deep positions have many conditions.
+
+        **Root Position**
+            A position based off of only a single condition. Pays out depending on the outcome of the condition. Pays out directly to the Collateral Token
+        
+        **Non-Root Position**
+            A position based off of multiple conditions. Pays out depending on all of the outcomes of the multiple conditions. Pays out to a shallower Position.
+
+        **Atomic Position**
+            A position is atomic with respect to a set of conditions if it is contingent on all of the conditions in that set. Pays out to a shallower Position.
+
+    **Splitting a Position**
+        Stakeholders can split a position on an optional collection identifier and a condition.
+
+        For Root Positions, a collection identifier is not given (instead it is 0), and the stakeholder transfers an input amount of collateral tokens in order to get an equal amount of outcome tokens in each of the condition’s outcome slots.
+
+        For Non-Root Positions, a parent Collection Identifier is provided, and the stakeholder transfers an input amount of Outcome Tokens from the Position corresponding to the parent Collection Identifier down to a set of new Non-Root Position(s). 
+
+        Results in outcome tokens being transferred from the position being split to the positions resulting from the split. 
+
+    **Merging a Position**
+        Basically the opposite of splitting a position. Stakeholders can merge a position on an optional Outcome Slot and a Collection Identifier for non-root positions.
+
+        For Root Positions, if an Outcome Slot is not given, the stakeholder inputs an equal amount of Outcome Tokens in each of the condition’s root Outcome Slots to receive an equal amount of Collateral Tokens.
+
+        For Non-Root Positions, a parent Collection Identifier is provided, and the stakeholder transfers an input amount of Outcome Tokens from all the Outcome Slots input in the partition[] either up to a position identified by the parent Collection Identifier or merged into a single Position. 
+
+        Results in outcome tokens being transferred from the positions being merged to the position resulting from the merge. 
+
+    **Redeeming Positions**
+        Redeems (1 - all Index Sets) of Positions that are predicated on a single Condition and collection identifier.
+
+        Resulting in either more Outcome Tokens in a shallower position, or a conversion of Outcome Tokens into the Collateral Token, depending on whether it’s a Root Position or Non-Root Position. 
+	
+        To redeem a position, you need:
+         1. The Collateral Token that position is tied to. 
+            It’s parent positions Collection Identifier (if it has one), otherwise it would be a Root Position, and you would input 0 to receive back Collateral Tokens.
+            The condition you want to redeem.
+            The Index Sets[] you want to redeem. 
+
+        This will redeem all of the Index Sets[] slots listed in the given condition, for only positions with a parent position that has a Collection Idenfier equal to parentCollectionId. 
+
+
+
+
+
