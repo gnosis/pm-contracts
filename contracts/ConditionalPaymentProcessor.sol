@@ -17,7 +17,10 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount);
 
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount, uint[] payoutNumerators);
+
+    /// @dev Emitted when a position is successfully split.
     event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
+    /// @dev Emitted when positions are successfully merged.
     event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
@@ -42,6 +45,9 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         emit ConditionPreparation(conditionId, oracle, questionId, outcomeSlotCount);
     }
 
+    /// @dev Called by the oracle for reporting results of conditions. Will set the payout vector for the condition with the ID ``keccak256(abi.encodePacked(oracle, questionId, outcomeSlotCount))``, where oracle is the message sender, questionId is one of the parameters of this function, and outcomeSlotCount is derived from result, which is the result of serializing 32-byte EVM words representing payoutNumerators for each outcome slot of the condition.
+    /// @param questionId The question ID the oracle is answering for
+    /// @param result The oracle's answer
     function receiveResult(bytes32 questionId, bytes result) external {
         require(result.length > 0, "results empty");
         require(result.length % 32 == 0, "results not 32-byte aligned");
@@ -198,6 +204,17 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         emit Transfer(msg.sender, _from, _to, _id, _value);
     }
 
+    /// @notice Transfers outcome tokens with position ID `_id` from the `_from` address to the `_to` address specified.
+    /// @dev MUST emit Transfer event on success.
+    /// Caller must have sufficient allowance by _from for the _id/_value pair, or isApprovedForAll must be true.
+    /// Throws if `_to` is the zero address.
+    /// Throws if `_id` is not a valid token ID.
+    /// When transfer is complete, this function checks if `_to` is a smart contract (code size > 0). If so, it calls `onERC1155Received` on `_to` and throws if the return value is not `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`.
+    /// @param _from Account where outcome token are gotten
+    /// @param _to Account where outcome tokens are sent
+    /// @param _id Position ID for outcome token
+    /// @param _value Transfer amount
+    /// @param _data Additional data with no specified format, sent in call to `_to`
     function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes _data) external {
         this.transferFrom(_from, _to, _id, _value);
 
@@ -211,6 +228,10 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         emit Approval(msg.sender, _spender, _id, _currentValue, _value);
     }
 
+    /// @dev Gets the outcome token balance of `_owner` in a position with ID `_id`.
+    /// @param _id Position ID
+    /// @param _owner Account to check for holding of outcome tokens in the position
+    /// @returns Outcome token balance
     function balanceOf(uint256 _id, address _owner) external view returns (uint256) {
         return positions[_owner][bytes32(_id)];
     }
