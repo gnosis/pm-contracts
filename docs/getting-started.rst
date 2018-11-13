@@ -392,11 +392,22 @@ Outcome tokens in positions are not ERC20 tokens, but rather part of an `ERC1155
 
 In addition to a holder address, each token is indexed by an ID in this standard. In particular, position IDs are used to index outcome tokens. This is reflected in the balance querying function:
 
-.. autosolfunction:: ConditionalPaymentProcessor.balanceOf
+.. sol:function:: balanceOf(address owner, uint256 positionId) external view returns (uint256)
 
-To transfer outcome tokens, the following function may be used, as per ERC1155:
+To transfer outcome tokens, the following functions may be used, as per ERC1155:
 
-.. autosolfunction:: ConditionalPaymentProcessor.safeTransferFrom
+.. sol:function::
+    safeTransferFrom(address from, address to, uint256 positionId, uint256 value, bytes data) external
+    safeBatchTransferFrom(address from, address to, uint256[] positionIds, uint256[] values, bytes data) external
+    safeMulticastTransferFrom(address[] from, address[] to, uint256[] positionIds, uint256[] values, bytes data) external
+
+Approving an operator account to transfer outcome tokens on your behalf may also be done via:
+
+.. sol:function:: setApprovalForAll(address operator, bool approved) external
+
+Querying the status of approval can be done with:
+
+.. sol:function:: isApprovedForAll(address owner, address operator) external view returns (bool)
 
 .. _ERC1155 multitoken: https://eips.ethereum.org/EIPS/eip-1155
 
