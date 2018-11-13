@@ -1,13 +1,9 @@
 pragma solidity ^0.4.24;
-import "openzeppelin-solidity/contracts/AddressUtils.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "erc-1155/contracts/IERC1155.sol";
+import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+import { ERC1155 } from "erc-1155/contracts/ERC1155.sol";
 import "./OracleConsumer.sol";
 
-contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
-    using SafeMath for uint;
-    using AddressUtils for address;
+contract ConditionalPaymentProcessor is OracleConsumer, ERC1155 {
 
     /// @dev Emitted upon the successful preparation of a condition.
     /// @param conditionId The condition's ID. This ID may be derived from the other three parameters via ``keccak256(abi.encodePacked(oracle, questionId, outcomeSlotCount))``.
@@ -19,19 +15,14 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     event ConditionResolution(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount, uint[] payoutNumerators);
 
     /// @dev Emitted when a position is successfully split.
-    event PositionSplit(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
+    event PositionSplit(address indexed stakeholder, IERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
     /// @dev Emitted when positions are successfully merged.
-    event PositionsMerge(address indexed stakeholder, ERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
-    event PayoutRedemption(address indexed redeemer, ERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
+    event PositionsMerge(address indexed stakeholder, IERC20 collateralToken, bytes32 indexed parentCollectionId, bytes32 indexed conditionId, uint[] partition, uint amount);
+    event PayoutRedemption(address indexed redeemer, IERC20 indexed collateralToken, bytes32 indexed parentCollectionId, uint payout);
 
     /// Mapping key is an condition ID. Value represents numerators of the payout vector associated with the condition. This array is initialized with a length equal to the outcome slot count.
     mapping(bytes32 => uint[]) public payoutNumerators;
     mapping(bytes32 => uint) public payoutDenominator;
-
-    /// First key is the address of an account holder who has outcome tokens in some outcome slots for a condition.
-    /// Second key is H(collateralToken . CollectionId), where CollectionId is made by summing up H(conditionId . indexSet).
-    /// The result of the mapping is the amount of Outcome Tokens held in a corresponding position by the account holder, where the Outcome Tokens are backed by CollateralTokens.
-    mapping(address => mapping(bytes32 => uint)) internal positions;
 
     /// @dev This function prepares a condition by initializing a payout vector associated with the condition.
     /// @param oracle The account assigned to report the result for the prepared condition.
@@ -76,7 +67,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
     /// @param conditionId The ID of the condition to split on.
     /// @param partition An array of disjoint index sets representing a nontrivial partition of the outcome slots of the given condition.
     /// @param amount The amount of collateral or stake to split.
-    function splitPosition(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
+    function splitPosition(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
 
@@ -91,7 +82,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
             freeIndexSet ^= indexSet;
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, indexSet)));
             // event should go here for collectionId logging?
-            positions[msg.sender][key] = positions[msg.sender][key].add(amount);
+            balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(amount);
         }
 
         if(freeIndexSet == 0) {
@@ -99,17 +90,17 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
                 require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
-                positions[msg.sender][key] = positions[msg.sender][key].sub(amount);
+                balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].sub(amount);
             }
         } else {
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, fullIndexSet ^ freeIndexSet)));
-            positions[msg.sender][key] = positions[msg.sender][key].sub(amount);
+            balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].sub(amount);
         }
 
         emit PositionSplit(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
     }
 
-    function mergePositions(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
+    function mergePositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
 
@@ -123,7 +114,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
             require((indexSet & freeIndexSet) == indexSet, "partition not disjoint");
             freeIndexSet ^= indexSet;
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, indexSet)));
-            positions[msg.sender][key] = positions[msg.sender][key].sub(amount);
+            balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].sub(amount);
         }
 
         if(freeIndexSet == 0) {
@@ -131,11 +122,11 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
                 require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
-                positions[msg.sender][key] = positions[msg.sender][key].add(amount);
+                balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(amount);
             }
         } else {
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, fullIndexSet ^ freeIndexSet)));
-            positions[msg.sender][key] = positions[msg.sender][key].add(amount);
+            balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(amount);
         }
 
         emit PositionsMerge(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
@@ -152,7 +143,7 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
         );
     }
 
-    function redeemPositions(ERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) public {
+    function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) public {
         require(payoutDenominator[conditionId] > 0, "result for condition not received yet");
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
@@ -173,10 +164,10 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
                 }
             }
 
-            uint payoutStake = positions[msg.sender][key];
+            uint payoutStake = balances[uint(key)][msg.sender];
             if(payoutStake > 0) {
                 totalPayout = totalPayout.add(payoutStake.mul(payoutNumerator).div(payoutDenominator[conditionId]));
-                positions[msg.sender][key] = 0;
+                balances[uint(key)][msg.sender] = 0;
             }
         }
 
@@ -185,77 +176,9 @@ contract ConditionalPaymentProcessor is OracleConsumer, IERC1155 {
                 require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
-                positions[msg.sender][key] = positions[msg.sender][key].add(totalPayout);
+                balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(totalPayout);
             }
         }
         emit PayoutRedemption(msg.sender, collateralToken, parentCollectionId, totalPayout);
-    }
-
-    mapping (uint256 => mapping(address => mapping(address => uint256))) internal allowances;
-
-    function transferFrom(address _from, address _to, uint256 _id, uint256 _value) external {
-        if(_from != msg.sender) {
-            allowances[_id][_from][msg.sender] = allowances[_id][_from][msg.sender].sub(_value);
-        }
-
-        positions[_from][bytes32(_id)] = positions[_from][bytes32(_id)].sub(_value);
-        positions[_to][bytes32(_id)] = _value.add(positions[_to][bytes32(_id)]);
-
-        emit Transfer(msg.sender, _from, _to, _id, _value);
-    }
-
-    /// @notice Transfers outcome tokens with position ID `_id` from the `_from` address to the `_to` address specified.
-    /// @dev MUST emit Transfer event on success.
-    /// Caller must have sufficient allowance by _from for the _id/_value pair, or isApprovedForAll must be true.
-    /// Throws if `_to` is the zero address.
-    /// Throws if `_id` is not a valid token ID.
-    /// When transfer is complete, this function checks if `_to` is a smart contract (code size > 0). If so, it calls `onERC1155Received` on `_to` and throws if the return value is not `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`.
-    /// @param _from Account where outcome token are gotten
-    /// @param _to Account where outcome tokens are sent
-    /// @param _id Position ID for outcome token
-    /// @param _value Transfer amount
-    /// @param _data Additional data with no specified format, sent in call to `_to`
-    function safeTransferFrom(address _from, address _to, uint256 _id, uint256 _value, bytes _data) external {
-        this.transferFrom(_from, _to, _id, _value);
-
-        require(_checkAndCallSafeTransfer(_from, _to, _id, _value, _data));
-    }
-
-    function approve(address _spender, uint256 _id, uint256 _currentValue, uint256 _value) external {
-        // if the allowance isn't 0, it can only be updated to 0 to prevent an allowance change immediately after withdrawal
-        require(_value == 0 || allowances[_id][msg.sender][_spender] == _currentValue);
-        allowances[_id][msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _id, _currentValue, _value);
-    }
-
-    /// @dev Gets the outcome token balance of `_owner` in a position with ID `_id`.
-    /// @param _id Position ID
-    /// @param _owner Account to check for holding of outcome tokens in the position
-    /// @returns Outcome token balance
-    function balanceOf(uint256 _id, address _owner) external view returns (uint256) {
-        return positions[_owner][bytes32(_id)];
-    }
-
-    function allowance(uint256 _id, address _owner, address _spender) external view returns (uint256) {
-        return allowances[_id][_owner][_spender];
-    }
-
-    bytes4 constant private ERC1155_RECEIVED = 0xf23a6e61;
-    function _checkAndCallSafeTransfer(
-        address _from,
-        address _to,
-        uint256 _id,
-        uint256 _value,
-        bytes _data
-    )
-    internal
-    returns (bool)
-    {
-        if (!_to.isContract()) {
-            return true;
-        }
-        bytes4 retval = IERC1155TokenReceiver(_to).onERC1155Received(
-            msg.sender, _from, _id, _value, _data);
-        return (retval == ERC1155_RECEIVED);
     }
 }

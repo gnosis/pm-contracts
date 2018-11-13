@@ -7,7 +7,8 @@ before_install:
 - npm install -g npm greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
 script:
-- travis_wait 60 npm test
+- npm run lint
+- npm test
 after_script: greenkeeper-lockfile-upload
 before_deploy:
 - npm-prepublish --verbose --lax
