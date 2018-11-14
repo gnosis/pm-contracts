@@ -38,19 +38,19 @@ Preparing a Condition
 
 Before predictive assets can exist in the system, a *condition* must be prepared. A condition is a question to be answered in the future by a specific oracle in a particular manner. The following function may be used to prepare a condition:
 
-.. autosolfunction:: ConditionalPaymentProcessor.prepareCondition
+.. autosolfunction:: PredictionMarketSystem.prepareCondition
 
 .. note:: It is up to the consumer of the contract to interpret the question ID correctly. For example, a client may interpret the question ID as an IPFS hash which can be used to retrieve a document specifying the question more fully. The meaning of the question ID is left up to clients.
 
 If the function succeeds, the following event will be emitted, signifying the preparation of a condition:
 
-.. autosolevent:: ConditionalPaymentProcessor.ConditionPreparation
+.. autosolevent:: PredictionMarketSystem.ConditionPreparation
 
 .. note:: The condition ID is different from the question ID, and their distinction is important.
 
 The successful preparation of a condition also initializes the following state variable:
 
-.. autosolstatevar:: ConditionalPaymentProcessor.payoutNumerators
+.. autosolstatevar:: PredictionMarketSystem.payoutNumerators
 
 The resultant payout vector of a condition contains a predetermined number of *payout slots*. The entries of this vector are reported by the oracle, and their values sum up to one. This payout vector may be interpreted as the oracle's answer to the question posed in the condition.
 
@@ -73,7 +73,7 @@ To prepare this condition, the following code gets run:
 
 .. code-block:: js
 
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
         '0x1337aBcdef1337abCdEf1337ABcDeF1337AbcDeF',
         '0xabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc1234',
         3
@@ -111,7 +111,7 @@ To prepare this condition, the following code gets run:
 
 .. code-block:: js
 
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
         '0xCafEBAbECAFEbAbEcaFEbabECAfebAbEcAFEBaBe',
         '0x777def777def777def777def777def777def777def777def777def777def7890',
         2
@@ -191,7 +191,7 @@ This calculation yields the value ``0x2a9b72306758380e3b0a31125ed39a635432b28318
 Defining Positions
 ------------------
 
-In order to define a position, we first need to designate a collateral token. This token must be an `ERC20`_ token which exists on the same chain as the ConditionalPaymentProcessor instance.
+In order to define a position, we first need to designate a collateral token. This token must be an `ERC20`_ token which exists on the same chain as the PredictionMarketSystem instance.
 
 Then we need at least one condition with a payout collection, though a position may refer to multiple conditions each with an associated payout collection. Positions become valuable precisely when *all* of its constituent payout collections are valuable. More explicitly, the value of a position is a *product* of the values of those payout collections composing the position.
 
@@ -231,11 +231,11 @@ Splitting and Merging Positions
 
 Once conditions have been prepared, stake in positions contingent on these conditions may be obtained. Furthermore, this stake must be backed by collateral held by the system. In order to ensure this is the case, stake in shallow positions may only be created directly by sending collateral to the system for the system to hold, and stake in deeper positions may only be created by destroying stake in shallower positions. Any of these is referred to as *splitting a position*, and is done through the following function:
 
-.. autosolfunction:: ConditionalPaymentProcessor.splitPosition
+.. autosolfunction:: PredictionMarketSystem.splitPosition
 
 If this transaction does not revert, the following event will be emitted:
 
-.. autosolevent:: ConditionalPaymentProcessor.PositionSplit
+.. autosolevent:: PredictionMarketSystem.PositionSplit
 
 To decipher this function, let's consider what would be considered a valid split, and what would be invalid:
 
@@ -254,11 +254,11 @@ Collateral ``$`` can be split into outcome tokens in positions ``$:(A)``, ``$:(B
 
     const amount = 1e18 // could be any amount
 
-    // user must allow conditionalPaymentProcessor to
+    // user must allow predictionMarketSystem to
     // spend amount of DollaCoin, e.g. through
-    // await dollaCoin.approve(conditionalPaymentProcessor.address, amount)
+    // await dollaCoin.approve(predictionMarketSystem.address, amount)
 
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
         // This is just DollaCoin's address
         '0xD011ad011ad011AD011ad011Ad011Ad011Ad011A',
         // For splitting from collateral, pass bytes32(0)
@@ -275,7 +275,7 @@ Collateral ``$`` can be split into outcome tokens in positions ``$:(A)``, ``$:(B
         amount,
     )
 
-The effect of this transaction is to transfer ``amount`` DollaCoin from the message sender to the ``conditionalPaymentProcessor`` to hold, and to mint ``amount`` of outcome token for the following positions:
+The effect of this transaction is to transfer ``amount`` DollaCoin from the message sender to the ``predictionMarketSystem`` to hold, and to mint ``amount`` of outcome token for the following positions:
 
 ========= ======================================================================
  Symbol                               Position ID
@@ -291,7 +291,7 @@ The set of ``(A)``, ``(B)``, and ``(C)`` is not the only nontrivial partition of
 
 .. code-block:: js
 
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
         '0xD011ad011ad011AD011ad011Ad011Ad011Ad011A',
         '0x00',
         '0x67eb23e8932765c1d7a094838c928476df8c50d1d3898f278ef1fb2a62afab63',
@@ -300,7 +300,7 @@ The set of ``(A)``, ``(B)``, and ``(C)`` is not the only nontrivial partition of
         amount,
     )
 
-This transaction also transfers ``amount`` DollaCoin from the message sender to the ``conditionalPaymentProcessor`` to hold, but it mints ``amount`` of outcome token for the following positions instead:
+This transaction also transfers ``amount`` DollaCoin from the message sender to the ``predictionMarketSystem`` to hold, but it mints ``amount`` of outcome token for the following positions instead:
 
 =========== ======================================================================
   Symbol                                  Position ID
@@ -320,7 +320,7 @@ It's also possible to split from a position, burning outcome tokens in that posi
 
 .. code-block:: js
 
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
         // Note that we're still supplying the same collateral token
         // even though we're going two levels deep.
         '0xD011ad011ad011AD011ad011Ad011Ad011Ad011A',
@@ -352,7 +352,7 @@ Supplying a partition which does not cover the set of all outcome slots for a co
 
 .. code-block:: js
 
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
         '0xD011ad011ad011AD011ad011Ad011Ad011Ad011A',
         // Note that we also supply zeroes here, as the only aspect shared
         // between $:(B|C), $:(B) and $:(C) is the collateral token
@@ -376,11 +376,11 @@ Merging positions does precisely the opposite of what splitting a position does.
 
 To merge positions, use the following function:
 
-.. autosolfunction:: ConditionalPaymentProcessor.mergePositions
+.. autosolfunction:: PredictionMarketSystem.mergePositions
 
 If successful, the function will emit this event:
 
-.. autosolevent:: ConditionalPaymentProcessor.PositionsMerge
+.. autosolevent:: PredictionMarketSystem.PositionsMerge
 
 .. note:: This generalizes ``sellAllOutcomes`` from v1 like ``splitPosition`` generalizes ``buyAllOutcomes``.
 
@@ -417,19 +417,19 @@ Redeeming Positions
 
 Before this is possible, the payout vector must be set by the oracle:
 
-.. autosolfunction:: ConditionalPaymentProcessor.receiveResult
+.. autosolfunction:: PredictionMarketSystem.receiveResult
 
 This will emit the following event:
 
-.. autosolevent:: ConditionalPaymentProcessor.ConditionResolution
+.. autosolevent:: PredictionMarketSystem.ConditionResolution
 
 Then positions containing this condition can be redeemed via:
 
-.. autosolfunction:: ConditionalPaymentProcessor.redeemPositions
+.. autosolfunction:: PredictionMarketSystem.redeemPositions
 
 This will trigger the following event:
 
-.. autosolevent:: ConditionalPaymentProcessor.PayoutRedemption
+.. autosolevent:: PredictionMarketSystem.PayoutRedemption
 
 Also look at this chart:
 

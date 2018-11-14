@@ -3,7 +3,7 @@ import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import { ERC1155 } from "erc-1155/contracts/ERC1155.sol";
 import "./OracleConsumer.sol";
 
-contract ConditionalPaymentProcessor is OracleConsumer, ERC1155 {
+contract PredictionMarketSystem is OracleConsumer, ERC1155 {
 
     /// @dev Emitted upon the successful preparation of a condition.
     /// @param conditionId The condition's ID. This ID may be derived from the other three parameters via ``keccak256(abi.encodePacked(oracle, questionId, outcomeSlotCount))``.
