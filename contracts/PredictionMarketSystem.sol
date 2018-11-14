@@ -48,14 +48,14 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         require(payoutNumerators[conditionId].length == outcomeSlotCount, "number of outcomes mismatch");
         require(payoutDenominator[conditionId] == 0, "payout denominator already set");
         for(uint i = 0; i < outcomeSlotCount; i++) {
-            uint payout;
+            uint payoutNum;
             assembly {
-                payout := calldataload(add(0x64, mul(0x20, i)))
+                payoutNum := calldataload(add(0x64, mul(0x20, i)))
             }
-            payoutDenominator[conditionId] = payoutDenominator[conditionId].add(payout);
+            payoutDenominator[conditionId] = payoutDenominator[conditionId].add(payoutNum);
 
-            require(payoutNumerators[conditionId][i] == 0, "payout already set");
-            payoutNumerators[conditionId][i] = payout;
+            require(payoutNumerators[conditionId][i] == 0, "payout numerator already set");
+            payoutNumerators[conditionId][i] = payoutNum;
         }
         require(payoutDenominator[conditionId] > 0, "payout is all zeroes");
         emit ConditionResolution(conditionId, msg.sender, questionId, outcomeSlotCount, payoutNumerators[conditionId]);
@@ -63,7 +63,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
 
     /// @dev This function splits a position. If splitting from the collateral, this contract will attempt to transfer `amount` collateral from the message sender to itself. Otherwise, this contract will burn `amount` stake held by the message sender in the position being split. Regardless, if successful, `amount` stake will be minted in the split target positions. If any of the transfers, mints, or burns fail, the transaction will revert. The transaction will also revert if the given partition is trivial, invalid, or refers to more slots than the condition is prepared with.
     /// @param collateralToken The address of the positions' backing collateral token.
-    /// @param parentCollectionId The ID of the payout collections common to the position being split and the split target positions. May be null, in which only the collateral is shared.
+    /// @param parentCollectionId The ID of the outcome collections common to the position being split and the split target positions. May be null, in which only the collateral is shared.
     /// @param conditionId The ID of the condition to split on.
     /// @param partition An array of disjoint index sets representing a nontrivial partition of the outcome slots of the given condition.
     /// @param amount The amount of collateral or stake to split.
@@ -81,7 +81,6 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
             require((indexSet & freeIndexSet) == indexSet, "partition not disjoint");
             freeIndexSet ^= indexSet;
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, indexSet)));
-            // event should go here for collectionId logging?
             balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(amount);
         }
 
@@ -132,11 +131,14 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         emit PositionsMerge(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
     }
 
+    /// @dev Gets the outcome slot count of a condition.
+    /// @param conditionId ID of the condition.
+    /// @return Number of outcome slots associated with a condition, or zero if condition has not been prepared yet.
     function getOutcomeSlotCount(bytes32 conditionId) public view returns (uint) {
         return payoutNumerators[conditionId].length;
     }
 
-    function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) public pure returns (bytes32) {
+    function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) private pure returns (bytes32) {
         return bytes32(
             uint(parentCollectionId) +
             uint(keccak256(abi.encodePacked(conditionId, indexSet)))

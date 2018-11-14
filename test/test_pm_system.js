@@ -157,7 +157,7 @@ contract("PredictionMarketSystem", function(accounts) {
   });
 
   it("should split positions, set outcome slot values, and redeem outcome tokens for conditions", async () => {
-    // Mint payout slots
+    // Mint outcome slots
     const buyer = 2;
     const recipient = 7;
     const collateralTokenCount = 10;
@@ -398,7 +398,7 @@ contract("PredictionMarketSystem", function(accounts) {
     );
 
     // assert correct payouts for Outcome Slots
-    const payoutsForPayoutSlots = [333, 666, 1, 0];
+    const payoutsForOutcomeSlots = [333, 666, 1, 0];
     for (var i = 0; i < buyers.length; i++) {
       assert.equal(
         await predictionMarketSystem.balanceOf.call(
@@ -414,7 +414,7 @@ contract("PredictionMarketSystem", function(accounts) {
       );
       assert.equal(
         await predictionMarketSystem.payoutNumerators(_conditionId, i),
-        payoutsForPayoutSlots[i]
+        payoutsForOutcomeSlots[i]
       );
       assert.equal(
         await predictionMarketSystem.payoutDenominator(_conditionId),

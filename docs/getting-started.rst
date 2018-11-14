@@ -52,7 +52,11 @@ The successful preparation of a condition also initializes the following state v
 
 .. autosolstatevar:: PredictionMarketSystem.payoutNumerators
 
-The resultant payout vector of a condition contains a predetermined number of *payout slots*. The entries of this vector are reported by the oracle, and their values sum up to one. This payout vector may be interpreted as the oracle's answer to the question posed in the condition.
+To determine if, given a condition's ID, a condition has been prepared, or to find out a condition's outcome slot count, use the following accessor:
+
+.. autosolfunction:: PredictionMarketSystem.getOutcomeSlotCount
+
+The resultant payout vector of a condition contains a predetermined number of *outcome slots*. The entries of this vector are reported by the oracle, and their values sum up to one. This payout vector may be interpreted as the oracle's answer to the question posed in the condition.
 
 A Categorical Example
 ~~~~~~~~~~~~~~~~~~~~~
@@ -96,7 +100,7 @@ The condition ID may also be determined from the parameters via:
 
 This yields a condition ID of ``0x67eb23e8932765c1d7a094838c928476df8c50d1d3898f278ef1fb2a62afab63``.
 
-Later, if the oracle ``0x1337aBcdef1337abCdEf1337ABcDeF1337AbcDeF`` makes a report that the payout vector for the condition is ``[0, 1, 0]``, the oracle essentially states that Bob was chosen, as the payout slot associated with Bob would receive all of the payout.
+Later, if the oracle ``0x1337aBcdef1337abCdEf1337ABcDeF1337AbcDeF`` makes a report that the payout vector for the condition is ``[0, 1, 0]``, the oracle essentially states that Bob was chosen, as the outcome slot associated with Bob would receive all of the payout.
 
 A Scalar Example
 ~~~~~~~~~~~~~~~~
@@ -122,36 +126,36 @@ The condition ID for this condition can be calculated as ``0x3bdb7de3d0860745c0c
 In this case, the condition was created with two slots: one which represents the low end of the range (0) and another which represents the high end (1000). The slots' reported payout values should indicate how close the answer was to these endpoints. For example, if the oracle ``0xCafEBAbECAFEbAbEcaFEbabECAfebAbEcAFEBaBe`` makes a report that the payout vector is ``[9/10, 1/10]``, then the oracle essentially states that the score was 100, as the slot corresponding to the low end is worth nine times what the slot corresponding with the high end is worth, meaning the score should be nine times closer to 0 than it is close to 1000. Likewise, if the payout vector is reported to be ``[0, 1]``, then the oracle is saying that the score was *at least* 1000.
 
 
-Payout Collections
-------------------
+Outcome Collections
+-------------------
 
-The main concept for understanding the mechanics of this system is that of a *position*. We will build to this concept from conditions and payout slots, and then demonstrate the use of this concept.
+The main concept for understanding the mechanics of this system is that of a *position*. We will build to this concept from conditions and outcome slots, and then demonstrate the use of this concept.
 
-However, before we can talk about positions, we first have to talk about *payout collections*, which may be defined like so:
+However, before we can talk about positions, we first have to talk about *outcome collections*, which may be defined like so:
 
-    A nonempty proper subset of a condition’s payout slots which represents the sum total of all the contained slots’ payout values.
+    A nonempty proper subset of a condition’s outcome slots which represents the sum total of all the contained slots’ payout values.
 
 Categorical Example Featuring Alice, Bob, and Carol
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We'll denote the payout slots for Alice, Bob, and Carol as ``A``, ``B``, and ``C`` respectively.
+We'll denote the outcome slots for Alice, Bob, and Carol as ``A``, ``B``, and ``C`` respectively.
 
-A valid payout collection may be ``(A|B)``. In this example, this payout collection represents the eventuality in which either Alice or Bob is chosen. Note that for a categorical condition, the payout vector which the oracle reports will eventually contain a one in exactly one of the three slots, so the sum of the values in Alice's and Bob's slots is one precisely when either Alice or Bob is chosen, and zero otherwise.
+A valid outcome collection may be ``(A|B)``. In this example, this outcome collection represents the eventuality in which either Alice or Bob is chosen. Note that for a categorical condition, the payout vector which the oracle reports will eventually contain a one in exactly one of the three slots, so the sum of the values in Alice's and Bob's slots is one precisely when either Alice or Bob is chosen, and zero otherwise.
 
-``(C)`` by itself is also a valid payout collection, and this simply represents the case where Carol is chosen.
+``(C)`` by itself is also a valid outcome collection, and this simply represents the case where Carol is chosen.
 
-``()`` is an invalid payout collection, as it is empty. Empty payout collections do not make sense, as they would essentially represent no eventuality and have no value no matter what happens.
+``()`` is an invalid outcome collection, as it is empty. Empty outcome collections do not make sense, as they would essentially represent no eventuality and have no value no matter what happens.
 
-Conversely, ``(A|B|C)`` is also an invalid payout collection, as it is not a proper subset. Payout collections consisting of all the payout slots for a condition also do not make sense, as they would simply represent any eventuality, and should be equivalent to whatever was used to collateralize these payout collections.
+Conversely, ``(A|B|C)`` is also an invalid outcome collection, as it is not a proper subset. Outcome collections consisting of all the outcome slots for a condition also do not make sense, as they would simply represent any eventuality, and should be equivalent to whatever was used to collateralize these outcome collections.
 
-Finally, payout slots from different conditions (e.g. ``(A|X)``) cannot be composed in a single payout collection.
+Finally, outcome slots from different conditions (e.g. ``(A|X)``) cannot be composed in a single outcome collection.
 
 Index Set Representation and Identifier Derivation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A payout collection may be represented by an a condition and an *index set*. This is a 256 bit array which denotes which payout slots are present in a payout collection. For example, the value ``3 == 0b011`` corresponds to the payout collection ``(A|B)``, whereas the value ``4 == 0b100`` corresponds to ``(C)``. Note that the indices start at the lowest bit in a ``uint``.
+A outcome collection may be represented by an a condition and an *index set*. This is a 256 bit array which denotes which outcome slots are present in a outcome collection. For example, the value ``3 == 0b011`` corresponds to the outcome collection ``(A|B)``, whereas the value ``4 == 0b100`` corresponds to ``(C)``. Note that the indices start at the lowest bit in a ``uint``.
 
-A payout collection may be identified with a 32 byte value called a *collection identifier*. In order to calculate the collection ID for ``(A|B)``, simply hash the condition ID and the index set:
+A outcome collection may be identified with a 32 byte value called a *collection identifier*. In order to calculate the collection ID for ``(A|B)``, simply hash the condition ID and the index set:
 
 .. code-block:: js
 
@@ -166,7 +170,7 @@ A payout collection may be identified with a 32 byte value called a *collection 
 
 This results in a collection ID of ``0x52ff54f0f5616e34a2d4f56fb68ab4cc636bf0d92111de74d1ec99040a8da118``.
 
-We may also combine collection IDs for payout collections for different conditions by adding their values modulo 2^256 (equivalently, by adding their values and then taking the lowest 256 bits).
+We may also combine collection IDs for outcome collections for different conditions by adding their values modulo 2^256 (equivalently, by adding their values and then taking the lowest 256 bits).
 
 To illustrate, let's denote the slots for range ends 0 and 1000 from our scalar condition example as ``LO`` and ``HI``. We can find the collection ID for ``(LO)`` to be ``0xd79c1d3f71f6c9d998353ba2a848e596f0c6c1a9f6fa633f2c9ec65aaa097cdc``.
 
@@ -193,9 +197,9 @@ Defining Positions
 
 In order to define a position, we first need to designate a collateral token. This token must be an `ERC20`_ token which exists on the same chain as the PredictionMarketSystem instance.
 
-Then we need at least one condition with a payout collection, though a position may refer to multiple conditions each with an associated payout collection. Positions become valuable precisely when *all* of its constituent payout collections are valuable. More explicitly, the value of a position is a *product* of the values of those payout collections composing the position.
+Then we need at least one condition with a outcome collection, though a position may refer to multiple conditions each with an associated outcome collection. Positions become valuable precisely when *all* of its constituent outcome collections are valuable. More explicitly, the value of a position is a *product* of the values of those outcome collections composing the position.
 
-With these ingredients, position identifiers can also be calculated by hashing the address of the collateral token and the combined collection ID of all the payout collections in the position. We say positions are *deeper* if they contain more conditions and payout collections, and *shallower* if they contain less.
+With these ingredients, position identifiers can also be calculated by hashing the address of the collateral token and the combined collection ID of all the outcome collections in the position. We say positions are *deeper* if they contain more conditions and outcome collections, and *shallower* if they contain less.
 
 As an example, let's suppose that there is an ERC20 token called DollaCoin which exists at the address ``0xD011ad011ad011AD011ad011Ad011Ad011Ad011A``, and it is used as collateral for some positions. We will denote this token with ``$``.
 
@@ -267,7 +271,7 @@ Collateral ``$`` can be split into outcome tokens in positions ``$:(A)``, ``$:(B
         // see A Categorical Example for derivation
         '0x67eb23e8932765c1d7a094838c928476df8c50d1d3898f278ef1fb2a62afab63',
         // Each element of this partition is an index set:
-        // see Payout Collections for explanation
+        // see Outcome Collections for explanation
         [0b001, 0b010, 0b100],
         // Amount of collateral token to submit for holding
         // in exchange for minting the same amount of
@@ -348,7 +352,7 @@ This transaction burns ``amount`` of outcome token in position ``$:(A|B)`` (posi
 Splits on Partial Partitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Supplying a partition which does not cover the set of all outcome slots for a condition, but instead some payout collection, is also possible. For example, it is possible to split ``$:(B|C)`` (position ID ``0x5d06cd85e2ff915efab0e7881432b1c93b3e543c5538d952591197b3893f5ce3``) to ``$:(B)`` and ``$:(C)``:
+Supplying a partition which does not cover the set of all outcome slots for a condition, but instead some outcome collection, is also possible. For example, it is possible to split ``$:(B|C)`` (position ID ``0x5d06cd85e2ff915efab0e7881432b1c93b3e543c5538d952591197b3893f5ce3``) to ``$:(B)`` and ``$:(C)``:
 
 .. code-block:: js
 
