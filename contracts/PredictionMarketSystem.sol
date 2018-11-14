@@ -3,6 +3,7 @@ import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import { ERC1155 } from "erc-1155/contracts/ERC1155.sol";
 import "./OracleConsumer.sol";
 
+
 contract PredictionMarketSystem is OracleConsumer, ERC1155 {
 
     /// @dev Emitted upon the successful preparation of a condition.
@@ -28,7 +29,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
     /// @param oracle The account assigned to report the result for the prepared condition.
     /// @param questionId An identifier for the question to be answered by the oracle.
     /// @param outcomeSlotCount The number of outcome slots which should be used for this condition. Must not exceed 256.
-    function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) public {
+    function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external {
         require(outcomeSlotCount <= 256, "too many outcome slots");
         bytes32 conditionId = keccak256(abi.encodePacked(oracle, questionId, outcomeSlotCount));
         require(payoutNumerators[conditionId].length == 0, "condition already prepared");
@@ -47,8 +48,9 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         bytes32 conditionId = keccak256(abi.encodePacked(msg.sender, questionId, outcomeSlotCount));
         require(payoutNumerators[conditionId].length == outcomeSlotCount, "number of outcomes mismatch");
         require(payoutDenominator[conditionId] == 0, "payout denominator already set");
-        for(uint i = 0; i < outcomeSlotCount; i++) {
+        for (uint i = 0; i < outcomeSlotCount; i++) {
             uint payoutNum;
+            // solhint-disable-next-line no-inline-assembly
             assembly {
                 payoutNum := calldataload(add(0x64, mul(0x20, i)))
             }
@@ -67,7 +69,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
     /// @param conditionId The ID of the condition to split on.
     /// @param partition An array of disjoint index sets representing a nontrivial partition of the outcome slots of the given condition.
     /// @param amount The amount of collateral or stake to split.
-    function splitPosition(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
+    function splitPosition(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external {
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
 
@@ -75,7 +77,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
 
         uint fullIndexSet = (1 << outcomeSlotCount) - 1;
         uint freeIndexSet = fullIndexSet;
-        for(uint i = 0; i < partition.length; i++) {
+        for (uint i = 0; i < partition.length; i++) {
             uint indexSet = partition[i];
             require(indexSet > 0 && indexSet < fullIndexSet, "got invalid index set");
             require((indexSet & freeIndexSet) == indexSet, "partition not disjoint");
@@ -84,8 +86,8 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
             balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].add(amount);
         }
 
-        if(freeIndexSet == 0) {
-            if(parentCollectionId == bytes32(0)) {
+        if (freeIndexSet == 0) {
+            if (parentCollectionId == bytes32(0)) {
                 require(collateralToken.transferFrom(msg.sender, this, amount), "could not receive collateral tokens");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
@@ -99,7 +101,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         emit PositionSplit(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
     }
 
-    function mergePositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) public {
+    function mergePositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] partition, uint amount) external {
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
 
@@ -107,7 +109,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
 
         uint fullIndexSet = (1 << outcomeSlotCount) - 1;
         uint freeIndexSet = fullIndexSet;
-        for(uint i = 0; i < partition.length; i++) {
+        for (uint i = 0; i < partition.length; i++) {
             uint indexSet = partition[i];
             require(indexSet > 0 && indexSet < fullIndexSet, "got invalid index set");
             require((indexSet & freeIndexSet) == indexSet, "partition not disjoint");
@@ -116,8 +118,8 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
             balances[uint(key)][msg.sender] = balances[uint(key)][msg.sender].sub(amount);
         }
 
-        if(freeIndexSet == 0) {
-            if(parentCollectionId == bytes32(0)) {
+        if (freeIndexSet == 0) {
+            if (parentCollectionId == bytes32(0)) {
                 require(collateralToken.transfer(msg.sender, amount), "could not send collateral tokens");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
@@ -131,21 +133,7 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         emit PositionsMerge(msg.sender, collateralToken, parentCollectionId, conditionId, partition, amount);
     }
 
-    /// @dev Gets the outcome slot count of a condition.
-    /// @param conditionId ID of the condition.
-    /// @return Number of outcome slots associated with a condition, or zero if condition has not been prepared yet.
-    function getOutcomeSlotCount(bytes32 conditionId) public view returns (uint) {
-        return payoutNumerators[conditionId].length;
-    }
-
-    function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) private pure returns (bytes32) {
-        return bytes32(
-            uint(parentCollectionId) +
-            uint(keccak256(abi.encodePacked(conditionId, indexSet)))
-        );
-    }
-
-    function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) public {
+    function redeemPositions(IERC20 collateralToken, bytes32 parentCollectionId, bytes32 conditionId, uint[] indexSets) external {
         require(payoutDenominator[conditionId] > 0, "result for condition not received yet");
         uint outcomeSlotCount = payoutNumerators[conditionId].length;
         require(outcomeSlotCount > 0, "condition not prepared yet");
@@ -154,27 +142,27 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
         bytes32 key;
 
         uint fullIndexSet = (1 << outcomeSlotCount) - 1;
-        for(uint i = 0; i < indexSets.length; i++) {
+        for (uint i = 0; i < indexSets.length; i++) {
             uint indexSet = indexSets[i];
             require(indexSet > 0 && indexSet < fullIndexSet, "got invalid index set");
             key = keccak256(abi.encodePacked(collateralToken, getCollectionId(parentCollectionId, conditionId, indexSet)));
 
             uint payoutNumerator = 0;
-            for(uint j = 0; j < outcomeSlotCount; j++) {
-                if(indexSet & (1 << j) != 0) {
+            for (uint j = 0; j < outcomeSlotCount; j++) {
+                if (indexSet & (1 << j) != 0) {
                     payoutNumerator = payoutNumerator.add(payoutNumerators[conditionId][j]);
                 }
             }
 
             uint payoutStake = balances[uint(key)][msg.sender];
-            if(payoutStake > 0) {
+            if (payoutStake > 0) {
                 totalPayout = totalPayout.add(payoutStake.mul(payoutNumerator).div(payoutDenominator[conditionId]));
                 balances[uint(key)][msg.sender] = 0;
             }
         }
 
         if (totalPayout > 0) {
-            if(parentCollectionId == bytes32(0)) {
+            if (parentCollectionId == bytes32(0)) {
                 require(collateralToken.transfer(msg.sender, totalPayout), "could not transfer payout to message sender");
             } else {
                 key = keccak256(abi.encodePacked(collateralToken, parentCollectionId));
@@ -182,5 +170,19 @@ contract PredictionMarketSystem is OracleConsumer, ERC1155 {
             }
         }
         emit PayoutRedemption(msg.sender, collateralToken, parentCollectionId, totalPayout);
+    }
+
+    /// @dev Gets the outcome slot count of a condition.
+    /// @param conditionId ID of the condition.
+    /// @return Number of outcome slots associated with a condition, or zero if condition has not been prepared yet.
+    function getOutcomeSlotCount(bytes32 conditionId) external view returns (uint) {
+        return payoutNumerators[conditionId].length;
+    }
+
+    function getCollectionId(bytes32 parentCollectionId, bytes32 conditionId, uint indexSet) private pure returns (bytes32) {
+        return bytes32(
+            uint(parentCollectionId) +
+            uint(keccak256(abi.encodePacked(conditionId, indexSet)))
+        );
     }
 }

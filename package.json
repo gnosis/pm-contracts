@@ -14,7 +14,7 @@
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
     "resetnetinfo": "truffle networks --clean && tnt iN",
-    "prepublishOnly": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN"
+    "prepack": "eslint . && solhint contracts/**/*.sol && truffle compile && truffle networks --clean && tnt iN"
   },
   "keywords": [
     "Ethereum",
@@ -39,7 +39,7 @@
     "lodash": "^4.17.4",
     "npm-prepublish": "^1.2.3",
     "prettier": "1.15.2",
-    "solhint": "1.2.1",
+    "solhint": "^1.2.1",
     "truffle": "^5.0.0-beta.1",
     "web3": "^1.0.0-beta.35"
   },

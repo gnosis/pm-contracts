@@ -4,9 +4,10 @@ pragma solidity ^0.4.24;
 // when https://github.com/trufflesuite/truffle/pull/1085 hits
 import "canonical-weth/contracts/WETH9.sol";
 
+
 contract Migrations {
     address public owner;
-    uint public last_completed_migration;
+    uint public lastCompletedMigration;
 
     modifier restricted() {
         if (msg.sender == owner) _;
@@ -17,11 +18,11 @@ contract Migrations {
     }
 
     function setCompleted(uint completed) public restricted {
-        last_completed_migration = completed;
+        lastCompletedMigration = completed;
     }
 
-    function upgrade(address new_address) public restricted {
-        Migrations upgraded = Migrations(new_address);
-        upgraded.setCompleted(last_completed_migration);
+    function upgrade(address newAddress) public restricted {
+        Migrations upgraded = Migrations(newAddress);
+        upgraded.setCompleted(lastCompletedMigration);
     }
 }
