@@ -25,7 +25,7 @@ Furthermore, since event contract instances are tied to single collateral token 
 
 The nomenclature clashed with Solidity's use of ``event``, which indicated the definition of a class of EVM logs consumers of contracts could expect to be emitted during transactions with the contract.
 
-In v2, future events to be resolved by an oracle are referred to as *conditions*. These conditions are defined by an oracle account, a question ID, and a payout slot count.
+In v2, future events to be resolved by an oracle are referred to as *conditions*. These conditions are defined by an oracle account, a question ID, and a outcome slot count.
 
 Any account, whether externally owned or a contract, may act as an oracle. The oracle simply reports the result of the specific question about a future event, which should be retrievable from the question ID, to the monolith.
 

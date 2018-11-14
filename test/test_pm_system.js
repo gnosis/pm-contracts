@@ -1,18 +1,16 @@
 const { assertRejects, getParamFromTxEvent } = require("./utils");
 const { toHex, padLeft, keccak256, asciiToHex, toBN, fromWei } = web3.utils;
 
-const ConditionalPaymentProcessor = artifacts.require(
-  "ConditionalPaymentProcessor"
-);
+const PredictionMarketSystem = artifacts.require("PredictionMarketSystem");
 const WETH9 = artifacts.require("WETH9");
 
-contract("ConditionalPaymentProcessor", function(accounts) {
+contract("PredictionMarketSystem", function(accounts) {
   let etherToken;
-  let oracle, questionId, outcomeSlotCount, conditionalPaymentProcessor;
+  let oracle, questionId, outcomeSlotCount, predictionMarketSystem;
   let conditionId;
 
   before(async () => {
-    conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed();
+    predictionMarketSystem = await PredictionMarketSystem.deployed();
     etherToken = await WETH9.deployed();
 
     // prepare condition
@@ -21,7 +19,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     questionId =
       "0xcafebabecafebabecafebabecafebabecafebabecafebabecafebabecafebabe";
     outcomeSlotCount = 2;
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
       oracle,
       questionId,
       outcomeSlotCount
@@ -37,22 +35,18 @@ contract("ConditionalPaymentProcessor", function(accounts) {
 
   it("should have obtainable conditionIds if in possession of oracle, questionId, and outcomeSlotCount", async () => {
     assert.equal(
-      (await conditionalPaymentProcessor.getOutcomeSlotCount(
-        conditionId
-      )).valueOf(),
+      (await predictionMarketSystem.getOutcomeSlotCount(conditionId)).valueOf(),
       outcomeSlotCount
     );
     assert.equal(
-      (await conditionalPaymentProcessor.payoutDenominator(
-        conditionId
-      )).valueOf(),
+      (await predictionMarketSystem.payoutDenominator(conditionId)).valueOf(),
       0
     );
   });
 
   it("should not be able to prepare the same condition more than once", async () => {
     await assertRejects(
-      conditionalPaymentProcessor.prepareCondition(
+      predictionMarketSystem.prepareCondition(
         oracle,
         questionId,
         outcomeSlotCount
@@ -74,13 +68,13 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     await etherToken.approve(
-      conditionalPaymentProcessor.address,
+      predictionMarketSystem.address,
       collateralTokenCount,
       { from: accounts[buyer] }
     );
 
     for (let i = 0; i < 10; i++) {
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         asciiToHex(0),
         conditionId,
@@ -91,13 +85,13 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     }
 
     assert.equal(
-      await etherToken.balanceOf.call(conditionalPaymentProcessor.address),
+      await etherToken.balanceOf.call(predictionMarketSystem.address),
       collateralTokenCount
     );
     assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0);
 
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -107,7 +101,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       collateralTokenCount
     );
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -119,11 +113,11 @@ contract("ConditionalPaymentProcessor", function(accounts) {
 
     // Validate getters
     assert.equal(
-      await conditionalPaymentProcessor.getOutcomeSlotCount.call(conditionId),
+      await predictionMarketSystem.getOutcomeSlotCount.call(conditionId),
       2
     );
 
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       asciiToHex(0),
       conditionId,
@@ -136,12 +130,12 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       collateralTokenCount
     );
     assert.equal(
-      await etherToken.balanceOf.call(conditionalPaymentProcessor.address),
+      await etherToken.balanceOf.call(predictionMarketSystem.address),
       0
     );
 
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -151,7 +145,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -163,7 +157,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
   });
 
   it("should split positions, set outcome slot values, and redeem outcome tokens for conditions", async () => {
-    // Mint payout slots
+    // Mint outcome slots
     const buyer = 2;
     const recipient = 7;
     const collateralTokenCount = 10;
@@ -176,12 +170,12 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       collateralTokenCount
     );
     await etherToken.approve(
-      conditionalPaymentProcessor.address,
+      predictionMarketSystem.address,
       collateralTokenCount,
       { from: accounts[buyer] }
     );
 
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       asciiToHex(0),
       conditionId,
@@ -191,14 +185,14 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
     assert.equal(
       (await etherToken.balanceOf.call(
-        conditionalPaymentProcessor.address
+        predictionMarketSystem.address
       )).valueOf(),
       collateralTokenCount
     );
     assert.equal(await etherToken.balanceOf.call(accounts[buyer]), 0);
 
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -208,7 +202,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       collateralTokenCount
     );
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -219,25 +213,25 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     // Set outcome in condition
-    await conditionalPaymentProcessor.receiveResult(
+    await predictionMarketSystem.receiveResult(
       questionId,
       "0x" + [padLeft("3", 64), padLeft("7", 64)].join(""),
       { from: oracle }
     );
     assert.equal(
-      await conditionalPaymentProcessor.payoutDenominator.call(conditionId),
+      await predictionMarketSystem.payoutDenominator.call(conditionId),
       10
     );
     assert.equal(
-      await conditionalPaymentProcessor.payoutNumerators.call(conditionId, 0),
+      await predictionMarketSystem.payoutNumerators.call(conditionId, 0),
       3
     );
     assert.equal(
-      await conditionalPaymentProcessor.payoutNumerators.call(conditionId, 1),
+      await predictionMarketSystem.payoutNumerators.call(conditionId, 1),
       7
     );
 
-    await conditionalPaymentProcessor.safeTransferFrom(
+    await predictionMarketSystem.safeTransferFrom(
       accounts[buyer],
       accounts[recipient],
       keccak256(
@@ -250,7 +244,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     const buyerPayout = getParamFromTxEvent(
-      await conditionalPaymentProcessor.redeemPositions(
+      await predictionMarketSystem.redeemPositions(
         etherToken.address,
         asciiToHex(0),
         conditionId,
@@ -262,7 +256,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
 
     assert.equal(buyerPayout.valueOf(), (collateralTokenCount * 7) / 10);
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[recipient],
         keccak256(
           etherToken.address +
@@ -272,7 +266,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       collateralTokenCount
     );
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf.call(
+      await predictionMarketSystem.balanceOf.call(
         accounts[buyer],
         keccak256(
           etherToken.address +
@@ -283,7 +277,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     const recipientPayout = getParamFromTxEvent(
-      await conditionalPaymentProcessor.redeemPositions(
+      await predictionMarketSystem.redeemPositions(
         etherToken.address,
         asciiToHex(0),
         conditionId,
@@ -309,7 +303,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     const _questionId =
       "0x1234567812345678123456781234567812345678123456781234567812345678";
     const _outcomeSlotCount = 4;
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
       _oracle,
       _questionId,
       _outcomeSlotCount
@@ -322,12 +316,12 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     assert.equal(
-      await conditionalPaymentProcessor.getOutcomeSlotCount(_conditionId),
+      await predictionMarketSystem.getOutcomeSlotCount(_conditionId),
       4
     );
     for (var i = 0; i < 4; i++) {
       assert.equal(
-        (await conditionalPaymentProcessor.payoutNumerators(
+        (await predictionMarketSystem.payoutNumerators(
           _conditionId,
           i
         )).valueOf(),
@@ -335,9 +329,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       );
     }
     assert.equal(
-      (await conditionalPaymentProcessor.payoutDenominator(
-        _conditionId
-      )).valueOf(),
+      (await predictionMarketSystem.payoutDenominator(_conditionId)).valueOf(),
       0
     );
     assert.notEqual(conditionId, _conditionId);
@@ -357,11 +349,11 @@ contract("ConditionalPaymentProcessor", function(accounts) {
         collateralTokenCounts[i]
       );
       await etherToken.approve(
-        conditionalPaymentProcessor.address,
+        predictionMarketSystem.address,
         collateralTokenCounts[i],
         { from: accounts[buyers[i]] }
       );
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         asciiToHex(0),
         _conditionId,
@@ -372,7 +364,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     }
 
     await assertRejects(
-      conditionalPaymentProcessor.receiveResult(
+      predictionMarketSystem.receiveResult(
         _questionId,
         "0x" +
           [
@@ -387,7 +379,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
     );
 
     // resolve the condition
-    await conditionalPaymentProcessor.receiveResult(
+    await predictionMarketSystem.receiveResult(
       _questionId,
       "0x" +
         [
@@ -399,17 +391,17 @@ contract("ConditionalPaymentProcessor", function(accounts) {
       { from: _oracle }
     );
     assert.equal(
-      await conditionalPaymentProcessor.payoutDenominator
+      await predictionMarketSystem.payoutDenominator
         .call(_conditionId)
         .then(res => res.toString()),
       1000
     );
 
     // assert correct payouts for Outcome Slots
-    const payoutsForPayoutSlots = [333, 666, 1, 0];
+    const payoutsForOutcomeSlots = [333, 666, 1, 0];
     for (var i = 0; i < buyers.length; i++) {
       assert.equal(
-        await conditionalPaymentProcessor.balanceOf.call(
+        await predictionMarketSystem.balanceOf.call(
           accounts[buyers[i]],
           keccak256(
             etherToken.address +
@@ -421,18 +413,18 @@ contract("ConditionalPaymentProcessor", function(accounts) {
         collateralTokenCounts[i]
       );
       assert.equal(
-        await conditionalPaymentProcessor.payoutNumerators(_conditionId, i),
-        payoutsForPayoutSlots[i]
+        await predictionMarketSystem.payoutNumerators(_conditionId, i),
+        payoutsForOutcomeSlots[i]
       );
       assert.equal(
-        await conditionalPaymentProcessor.payoutDenominator(_conditionId),
+        await predictionMarketSystem.payoutDenominator(_conditionId),
         1000
       );
     }
 
     // assert Outcome Token redemption
     for (var i = 0; i < buyers.length; i++) {
-      await conditionalPaymentProcessor.redeemPositions(
+      await predictionMarketSystem.redeemPositions(
         etherToken.address,
         asciiToHex(0),
         _conditionId,
@@ -450,7 +442,7 @@ contract("ConditionalPaymentProcessor", function(accounts) {
 });
 
 contract("Complex splitting and merging scenario #1.", function(accounts) {
-  let conditionalPaymentProcessor,
+  let predictionMarketSystem,
     etherToken,
     oracle1,
     oracle2,
@@ -469,7 +461,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     conditionId3;
 
   before(async () => {
-    conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed();
+    predictionMarketSystem = await PredictionMarketSystem.deployed();
     etherToken = await WETH9.deployed();
 
     // prepare condition
@@ -492,17 +484,17 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     player2 = accounts[5];
     player3 = accounts[6];
 
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
       oracle1,
       questionId1,
       outcomeSlotCount1
     );
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
       oracle2,
       questionId2,
       outcomeSlotCount2
     );
-    await conditionalPaymentProcessor.prepareCondition(
+    await predictionMarketSystem.prepareCondition(
       oracle3,
       questionId3,
       outcomeSlotCount3
@@ -528,21 +520,21 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     await etherToken.deposit({ value: 10000, from: player1 });
-    await etherToken.approve(conditionalPaymentProcessor.address, 10000, {
+    await etherToken.approve(predictionMarketSystem.address, 10000, {
       from: player1
     });
     await etherToken.deposit({ value: 10000, from: player2 });
-    await etherToken.approve(conditionalPaymentProcessor.address, 10000, {
+    await etherToken.approve(predictionMarketSystem.address, 10000, {
       from: player2
     });
     await etherToken.deposit({ value: 10000, from: player3 });
-    await etherToken.approve(conditionalPaymentProcessor.address, 10000, {
+    await etherToken.approve(predictionMarketSystem.address, 10000, {
       from: player3
     });
   });
 
   it("Invalid initial positions should not give any outcome tokens", async () => {
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -552,7 +544,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     assert.equal(
-      await conditionalPaymentProcessor.balanceOf(
+      await predictionMarketSystem.balanceOf(
         player1,
         keccak256(
           etherToken.address,
@@ -568,7 +560,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     await assertRejects(
-      conditionalPaymentProcessor.splitPosition(
+      predictionMarketSystem.splitPosition(
         etherToken.address,
         0,
         conditionId1,
@@ -579,7 +571,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Worked with an invalid indexSet."
     );
     await assertRejects(
-      conditionalPaymentProcessor.splitPosition(
+      predictionMarketSystem.splitPosition(
         etherToken.address,
         0,
         conditionId1,
@@ -590,7 +582,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Worked with an invalid indexSet."
     );
     await assertRejects(
-      conditionalPaymentProcessor.splitPosition(
+      predictionMarketSystem.splitPosition(
         etherToken.address,
         0,
         conditionId1,
@@ -603,7 +595,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
   });
 
   it("should not produce any position changes when split on an incomplete set of base conditions", async () => {
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -611,7 +603,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       1,
       { from: player3 }
     );
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -629,13 +621,13 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     const positionId2 = keccak256(etherToken.address + collectionId2.slice(2));
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player3, positionId1)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player3, positionId2)
         .then(r => r.toNumber()),
       0
@@ -644,7 +636,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
 
   it("should not be able to merge back into a collateral token from a position without any outcome tokens", async () => {
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         asciiToHex(0),
         conditionId1,
@@ -665,13 +657,13 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     const positionId2 = keccak256(etherToken.address + collectionId2.slice(2));
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player3, positionId1)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player3, positionId2)
         .then(r => r.toNumber()),
       0
@@ -680,7 +672,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
 
   it("Should be able to split and merge in more complex scenarios", async () => {
     // Split on an initial condition
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -699,26 +691,24 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     const positionId2 = keccak256(etherToken.address + collectionId2.slice(2));
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       1000
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId2)
         .then(r => r.toNumber()),
       1000
     );
     assert.equal(
-      await conditionalPaymentProcessor
-        .getOutcomeSlotCount(conditionId2)
-        .valueOf(),
+      await predictionMarketSystem.getOutcomeSlotCount(conditionId2).valueOf(),
       3
     );
 
     // Split on a non-root Collection Identifier and Condition
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       collectionId1,
       conditionId2,
@@ -727,13 +717,13 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       900
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId2)
         .then(r => r.toNumber()),
       1000
@@ -765,26 +755,26 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     const positionId5 = keccak256(etherToken.address + collectionId5.slice(2));
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       100
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId4)
         .then(r => r.toNumber()),
       100
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId5)
         .then(r => r.toNumber()),
       100
     );
 
     // Split again on a non-root Collection Identifier and Condition
-    await conditionalPaymentProcessor.splitPosition(
+    await predictionMarketSystem.splitPosition(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -793,13 +783,13 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId2)
         .then(r => r.toNumber()),
       1000
@@ -839,32 +829,32 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     const positionId9 = keccak256(etherToken.address + collectionId9.slice(2));
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId6)
         .then(r => r.toNumber()),
       100
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId7)
         .then(r => r.toNumber()),
       100
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       100
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId9)
         .then(r => r.toNumber()),
       100
     );
 
     // Merge a full set of Outcome Slots back into conditionId3
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -873,38 +863,38 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId6)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId7)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId9)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       50
     );
 
     // Merge a partial set of Outcome Slots back
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -923,38 +913,38 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       etherToken.address + collectionId10.slice(2)
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId10)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId6)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId7)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId9)
         .then(r => r.toNumber()),
       0
     );
 
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         collectionId3,
         conditionId3,
@@ -965,7 +955,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Invalid merging of more tokens than the positions held did not revent"
     );
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         collectionId3,
         conditionId3,
@@ -976,7 +966,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Invalid merging of tokens amounting to more than the positions held happened."
     );
 
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -985,26 +975,26 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId10)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       75
     );
 
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         collectionId1,
         conditionId2,
@@ -1015,7 +1005,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "it didn't revert when only partial positions in the set have enough outcomeTokens."
     );
 
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       collectionId1,
       conditionId2,
@@ -1024,32 +1014,32 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       950
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId4)
         .then(r => r.toNumber()),
       50
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId5)
         .then(r => r.toNumber()),
       50
     );
 
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         0,
         conditionId1,
@@ -1060,7 +1050,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Should not merge proper positions back into collateralTokens"
     );
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         0,
         conditionId1,
@@ -1071,7 +1061,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Should not merge positions that dont hold enough value specified back into collateralTokens"
     );
     await assertRejects(
-      conditionalPaymentProcessor.mergePositions(
+      predictionMarketSystem.mergePositions(
         etherToken.address,
         0,
         conditionId1,
@@ -1082,7 +1072,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "Should not merge positions from the wrong player back into collateralTokens"
     );
 
-    await conditionalPaymentProcessor.mergePositions(
+    await predictionMarketSystem.mergePositions(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -1091,13 +1081,13 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId2)
         .then(r => r.toNumber()),
       50
@@ -1108,7 +1098,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     await assertRejects(
-      conditionalPaymentProcessor.redeemPositions(
+      predictionMarketSystem.redeemPositions(
         etherToken.address,
         asciiToHex(0),
         conditionId1,
@@ -1118,7 +1108,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       "The position is being redeemed before the payouts for the condition have been set."
     );
 
-    await conditionalPaymentProcessor.receiveResult(
+    await predictionMarketSystem.receiveResult(
       questionId3,
       "0x" +
         [
@@ -1131,13 +1121,11 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     assert.equal(
-      await conditionalPaymentProcessor
-        .payoutDenominator(conditionId3)
-        .valueOf(),
+      await predictionMarketSystem.payoutDenominator(conditionId3).valueOf(),
       1000
     );
     await assertRejects(
-      conditionalPaymentProcessor.redeemPositions(
+      predictionMarketSystem.redeemPositions(
         etherToken.address,
         asciiToHex(0),
         conditionId2,
@@ -1148,38 +1136,38 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
     );
 
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId10)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId6)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId7)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId9)
         .then(r => r.toNumber()),
       0
     );
 
     // asserts that if you redeem the wrong indexSets, it won't affect the other indexes.
-    await conditionalPaymentProcessor.redeemPositions(
+    await predictionMarketSystem.redeemPositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -1187,19 +1175,19 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       25
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       25
     );
 
-    await conditionalPaymentProcessor.redeemPositions(
+    await predictionMarketSystem.redeemPositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -1207,19 +1195,19 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId8)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       25 + Math.floor(25 * (666 / 1000))
     );
 
-    await conditionalPaymentProcessor.redeemPositions(
+    await predictionMarketSystem.redeemPositions(
       etherToken.address,
       collectionId3,
       conditionId3,
@@ -1229,19 +1217,19 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
 
     // We have to account for a small fraction of tokens getting stuck in the contract there on payout
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       25 + Math.floor(25 * (666 / 1000 + 334 / 1000)) - 1
     );
 
-    await conditionalPaymentProcessor.receiveResult(
+    await predictionMarketSystem.receiveResult(
       questionId2,
       "0x" + [padLeft("FF", 64), padLeft("FF", 64), padLeft("0", 64)].join(""),
       { from: oracle2 }
     );
 
-    await conditionalPaymentProcessor.redeemPositions(
+    await predictionMarketSystem.redeemPositions(
       etherToken.address,
       collectionId1,
       conditionId2,
@@ -1249,43 +1237,41 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId3)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId4)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId5)
         .then(r => r.toNumber()),
       0
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       49
     );
 
-    await conditionalPaymentProcessor.receiveResult(
+    await predictionMarketSystem.receiveResult(
       questionId1,
       "0x" + [padLeft("1", 64), padLeft("0", 64)].join(""),
       { from: oracle1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
-        .payoutDenominator(conditionId1)
-        .valueOf(),
+      await predictionMarketSystem.payoutDenominator(conditionId1).valueOf(),
       1
     );
 
-    await conditionalPaymentProcessor.redeemPositions(
+    await predictionMarketSystem.redeemPositions(
       etherToken.address,
       asciiToHex(0),
       conditionId1,
@@ -1293,7 +1279,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
       { from: player1 }
     );
     assert.equal(
-      await conditionalPaymentProcessor
+      await predictionMarketSystem
         .balanceOf(player1, positionId1)
         .then(r => r.toNumber()),
       0
@@ -1310,7 +1296,7 @@ contract("Complex splitting and merging scenario #1.", function(accounts) {
 contract(
   "Should be able to partially split and merge in complex scenarios. #2",
   function(accounts) {
-    let conditionalPaymentProcessor,
+    let predictionMarketSystem,
       etherToken,
       oracle1,
       oracle2,
@@ -1329,7 +1315,7 @@ contract(
       conditionId3;
 
     before(async () => {
-      conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed();
+      predictionMarketSystem = await PredictionMarketSystem.deployed();
       etherToken = await WETH9.deployed();
 
       // prepare condition
@@ -1352,17 +1338,17 @@ contract(
       player2 = accounts[5];
       player3 = accounts[6];
 
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle1,
         questionId1,
         outcomeSlotCount1
       );
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle2,
         questionId2,
         outcomeSlotCount2
       );
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle3,
         questionId3,
         outcomeSlotCount3
@@ -1388,21 +1374,21 @@ contract(
       );
 
       await etherToken.deposit({ value: 1e19, from: player1 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player1
       });
       await etherToken.deposit({ value: 1e19, from: player2 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player2
       });
       await etherToken.deposit({ value: 1e19, from: player3 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player3
       });
     });
 
     it("Should correctly and safely partially split and merge in complex scnarios.", async () => {
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         asciiToHex(0),
         conditionId1,
@@ -1426,14 +1412,14 @@ contract(
 
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId1),
+          await predictionMarketSystem.balanceOf(player1, positionId1),
           "ether"
         ),
         10
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId2),
+          await predictionMarketSystem.balanceOf(player1, positionId2),
           "ether"
         ),
         10
@@ -1441,7 +1427,7 @@ contract(
       assert.equal(fromWei(await etherToken.balanceOf(player1), "ether"), 0);
 
       await assertRejects(
-        conditionalPaymentProcessor.splitPosition(
+        predictionMarketSystem.splitPosition(
           etherToken.address,
           collectionId2,
           conditionId2,
@@ -1453,7 +1439,7 @@ contract(
       );
 
       await assertRejects(
-        conditionalPaymentProcessor.splitPosition(
+        predictionMarketSystem.splitPosition(
           etherToken.address,
           collectionId2,
           conditionId2,
@@ -1464,7 +1450,7 @@ contract(
         "should be rejected"
       );
 
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         collectionId2,
         conditionId2,
@@ -1495,20 +1481,20 @@ contract(
 
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId3),
+          await predictionMarketSystem.balanceOf(player1, positionId3),
           "ether"
         ),
         10
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId4),
+          await predictionMarketSystem.balanceOf(player1, positionId4),
           "ether"
         ),
         10
       );
 
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         collectionId2,
         conditionId2,
@@ -1518,14 +1504,14 @@ contract(
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId3),
+          await predictionMarketSystem.balanceOf(player1, positionId3),
           "ether"
         ),
         0
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId4),
+          await predictionMarketSystem.balanceOf(player1, positionId4),
           "ether"
         ),
         10
@@ -1553,20 +1539,20 @@ contract(
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId5),
+          await predictionMarketSystem.balanceOf(player1, positionId5),
           "ether"
         ),
         10
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId6),
+          await predictionMarketSystem.balanceOf(player1, positionId6),
           "ether"
         ),
         10
       );
 
-      await conditionalPaymentProcessor.mergePositions(
+      await predictionMarketSystem.mergePositions(
         etherToken.address,
         collectionId2,
         conditionId2,
@@ -1576,14 +1562,14 @@ contract(
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId6),
+          await predictionMarketSystem.balanceOf(player1, positionId6),
           "ether"
         ),
         0
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId4),
+          await predictionMarketSystem.balanceOf(player1, positionId4),
           "ether"
         ),
         0
@@ -1601,7 +1587,7 @@ contract(
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId7),
+          await predictionMarketSystem.balanceOf(player1, positionId7),
           "ether"
         ),
         10
@@ -1613,7 +1599,7 @@ contract(
 contract(
   "The same positions in different orders should equal each other.",
   function(accounts) {
-    let conditionalPaymentProcessor,
+    let predictionMarketSystem,
       etherToken,
       oracle1,
       oracle2,
@@ -1632,7 +1618,7 @@ contract(
       conditionId3;
 
     before(async () => {
-      conditionalPaymentProcessor = await ConditionalPaymentProcessor.deployed();
+      predictionMarketSystem = await PredictionMarketSystem.deployed();
       etherToken = await WETH9.deployed();
 
       // prepare condition
@@ -1655,17 +1641,17 @@ contract(
       player2 = accounts[5];
       player3 = accounts[6];
 
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle1,
         questionId1,
         outcomeSlotCount1
       );
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle2,
         questionId2,
         outcomeSlotCount2
       );
-      await conditionalPaymentProcessor.prepareCondition(
+      await predictionMarketSystem.prepareCondition(
         oracle3,
         questionId3,
         outcomeSlotCount3
@@ -1691,21 +1677,21 @@ contract(
       );
 
       await etherToken.deposit({ value: 1e19, from: player1 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player1
       });
       await etherToken.deposit({ value: 1e19, from: player2 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player2
       });
       await etherToken.deposit({ value: 1e19, from: player3 });
-      await etherToken.approve(conditionalPaymentProcessor.address, 1e19, {
+      await etherToken.approve(predictionMarketSystem.address, 1e19, {
         from: player3
       });
     });
 
     it("Should create positions in opposite orders that equal each others values", async () => {
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         asciiToHex(0),
         conditionId1,
@@ -1713,7 +1699,7 @@ contract(
         1e18,
         { from: player1 }
       );
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         asciiToHex(0),
         conditionId2,
@@ -1756,35 +1742,35 @@ contract(
 
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId1),
+          await predictionMarketSystem.balanceOf(player1, positionId1),
           "ether"
         ),
         1
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId2),
+          await predictionMarketSystem.balanceOf(player1, positionId2),
           "ether"
         ),
         1
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId3),
+          await predictionMarketSystem.balanceOf(player1, positionId3),
           "ether"
         ),
         1
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId4),
+          await predictionMarketSystem.balanceOf(player1, positionId4),
           "ether"
         ),
         1
       );
       assert.equal(
         fromWei(
-          await conditionalPaymentProcessor.balanceOf(player1, positionId5),
+          await predictionMarketSystem.balanceOf(player1, positionId5),
           "ether"
         ),
         1
@@ -1792,7 +1778,7 @@ contract(
 
       assert.equal(fromWei(await etherToken.balanceOf(player1), "ether"), 8);
 
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         collectionId1,
         conditionId2,
@@ -1800,7 +1786,7 @@ contract(
         1e18,
         { from: player1 }
       );
-      await conditionalPaymentProcessor.splitPosition(
+      await predictionMarketSystem.splitPosition(
         etherToken.address,
         collectionId4,
         conditionId1,
