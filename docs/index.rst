@@ -6,7 +6,7 @@ Gnosis Prediction Market Contracts
    :caption: Contents:
 
    intro
-   getting-started
+   developer-guide
    changes-from-v1
    contributing
    glossary
