@@ -1,110 +1,87 @@
 Contributing
 ============
 
-Install
--------
+The source for the contracts can be found on `Github`_.
 
-Install requirements with npm:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _Github: https://github.com/gnosis/pm-contracts
 
-.. code-block:: bash
+.. highlight:: bash
+
+To set up for contributing, first install requirements with NPM::
 
    npm install
+
+Then, set up Git hooks to ensure commits pass the linters::
+
+   npm run setup-githooks
+
+.. tip:: Many of the following commands simply wrap corresponding `Truffle commands <https://truffleframework.com/docs/truffle/reference/truffle-commands>`_.
+
 
 Testing and Linting
 -------------------
 
-Run all tests (requires Node version >=7 for ``async/await``\ , and will automatically run TestRPC in the background):
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
+The test suite may be run using::
 
    npm test
 
-Run all tests matching a regexp pattern by setting the ``TEST_GREP`` environment variable
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order to run a subset of test cases which match a regular expression, the ``TEST_GREP`` environment variable may be used::
 
-.. code-block:: bash
+   TEST_GREP='obtainable conditionIds' npm test
 
-   TEST_GREP='short selling' npm test
-
-Lint the JS
-^^^^^^^^^^^
-
-.. code-block:: bash
+The JS test files may be linted via::
 
    npm run lint
 
-Compile and Deploy
-------------------
+Contracts may also be linted via::
 
-These commands apply to the RPC provider running on port 8545. You may want to have TestRPC running in the background. They are really wrappers around the `corresponding Truffle commands <http://truffleframework.com/docs/advanced/commands>`_.
+   npm run lint-contracts
 
-Compile all contracts to obtain ABI and bytecode:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _Truffle: https://truffleframework.com
 
-.. code-block:: bash
+
+Development commands
+--------------------
+
+To compile all the contracts, obtaining build artifacts containing each containing their respective contract's ABI and bytecode, use the following command::
 
    npm run compile
 
-Migrate all contracts required for the basic framework onto network associated with RPC provider:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
+Running the migrations, deploying the contracts onto a chain and recording the contract's deployed location in the build artifact can also be done::
 
    npm run migrate
 
-Network Artifacts
------------------
+Dropping into a Truffle develop session can be done via::
 
-Show the deployed addresses of all contracts on all networks:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   npm run develop
 
-.. code-block:: bash
+
+Network Information
+-------------------
+
+Showing the deployed addresses of all contracts on all networks can be done via::
 
    npm run networks
 
-Command line options for ``truffle`` can be passed down through NPM by preceding the options list with ``--``. For example:
-
-Clean network artifacts:
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
+Extra command line options for the underlying Truffle command can be passed down through NPM by preceding the options list with ``--``. For example, in order to purge the build artifacts of any unnamed network information, you can run::
 
    npm run networks -- --clean
 
-Network artifacts from running migrations will contain addresses of deployed contracts on the Kovan and Rinkeby testnets.
-
-Take network info from ``networks.json`` and inject it into contract build artifacts. This is done prepublish as well.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
+To take network info from ``networks.json`` and inject it into the build artifacts, you can run::
 
    npm run injectnetinfo
 
-Extract all network information into ``networks.json``.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Be aware that this will clobber ``networks.json``\ , so be careful with this command:
-
-.. code-block:: bash
+If you instead wish to extract all network information from the build artifacts into ``networks.json``, run::
 
    npm run extractnetinfo
 
-Gas Measurements
-----------------
+.. warning:: Extracting network info will overwrite ``networks.json``.
 
-Log gas measurements into ``build/gas-stats.json``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: bash
+Building the Documentation
+--------------------------
 
-   npm run measuregasstats
-
-Locally build docs for readthedocs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Will install `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ and `Solidity Domain for Sphinx <https://github.com/cag/sphinxcontrib-soliditydomain/>`_\ :
+(Will install `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ and `Solidity Domain for Sphinx <https://github.com/cag/sphinxcontrib-soliditydomain/>`_):
 
 .. code-block:: bash
 
@@ -116,10 +93,13 @@ Will install `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ and `Solidity Doma
 Contributors
 ------------
 
-
-* Stefan George (\ `Georgi87 <https://github.com/Georgi87>`_\ )
-* Martin Koeppelmann (\ `koeppelmann <https://github.com/koeppelmann>`_\ )
-* Alan Lu (\ `cag <https://github.com/cag>`_\ )
-* Roland Kofler (\ `rolandkofler <https://github.com/rolandkofler>`_\ )
-* Collin Chin (\ `collinc97 <https://github.com/collinc97>`_\ )
-* Christopher Gewecke (\ `cgewecke <https://github.com/cgewecke>`_\ )
+* Stefan George (`Georgi87 <https://github.com/Georgi87>`_)
+* Martin Koeppelmann (`koeppelmann <https://github.com/koeppelmann>`_)
+* Alan Lu (`cag <https://github.com/cag>`_)
+* Roland Kofler (`rolandkofler <https://github.com/rolandkofler>`_)
+* Collin Chin (`collinc97 <https://github.com/collinc97>`_)
+* Christopher Gewecke (`cgewecke <https://github.com/cgewecke>`_)
+* Anton V Shtylman (`InfiniteStyles <https://github.com/InfiniteStyles>`_)
+* Billy Rennekamp (`okwme <https://github.com/okwme>`_)
+* Denis Granha (`denisgranha <https://github.com/denisgranha>`_)
+* Alex Beregszaszi (`axic <https://github.com/axic>`_)
