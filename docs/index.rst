@@ -1,11 +1,9 @@
-Gnosis Prediction Market Contracts
-==================================
+.. include:: ../README.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   intro
    developer-guide
    changes-from-v1
    contributing
