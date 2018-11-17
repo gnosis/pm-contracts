@@ -114,6 +114,10 @@ pip install -r requirements.txt
 make html
 ```
 
+Audits
+---------
+- [by Alexey Akhunov](docs/audit/Gnosis_Audit_Report.pdf)
+
 Security and Liability
 ----------------------
 All contracts are WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
