@@ -43,7 +43,7 @@
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.11",
     "npm-prepublish": "^1.2.3",
-    "solhint": "^1.4.0",
+    "solhint": "^1.4.1",
     "truffle": "^4.1.14"
   },
   "repository": {
