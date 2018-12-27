@@ -11,6 +11,6 @@
         "SignedMessageOracle",
         "UltimateOracle"
       ],
-    "StandardToken": ["WETH9", "OutcomeToken"],
-    "ERC20": ["StandardToken"]
+    "ERC20Gnosis": ["WETH9", "OutcomeToken"],
+    "ERC20Gnosis": ["ERC20Gnosis"]
 }

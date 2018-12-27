@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../Tokens/ERC20Gnosis.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
@@ -19,7 +19,7 @@ contract EventData {
     /*
      *  Storage
      */
-    ERC20 public collateralToken;
+    ERC20Gnosis public collateralToken;
     Oracle public oracle;
     bool public isOutcomeSet;
     int public outcome;

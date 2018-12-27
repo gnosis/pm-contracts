@@ -29,7 +29,7 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
     constructor(
         address proxied,
         address outcomeTokenMasterCopy,
-        ERC20 _collateralToken,
+        ERC20Gnosis _collateralToken,
         Oracle _oracle,
         int _lowerBound,
         int _upperBound

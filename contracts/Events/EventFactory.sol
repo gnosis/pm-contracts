@@ -10,8 +10,8 @@ contract EventFactory {
     /*
      *  Events
      */
-    event CategoricalEventCreation(address indexed creator, CategoricalEvent categoricalEvent, ERC20 collateralToken, Oracle oracle, uint8 outcomeCount);
-    event ScalarEventCreation(address indexed creator, ScalarEvent scalarEvent, ERC20 collateralToken, Oracle oracle, int lowerBound, int upperBound);
+    event CategoricalEventCreation(address indexed creator, CategoricalEvent categoricalEvent, ERC20Gnosis collateralToken, Oracle oracle, uint8 outcomeCount);
+    event ScalarEventCreation(address indexed creator, ScalarEvent scalarEvent, ERC20Gnosis collateralToken, Oracle oracle, int lowerBound, int upperBound);
 
     /*
      *  Storage
@@ -43,7 +43,7 @@ contract EventFactory {
     /// @param outcomeCount Number of event outcomes
     /// @return Event contract
     function createCategoricalEvent(
-        ERC20 collateralToken,
+        ERC20Gnosis collateralToken,
         Oracle oracle,
         uint8 outcomeCount
     )
@@ -72,7 +72,7 @@ contract EventFactory {
     /// @param upperBound Lower bound for event outcome
     /// @return Event contract
     function createScalarEvent(
-        ERC20 collateralToken,
+        ERC20Gnosis collateralToken,
         Oracle oracle,
         int lowerBound,
         int upperBound

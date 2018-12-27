@@ -58,7 +58,7 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
         address proxied,
         address _creator,
         EventFactory eventFactory,
-        ERC20 collateralToken,
+        ERC20Gnosis collateralToken,
         Oracle oracle,
         uint8 outcomeCount,
         int lowerBound,

@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Oracles/Oracle.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../Tokens/ERC20Gnosis.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -19,7 +19,7 @@ contract UltimateOracleData {
      *  Storage
      */
     Oracle public forwardedOracle;
-    ERC20 public collateralToken;
+    ERC20Gnosis public collateralToken;
     uint8 public spreadMultiplier;
     uint public challengePeriod;
     uint public challengeAmount;
@@ -47,7 +47,7 @@ contract UltimateOracleProxy is Proxy, UltimateOracleData {
     constructor(
         address proxied,
         Oracle _forwardedOracle,
-        ERC20 _collateralToken,
+        ERC20Gnosis _collateralToken,
         uint8 _spreadMultiplier,
         uint _challengePeriod,
         uint _challengeAmount,

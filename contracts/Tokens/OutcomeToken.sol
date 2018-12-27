@@ -1,5 +1,5 @@
 pragma solidity ^0.4.24;
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+import "./ERC20Gnosis.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
@@ -8,7 +8,7 @@ contract OutcomeTokenProxy is Proxy {
      *  Storage
      */
 
-    // HACK: Lining up storage with StandardToken and OutcomeToken
+    // HACK: Lining up storage with ERC20Gnosis and OutcomeToken
     mapping(address => uint256) balances;
     uint256 totalSupply_;
     mapping (address => mapping (address => uint256)) internal allowed;
@@ -29,7 +29,7 @@ contract OutcomeTokenProxy is Proxy {
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is Proxied, StandardToken {
+contract OutcomeToken is Proxied, ERC20Gnosis {
     using SafeMath for *;
 
     /*
@@ -42,6 +42,7 @@ contract OutcomeToken is Proxied, StandardToken {
      *  Storage
      */
     address public eventContract;
+    event Debug(address eventContract);
 
     /*
      *  Modifiers
@@ -49,6 +50,7 @@ contract OutcomeToken is Proxied, StandardToken {
     modifier isEventContract () {
         // Only event contract is allowed to proceed
         require(msg.sender == eventContract);
+        emit Debug(eventContract);
         _;
     }
 
@@ -64,6 +66,9 @@ contract OutcomeToken is Proxied, StandardToken {
     {
         balances[_for] = balances[_for].add(outcomeTokenCount);
         totalSupply_ = totalSupply_.add(outcomeTokenCount);
+
+        emit Debug(eventContract);
+
         emit Issuance(_for, outcomeTokenCount);
     }
 

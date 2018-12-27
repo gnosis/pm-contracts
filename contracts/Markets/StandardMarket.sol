@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24;
 import "../Markets/Market.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../Tokens/ERC20Gnosis.sol";
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 

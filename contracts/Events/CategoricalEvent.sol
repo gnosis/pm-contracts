@@ -9,7 +9,7 @@ contract CategoricalEventProxy is Proxy, EventData {
     /// @param _collateralToken Tokens used as collateral in exchange for outcome tokens
     /// @param _oracle Oracle contract used to resolve the event
     /// @param outcomeCount Number of event outcomes
-    constructor(address proxied, address outcomeTokenMasterCopy, ERC20 _collateralToken, Oracle _oracle, uint8 outcomeCount)
+    constructor(address proxied, address outcomeTokenMasterCopy, ERC20Gnosis _collateralToken, Oracle _oracle, uint8 outcomeCount)
         Proxy(proxied)
         public
     {
