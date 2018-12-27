@@ -14,7 +14,6 @@
     "injectnetinfo": "tnt iN",
     "extractnetinfo": "tnt eN",
     "resetnetinfo": "truffle networks --clean && tnt iN",
-    "ensurebc": "node ensurebc.js",
     "measuregasstats": "cross-env TESTDIR=test/javascript/ tnt measureGas -f inheritanceMap.json -o build/gas-stats.json",
     "prepack": "eslint . && npm run measuregasstats && truffle compile && truffle networks --clean && tnt iN && node ensurebc.js"
   },
