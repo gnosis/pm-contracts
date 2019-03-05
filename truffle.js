@@ -1,3 +1,6 @@
+const HDWalletProvider = require('truffle-hdwallet-provider')
+const mnemonic =process.env["MNEMONIC"];
+
 const config = {
     networks: {
         coverage: {
@@ -16,6 +19,12 @@ const config = {
             host: "localhost",
             port: 8545,
             network_id: "3",
+        },
+        xdai: {
+            provider: function () {
+                return new HDWalletProvider(mnemonic, 'https://dai.poa.network')
+              },
+            network_id: "*"
         },
         kovan: {
             host: "localhost",

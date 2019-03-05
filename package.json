@@ -1,6 +1,6 @@
 {
-  "name": "@gnosis.pm/pm-contracts",
-  "version": "1.2.0",
+  "name": "@frontier-token-research/pm-contracts",
+  "version": "1.2.2",
   "description": "Collection of smart contracts for the Gnosis prediction market platform",
   "scripts": {
     "lint": "eslint .",
@@ -30,7 +30,8 @@
   "dependencies": {
     "@gnosis.pm/util-contracts": "^2.0.0-alpha",
     "canonical-weth": "^1.2.0",
-    "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath"
+    "openzeppelin-solidity": "github:gnosis/openzeppelin-solidity#fix-signed-safemath",
+    "truffle-hdwallet-provider": "^1.0.4"
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
