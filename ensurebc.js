@@ -5,7 +5,7 @@ const artifactsDir = path.join('build', 'contracts')
 
 for(const [newName, bcName] of [
     ['ERC20', 'Token'],
-    ['DetailedERC20', 'HumanFriendlyToken'],
+    ['ERC20Detailed', 'HumanFriendlyToken'],
     ['WETH9', 'EtherToken'],
     ['Fixed192x64Math', 'Math'],
 ])

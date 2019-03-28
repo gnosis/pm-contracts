@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
@@ -75,7 +75,7 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
         // trading period is at least a second
         require(_tradingPeriod > 0);
         // Create decision event
-        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, Oracle(this), outcomeCount);
+        categoricalEvent = eventFactory.createCategoricalEvent(collateralToken, Oracle(address(this)), outcomeCount);
         // Create outcome events
         for (uint8 i = 0; i < categoricalEvent.getOutcomeCount(); i++) {
             ScalarEvent scalarEvent = eventFactory.createScalarEvent(
@@ -106,14 +106,14 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
         isCreator
     {
         // Buy all outcomes
-        require(   categoricalEvent.collateralToken().transferFrom(creator, this, funding)
-                && categoricalEvent.collateralToken().approve(categoricalEvent, funding));
+        require(   categoricalEvent.collateralToken().transferFrom(creator, address(this), funding)
+                && categoricalEvent.collateralToken().approve(address(categoricalEvent), funding));
         categoricalEvent.buyAllOutcomes(funding);
         // Fund each market with outcome tokens from categorical event
         for (uint8 i = 0; i < markets.length; i++) {
             Market market = markets[i];
             // Approve funding for market
-            require(market.eventContract().collateralToken().approve(market, funding));
+            require(market.eventContract().collateralToken().approve(address(market), funding));
             market.fund(funding);
         }
         emit FutarchyFunding(funding);
@@ -133,7 +133,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
         market.withdrawFees();
         // Redeem collateral token for winning outcome tokens and transfer collateral tokens to creator
         categoricalEvent.redeemWinnings();
-        require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(this)));
+        require(categoricalEvent.collateralToken().transfer(creator, categoricalEvent.collateralToken().balanceOf(address(this))));
         emit FutarchyClosing();
     }
 

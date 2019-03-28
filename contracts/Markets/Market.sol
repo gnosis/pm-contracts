@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
@@ -46,6 +46,6 @@ contract Market is MarketData {
     function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost) public returns (uint);
     function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
     function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function trade(int[] outcomeTokenAmounts, int costLimit) public returns (int);
+    function trade(int[] memory outcomeTokenAmounts, int costLimit) public returns (int);
     function calcMarketFee(uint outcomeTokenCost) public view returns (uint);
 }

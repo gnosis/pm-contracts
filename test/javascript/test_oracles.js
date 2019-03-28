@@ -1,6 +1,6 @@
 const utils = require('./utils')
 const { getBlock } = utils
-const { wait } = require('@digix/tempo')(web3)
+const { wait } = require('./digix_tempo')(web3)
 
 const WETH9 = artifacts.require('WETH9')
 const CentralizedOracle = artifacts.require('CentralizedOracle')
@@ -44,7 +44,7 @@ contract('Oracle', function (accounts) {
         etherToken = await WETH9.deployed()
 
         // ipfs hashes
-        ipfsHash = 'QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG'
+        ipfsHash = web3.utils.utf8ToHex('QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG')
         ipfsBytes = '0x516d597741504a7a7635435a736e4136323573335866326e656d7459675070486457457a37396f6a576e50626447'
 
         // Ultimate oracle stuff
@@ -56,7 +56,7 @@ contract('Oracle', function (accounts) {
         // Futarchy oracle stuff
         fee = 500000 // 5%
         deadline = 100 // 100s
-        funding = 10**18 // 1 ETH
+        funding = (10**18).toString() // 1 ETH
         startDate = 0
     })
 
@@ -66,7 +66,7 @@ contract('Oracle', function (accounts) {
         const owner2 = 1
 
         // create centralized oracle
-        const centralizedOracle = utils.getParamFromTxEvent(
+        const centralizedOracle = await utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash, { from: accounts[owner1] }),
             'centralizedOracle', CentralizedOracle
         )
@@ -88,7 +88,7 @@ contract('Oracle', function (accounts) {
     it('should test difficulty oracle', async () => {
         // Create difficulty oracle
         const targetBlock = (await getBlock('latest')).number + 100
-        const difficultyOracle = utils.getParamFromTxEvent(
+        const difficultyOracle = await utils.getParamFromTxEvent(
             await difficultyOracleFactory.createDifficultyOracle(targetBlock),
             'difficultyOracle', DifficultyOracle
         )
@@ -109,7 +109,7 @@ contract('Oracle', function (accounts) {
 
     it('can create futarchy oracles in the future, but not the past', async () => {
         // Create Oracles
-        const centralizedOracle = utils.getParamFromTxEvent(
+        const centralizedOracle = await utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
             'centralizedOracle', CentralizedOracle
         )
@@ -132,12 +132,12 @@ contract('Oracle', function (accounts) {
 
     it('should test futarchy oracle', async () => {
         // Create Oracles
-        const centralizedOracle = utils.getParamFromTxEvent(
+        const centralizedOracle = await utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
             'centralizedOracle', CentralizedOracle
         )
 
-        const futarchyOracle = utils.getParamFromTxEvent(
+        const futarchyOracle = await utils.getParamFromTxEvent(
             await futarchyOracleFactory.createFutarchyOracle(
                 etherToken.address, centralizedOracle.address, 2, -100, 100,
                 lmsrMarketMaker.address, fee, deadline, startDate),
@@ -150,13 +150,13 @@ contract('Oracle', function (accounts) {
         await etherToken.approve(futarchyOracle.address, funding, { from: accounts[creator] })
         await futarchyOracle.fund(funding, { from: accounts[creator] })
 
-        const market = StandardMarketWithPriceLogger.at(await futarchyOracle.markets(1))
-        const categoricalEvent = CategoricalEvent.at(await futarchyOracle.categoricalEvent())
+        const market = await StandardMarketWithPriceLogger.at(await futarchyOracle.markets(1))
+        const categoricalEvent = await CategoricalEvent.at(await futarchyOracle.categoricalEvent())
 
         // Buy into market for outcome token 1
         const buyer = 1
         const outcome = 1
-        const tokenCount = 1e15
+        const tokenCount = 1e15.toString()
 
         let outcomeTokenAmounts = Array.from({length: 2}, (v, i) => i === outcome ? tokenCount : 0)
         const outcomeTokenCost = await lmsrMarketMaker.calcNetCost.call(market.address, outcomeTokenAmounts)
@@ -165,17 +165,17 @@ contract('Oracle', function (accounts) {
 
         // Buy all outcomes
         await etherToken.deposit({ value: cost, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost.valueOf())
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), cost.toString())
         await etherToken.approve(categoricalEvent.address, cost, { from: accounts[buyer] })
         await categoricalEvent.buyAllOutcomes(cost, { from: accounts[buyer] })
 
         // Buy long tokens from market 1
-        const collateralToken = OutcomeToken.at(await categoricalEvent.outcomeTokens(1))
+        const collateralToken = await OutcomeToken.at(await categoricalEvent.outcomeTokens(1))
         await collateralToken.approve(market.address, cost, { from: accounts[buyer] })
 
-        assert.equal(utils.getParamFromTxEvent(
+        assert.equal(await utils.getParamFromTxEvent(
             await market.trade(outcomeTokenAmounts, cost, { from: accounts[buyer] }), 'outcomeTokenNetCost'
-        ), outcomeTokenCost.valueOf())
+        ), outcomeTokenCost.toString())
 
         // Set outcome of futarchy oracle
         await utils.assertRejects(
@@ -192,7 +192,7 @@ contract('Oracle', function (accounts) {
             futarchyOracle.close(),
             'Futarchy oracle cannot be closed if oracle for scalar market is not set')
         await centralizedOracle.setOutcome(-50)
-        const scalarEvent = ScalarEvent.at(await market.eventContract())
+        const scalarEvent = await ScalarEvent.at(await market.eventContract())
         await scalarEvent.setOutcome()
 
         // Close winning market and transfer collateral tokens to creator
@@ -203,11 +203,13 @@ contract('Oracle', function (accounts) {
     it('should test majority oracle', async () => {
         // create Oracles
         const owners = [0, 1, 2]
-        const oracles = (await Promise.all(
-            owners.map((owner) => centralizedOracleFactory.createCentralizedOracle(ipfsHash, {from: accounts[owner]}))
-        )).map((tx) => utils.getParamFromTxEvent(tx, 'centralizedOracle', CentralizedOracle))
-
-        const majorityOracle = utils.getParamFromTxEvent(
+        const oracles = await Promise.all(
+            (await Promise.all(
+                owners.map((owner) => centralizedOracleFactory.createCentralizedOracle(ipfsHash, {from: accounts[owner]}))
+            )).map((tx) => utils.getParamFromTxEvent(tx, 'centralizedOracle', CentralizedOracle))
+        )
+        
+        const majorityOracle = await utils.getParamFromTxEvent(
             await majorityOracleFactory.createMajorityOracle(oracles.map((o) => o.address)),
             'majorityOracle', MajorityOracle
         )
@@ -233,11 +235,11 @@ contract('Oracle', function (accounts) {
 
     it('should test ultimate oracle', async () => {
         // Create Oracles
-        const centralizedOracle = utils.getParamFromTxEvent(
+        const centralizedOracle = await utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash),
             'centralizedOracle', CentralizedOracle
         )
-        const ultimateOracle = utils.getParamFromTxEvent(
+        const ultimateOracle = await utils.getParamFromTxEvent(
             await ultimateOracleFactory.createUltimateOracle(
                 centralizedOracle.address, etherToken.address,
                 spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod),
@@ -291,7 +293,7 @@ contract('Oracle', function (accounts) {
         assert.equal(await ultimateOracle.getOutcome.call(), 3)
 
         // Withdraw winnings
-        assert.equal(utils.getParamFromTxEvent(
+        assert.equal(await utils.getParamFromTxEvent(
             await ultimateOracle.withdraw({from: accounts[sender2]}), 'amount'
         ).valueOf(), 300)
     })
@@ -299,11 +301,11 @@ contract('Oracle', function (accounts) {
     it('should test ultimate oracle challenge period', async () => {
         // create Oracles
         const owner1 = 0
-        const centralizedOracle = utils.getParamFromTxEvent(
+        const centralizedOracle = await utils.getParamFromTxEvent(
             await centralizedOracleFactory.createCentralizedOracle(ipfsHash, {from: accounts[owner1]}),
             'centralizedOracle', CentralizedOracle
         )
-        const ultimateOracle = utils.getParamFromTxEvent(
+        const ultimateOracle = await utils.getParamFromTxEvent(
             await ultimateOracleFactory.createUltimateOracle(
                 centralizedOracle.address, etherToken.address,
                 spreadMultiplier, challengePeriod, challengeAmount, frontRunnerPeriod),

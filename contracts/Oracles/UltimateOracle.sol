@@ -1,7 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
@@ -57,8 +58,8 @@ contract UltimateOracleProxy is Proxy, UltimateOracleData {
         public
     {
         // Validate inputs
-        require(   address(_forwardedOracle) != 0
-                && address(_collateralToken) != 0
+        require(   address(_forwardedOracle) != address(0)
+                && address(_collateralToken) != address(0)
                 && _spreadMultiplier >= 2
                 && _challengePeriod > 0
                 && _challengeAmount > 0
@@ -75,7 +76,8 @@ contract UltimateOracleProxy is Proxy, UltimateOracleData {
 /// @title Ultimate oracle contract - Allows to swap oracle result for ultimate oracle result
 /// @author Stefan George - <stefan@gnosis.pm>
 contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
-    using SafeMath for *;
+    using SignedSafeMath for int;
+    using SafeMath for uint;
 
     /*
      *  Public functions
@@ -101,7 +103,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         // There was no challenge yet or the challenge period expired
         require(   !isChallenged()
                 && !isChallengePeriodOver()
-                && collateralToken.transferFrom(msg.sender, this, challengeAmount));
+                && collateralToken.transferFrom(msg.sender, address(this), challengeAmount));
         outcomeAmounts[msg.sender][_outcome] = challengeAmount;
         totalOutcomeAmounts[_outcome] = challengeAmount;
         totalAmount = challengeAmount;
@@ -128,7 +130,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         // Outcome is challenged and front runner period is not over yet and tokens can be transferred
         require(   isChallenged()
                 && !isFrontRunnerPeriodOver()
-                && collateralToken.transferFrom(msg.sender, this, amount));
+                && collateralToken.transferFrom(msg.sender, address(this), amount));
         outcomeAmounts[msg.sender][_outcome] = outcomeAmounts[msg.sender][_outcome].add(amount);
         totalOutcomeAmounts[_outcome] = totalOutcomeAmounts[_outcome].add(amount);
         totalAmount = totalAmount.add(amount);

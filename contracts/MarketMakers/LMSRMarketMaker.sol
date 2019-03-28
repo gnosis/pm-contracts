@@ -1,5 +1,6 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Fixed192x64Math.sol";
 import "../MarketMakers/MarketMaker.sol";
 
@@ -7,7 +8,8 @@ import "../MarketMakers/MarketMaker.sol";
 /// @title LMSR market maker contract - Calculates share prices based on share distribution and initial funding
 /// @author Alan Lu - <alan.lu@gnosis.pm>
 contract LMSRMarketMaker is MarketMaker {
-    using SafeMath for *;
+    using SignedSafeMath for int;
+    using SafeMath for uint;
 
     /*
      *  Constants
@@ -22,7 +24,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param market Market contract
     /// @param outcomeTokenAmounts Amounts of outcome tokens to buy from the market. If an amount is negative, represents an amount to sell to the market.
     /// @return Net cost of trade. If positive, represents amount of collateral which would be paid to the market for the trade. If negative, represents amount of collateral which would be received from the market for the trade.
-    function calcNetCost(Market market, int[] outcomeTokenAmounts)
+    function calcNetCost(Market market, int[] memory outcomeTokenAmounts)
         public
         view
         returns (int netCost)
@@ -148,7 +150,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
     /// @return Cost level
-    function calcCostLevel(int logN, int[] netOutcomeTokensSold, uint funding, Fixed192x64Math.EstimationMode estimationMode)
+    function calcCostLevel(int logN, int[] memory netOutcomeTokensSold, uint funding, Fixed192x64Math.EstimationMode estimationMode)
         private
         pure
         returns(int costLevel)
@@ -169,7 +171,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param funding Initial funding for market
     /// @param outcomeIndex Index of exponential term to extract (for use by marginal price function)
     /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
-    function sumExpOffset(int logN, int[] netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Fixed192x64Math.EstimationMode estimationMode)
+    function sumExpOffset(int logN, int[] memory netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Fixed192x64Math.EstimationMode estimationMode)
         private
         pure
         returns (uint sum, int offset, uint outcomeExpTerm)
@@ -211,7 +213,7 @@ contract LMSRMarketMaker is MarketMaker {
     function getNetOutcomeTokensSold(Market market)
         private
         view
-        returns (int[] quantities)
+        returns (int[] memory quantities)
     {
         quantities = new int[](market.eventContract().getOutcomeCount());
         for (uint8 i = 0; i < quantities.length; i++)

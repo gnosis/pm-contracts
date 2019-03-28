@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Events/CategoricalEvent.sol";
 import "../Events/ScalarEvent.sol";
 
@@ -52,15 +52,15 @@ contract EventFactory {
     {
         bytes32 eventHash = keccak256(abi.encodePacked(collateralToken, oracle, outcomeCount));
         // Event should not exist yet
-        require(address(categoricalEvents[eventHash]) == 0);
+        require(address(categoricalEvents[eventHash]) == address(0));
         // Create event
-        eventContract = CategoricalEvent(new CategoricalEventProxy(
-            categoricalEventMasterCopy,
-            outcomeTokenMasterCopy,
+        eventContract = CategoricalEvent(address(new CategoricalEventProxy(
+            address(categoricalEventMasterCopy),
+            address(outcomeTokenMasterCopy),
             collateralToken,
             oracle,
             outcomeCount
-        ));
+        )));
         categoricalEvents[eventHash] = eventContract;
         emit CategoricalEventCreation(msg.sender, eventContract, collateralToken, oracle, outcomeCount);
     }
@@ -82,16 +82,16 @@ contract EventFactory {
     {
         bytes32 eventHash = keccak256(abi.encodePacked(collateralToken, oracle, lowerBound, upperBound));
         // Event should not exist yet
-        require(address(scalarEvents[eventHash]) == 0);
+        require(address(scalarEvents[eventHash]) == address(0));
         // Create event
-        eventContract = ScalarEvent(new ScalarEventProxy(
-            scalarEventMasterCopy,
-            outcomeTokenMasterCopy,
+        eventContract = ScalarEvent(address(new ScalarEventProxy(
+            address(scalarEventMasterCopy),
+            address(outcomeTokenMasterCopy),
             collateralToken,
             oracle,
             lowerBound,
             upperBound
-        ));
+        )));
         scalarEvents[eventHash] = eventContract;
         emit ScalarEventCreation(msg.sender, eventContract, collateralToken, oracle, lowerBound, upperBound);
     }
