@@ -1,11 +1,11 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol'; 
 
 contract Whitelist is Ownable {
 
-  event UsersAddedToWhitelist(address[] user);
-  event UsersRemovedFromWhitelist(address[] user);
+  event UsersAddedToWhitelist(address[] indexed users);
+  event UsersRemovedFromWhitelist(address[] indexed users);
 
   mapping(address => bool) userWhitelist;
 

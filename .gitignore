@@ -147,3 +147,8 @@ truffle-local.js
 Gemfile
 Gemfile.lock
 _site/
+
+# History Extension #
+#####################
+.history
+

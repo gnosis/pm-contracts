@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.25;
 import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
