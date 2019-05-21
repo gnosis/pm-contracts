@@ -7,7 +7,7 @@ contract Whitelist is Ownable {
   event UsersAddedToWhitelist(address[] indexed users);
   event UsersRemovedFromWhitelist(address[] indexed users);
 
-  mapping(address => bool) userWhitelist;
+  mapping(address => bool) public userWhitelist;
 
   function addToWhitelist(address[] users) onlyOwner external {
     for (uint i=0; i< users.length; i++) {

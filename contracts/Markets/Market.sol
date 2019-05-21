@@ -2,7 +2,7 @@ pragma solidity ^0.4.25;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
-
+import "../Whitelists/Whitelist.sol";
 
 contract MarketData {
     /*
@@ -27,6 +27,7 @@ contract MarketData {
     uint public funding;
     int[] public netOutcomeTokensSold;
     Stages public stage;
+    Whitelist public whitelist;
 
     enum Stages {
         MarketCreated,
