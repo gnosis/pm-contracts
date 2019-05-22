@@ -41,7 +41,13 @@ const config = {
     mocha: {
         enableTimeouts: false,
         grep: process.env.TEST_GREP
+    },
+    compilers: {
+        solc: {
+            version: '0.4.25'
+        }
     }
+    
 }
 
 const _ = require('lodash')

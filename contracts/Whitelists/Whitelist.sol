@@ -4,8 +4,8 @@ import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract Whitelist is Ownable {
 
-  event UsersAddedToWhitelist(address[] indexed users);
-  event UsersRemovedFromWhitelist(address[] indexed users);
+  event UsersAddedToWhitelist(address[] users);
+  event UsersRemovedFromWhitelist(address[] users);
 
   mapping(address => bool) public userWhitelist;
 
