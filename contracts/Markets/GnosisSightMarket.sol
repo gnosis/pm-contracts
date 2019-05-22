@@ -143,6 +143,35 @@ contract GnosisSightMarket is Proxied, Market, GnosisSightMarketData {
         emit OutcomeTokenSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, uint(-outcomeTokenNetCost), fees);
     }
 
+    /// @dev Buys all outcomes, then sells all shares of selected outcome which were bought, keeping
+    ///      shares of all other outcome tokens.
+    /// @param outcomeTokenIndex Index of the outcome token to short sell
+    /// @param outcomeTokenCount Amount of outcome tokens to short sell
+    /// @param minProfit The minimum profit in collateral tokens to earn for short sold outcome tokens
+    /// @return Cost to short sell outcome in collateral tokens
+    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
+        public
+        isWhitelisted
+        returns (uint cost)
+    {
+        // Buy all outcomes
+        require(   eventContract.collateralToken().transferFrom(msg.sender, this, outcomeTokenCount)
+                && eventContract.collateralToken().approve(eventContract, outcomeTokenCount));
+        eventContract.buyAllOutcomes(outcomeTokenCount);
+        // Short sell selected outcome
+        eventContract.outcomeTokens(outcomeTokenIndex).approve(this, outcomeTokenCount);
+        uint profit = this.sell(outcomeTokenIndex, outcomeTokenCount, minProfit);
+        cost = outcomeTokenCount - profit;
+        // Transfer outcome tokens to buyer
+        uint8 outcomeCount = eventContract.getOutcomeCount();
+        for (uint8 i = 0; i < outcomeCount; i++)
+            if (i != outcomeTokenIndex)
+                require(eventContract.outcomeTokens(i).transfer(msg.sender, outcomeTokenCount));
+        // Send change back to buyer
+        require(eventContract.collateralToken().transfer(msg.sender, profit));
+        emit OutcomeTokenShortSale(msg.sender, outcomeTokenIndex, outcomeTokenCount, cost);
+    }
+
     /// @dev Allows to trade outcome tokens and collateral with the market maker
     /// @param outcomeTokenAmounts Amounts of each outcome token to buy or sell. If positive, will buy this amount of outcome token from the market. If negative, will sell this amount back to the market instead.
     /// @param collateralLimit If positive, this is the limit for the amount of collateral tokens which will be sent to the market to conduct the trade. If negative, this is the minimum amount of collateral tokens which will be received from the market for the trade. If zero, there is no limit.
