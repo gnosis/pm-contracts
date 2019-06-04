@@ -184,7 +184,7 @@ contract StandardMarket is Proxied, Market, StandardMarketData {
     }
 
     function tradeImpl(uint8 outcomeCount, int[] outcomeTokenAmounts, int collateralLimit)
-        private
+        internal
         returns (int netCost, int outcomeTokenNetCost, uint fees)
     {
         // Calculate net cost for executing trade
