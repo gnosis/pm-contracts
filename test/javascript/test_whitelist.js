@@ -1,27 +1,17 @@
-const _ = require("lodash");
-const { wait } = require("@digix/tempo")(web3);
-
 const utils = require("./utils");
 const {
-  getBlock,
   getParamFromTxEvent,
   assertRejects,
-  Decimal,
-  randrange,
-  randnums
 } = utils;
 
 const CategoricalEvent = artifacts.require("CategoricalEvent");
 const EventFactory = artifacts.require("EventFactory");
-const OutcomeToken = artifacts.require("OutcomeToken");
 const WETH9 = artifacts.require("WETH9");
 const CentralizedOracle = artifacts.require("CentralizedOracle");
 const CentralizedOracleFactory = artifacts.require("CentralizedOracleFactory");
 const GnosisSightMarket = artifacts.require("GnosisSightMarket");
 const GnosisSightMarketFactory = artifacts.require("GnosisSightMarketFactory");
 const LMSRMarketMaker = artifacts.require("LMSRMarketMaker");
-const Campaign = artifacts.require("Campaign");
-const CampaignFactory = artifacts.require("CampaignFactory");
 const Whitelist = artifacts.require("Whitelist");
 
 contract("GnosisSightMarket (Whitelist) Tests", function(accounts) {

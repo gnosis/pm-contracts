@@ -173,32 +173,6 @@
       "transactionHash": "0x6b5bdd030cce53686c0a677d2ac69f3c82450a8045331c26ba6d8108365799a9"
     }
   },
-  "EtherToken": {
-    "1": {
-      "events": {},
-      "links": {},
-      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "transactionHash": "0xb95343413e459a0f97461812111254163ae53467855c0d73e0f1e7c5b8442fa3"
-    },
-    "3": {
-      "events": {},
-      "links": {},
-      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
-      "transactionHash": "0x19ae7fb1bd96c6f623741f76573a3e97d8a863358dafb1d773a8f9ad98b424b4"
-    },
-    "4": {
-      "events": {},
-      "links": {},
-      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
-      "transactionHash": "0x7bc8e85f99556aa23a41dd3c107e92ec76f057e4cea39f376ffb1b15d514b11f"
-    },
-    "42": {
-      "events": {},
-      "links": {},
-      "address": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
-      "transactionHash": "0x0e8d602b350e2a896134d79b48b8a59488a0a70933d46c5736c47b468877be35"
-    }
-  },
   "EventFactory": {
     "1": {
       "events": {},

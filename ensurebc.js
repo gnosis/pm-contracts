@@ -6,7 +6,7 @@ const artifactsDir = path.join('build', 'contracts')
 for(const [newName, bcName] of [
     ['ERC20', 'Token'],
     ['DetailedERC20', 'HumanFriendlyToken'],
-    ['WETH9', 'EtherToken'],
+    ['WETH9'],
     ['Fixed192x64Math', 'Math'],
 ])
     fs.copySync(path.join(artifactsDir, newName + '.json'), path.join(artifactsDir, bcName + '.json'))

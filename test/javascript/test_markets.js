@@ -218,7 +218,7 @@ contract('StandardMarket', function (accounts) {
 
         await etherToken.deposit({ value: amount, from: accounts[backer2] })
         await etherToken.approve(campaign.address, amount, { from: accounts[backer2] })
-        campaign.fund(amount, { from: accounts[backer2] })
+        await campaign.fund(amount, { from: accounts[backer2] })
         assert.equal(await campaign.stage.call(), 1)
 
         // Create market
@@ -446,7 +446,7 @@ contract('StandardMarket', function (accounts) {
 
         await etherToken.deposit({ value: amount, from: accounts[backer2] })
         await etherToken.approve(campaign.address, amount, { from: accounts[backer2] })
-        campaign.fund(amount, { from: accounts[backer2] })
+        await campaign.fund(amount, { from: accounts[backer2] })
         assert.equal(await campaign.stage.call(), 1)
 
         // Create market
