@@ -92,7 +92,7 @@ contract('MarketMaker', function(accounts) {
             let actual = new BigNumber((await lmsrMarketMaker.calcMarginalPrice.call(market.address, outcome.toString())))
                 .div(ONE.toString())
             assert(
-                isClose(actual, expected, relTol=1e-3, absTol=1e-9),
+                isClose(actual, expected, 1e-3, 1e-9),
                 `Marginal price calculation is off for iteration ${i}:\n` +
                 `        funding: ${funding}\n` +
                 `        net outcome tokens sold: ${netOutcomeTokensSold}\n` +
