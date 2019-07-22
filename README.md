@@ -9,8 +9,6 @@ Gnosis Prediction Market Contracts
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/gnosis/pm-contracts.svg)](https://greenkeeper.io/)
 
-[![Slack Status](https://slack.gnosis.pm/badge.svg)](https://slack.gnosis.pm)
-
 Collection of smart contracts for the Gnosis prediction market platform (https://www.gnosis.pm).
 To interact with those contracts have a look at (https://github.com/gnosis/pm-js/).
 
