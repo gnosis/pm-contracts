@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
@@ -39,7 +39,7 @@ contract Event is EventData {
         public
     {
         // Transfer collateral tokens to events contract
-        require(collateralToken.transferFrom(msg.sender, this, collateralTokenCount));
+        require(collateralToken.transferFrom(msg.sender, address(this), collateralTokenCount));
         // Issue new outcome tokens to sender
         for (uint8 i = 0; i < outcomeTokens.length; i++)
             outcomeTokens[i].issue(msg.sender, collateralTokenCount);
@@ -86,7 +86,7 @@ contract Event is EventData {
     function getOutcomeTokens()
         public
         view
-        returns (OutcomeToken[])
+        returns (OutcomeToken[] memory)
     {
         return outcomeTokens;
     }
@@ -96,7 +96,7 @@ contract Event is EventData {
     function getOutcomeTokenDistribution(address owner)
         public
         view
-        returns (uint[] outcomeTokenDistribution)
+        returns (uint[] memory outcomeTokenDistribution)
     {
         outcomeTokenDistribution = new uint[](outcomeTokens.length);
         for (uint8 i = 0; i < outcomeTokenDistribution.length; i++)

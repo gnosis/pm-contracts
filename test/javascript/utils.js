@@ -6,11 +6,13 @@ const Decimal = require('decimal.js').clone({ precision: PRECISION })
 const ONE = Decimal(2).pow(64)
 
 function isClose(a, b, relTol=1e-9, absTol=1e-18) {
-    return Decimal(a.valueOf()).sub(b).abs().lte(
+    a = Decimal(a.toString()).add(1) // Adding 1 is just for the case when a and b are both near to 0
+    b = Decimal(b.toString()).add(1)
+    return Decimal(a).sub(b).abs().lte(
         Decimal.max(
             Decimal.max(
-                Decimal.abs(a.valueOf()),
-                Decimal.abs(b.valueOf())
+                a.abs(),
+                b.abs()
             ).mul(relTol),
             absTol))
 }
@@ -24,7 +26,7 @@ function randnums(a, b, n) {
     return _.range(n).map(() => randrange(a, b))
 }
 
-function getParamFromTxEvent(transaction, paramName, contractFactory, eventName) {
+async function getParamFromTxEvent(transaction, paramName, contractFactory, eventName) {
     assert.isObject(transaction)
     let logs = transaction.logs
     if(eventName != null) {
@@ -33,7 +35,7 @@ function getParamFromTxEvent(transaction, paramName, contractFactory, eventName)
     assert.equal(logs.length, 1, `expected one log but got ${logs.length} logs`)
     let param = logs[0].args[paramName]
     if(contractFactory != null) {
-        let contract = contractFactory.at(param)
+        let contract = await contractFactory.at(param);        
         assert.isObject(contract, `getting ${paramName} failed for ${param}`)
         return contract
     } else {
@@ -63,11 +65,11 @@ function getBlock(b) {
 }
 
 function lmsrMarginalPrice(funding, netOutcomeTokensSold, outcomeIndex) {
-    const b = Decimal(funding.valueOf()).div(netOutcomeTokensSold.length).ln()
+    const b = Decimal(funding.toString()).div(netOutcomeTokensSold.length).ln()
 
-    return Decimal(netOutcomeTokensSold[outcomeIndex].valueOf()).div(b).exp().div(
+    return Decimal(netOutcomeTokensSold[outcomeIndex].toString()).div(b).exp().div(
         netOutcomeTokensSold.reduce(
-            (acc, tokensSold) => acc.add(Decimal(tokensSold.valueOf()).div(b).exp()),
+            (acc, tokensSold) => acc.add(Decimal(tokensSold.toString()).div(b).exp()),
             Decimal(0)
         )
     ).valueOf()

@@ -1,8 +1,8 @@
 language: node_js
 node_js:
 - 'node'
-- '8'
-- '7'
+- '10'
+- '9'
 before_install:
 - npm install -g npm codecov greenkeeper-lockfile@1
 before_script: greenkeeper-lockfile-update
@@ -16,5 +16,5 @@ deploy:
   on:
     all_branches: true
     tags: true
-    node: '8'
+    node: '10'
     repo: gnosis/pm-contracts

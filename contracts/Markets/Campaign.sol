@@ -1,7 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 contract CampaignData {
@@ -79,9 +80,9 @@ contract CampaignProxy is Proxy, CampaignData {
         public
     {
         // Validate input
-        require(   address(_eventContract) != 0
-                && address(_marketFactory) != 0
-                && address(_marketMaker) != 0
+        require(   address(_eventContract) != address(0)
+                && address(_marketFactory) != address(0)
+                && address(_marketMaker) != address(0)
                 && _fee < FEE_RANGE
                 && _funding > 0
                 && now < _deadline);
@@ -97,7 +98,8 @@ contract CampaignProxy is Proxy, CampaignData {
 /// @title Campaign contract - Allows to crowdfund a market
 /// @author Stefan George - <stefan@gnosis.pm>
 contract Campaign is Proxied, CampaignData {
-    using SafeMath for *;
+    using SignedSafeMath for int;
+    using SafeMath for uint;
 
     /*
      *  Public functions
@@ -109,12 +111,12 @@ contract Campaign is Proxied, CampaignData {
         timedTransitions
         atStage(Stages.AuctionStarted)
     {
-        uint raisedAmount = eventContract.collateralToken().balanceOf(this);
+        uint raisedAmount = eventContract.collateralToken().balanceOf(address(this));
         uint maxAmount = funding.sub(raisedAmount);
         if (maxAmount < amount)
             amount = maxAmount;
         // Collect collateral tokens
-        require(eventContract.collateralToken().transferFrom(msg.sender, this, amount));
+        require(eventContract.collateralToken().transferFrom(msg.sender, address(this), amount));
         contributions[msg.sender] = contributions[msg.sender].add(amount);
         if (amount == maxAmount)
             stage = Stages.AuctionSuccessful;
@@ -145,7 +147,7 @@ contract Campaign is Proxied, CampaignData {
         returns (Market)
     {
         market = marketFactory.createMarket(eventContract, marketMaker, fee);
-        require(eventContract.collateralToken().approve(market, funding));
+        require(eventContract.collateralToken().approve(address(market), funding));
         market.fund(funding);
         stage = Stages.MarketCreated;
         emit MarketCreation(market);
@@ -163,7 +165,7 @@ contract Campaign is Proxied, CampaignData {
         market.close();
         market.withdrawFees();
         eventContract.redeemWinnings();
-        finalBalance = eventContract.collateralToken().balanceOf(this);
+        finalBalance = eventContract.collateralToken().balanceOf(address(this));
         stage = Stages.MarketClosed;
         emit MarketClosing();
     }

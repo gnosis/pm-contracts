@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -15,7 +15,7 @@ contract MajorityOracleProxy is Proxy, MajorityOracleData {
 
     /// @dev Allows to create an oracle for a majority vote based on other oracles
     /// @param _oracles List of oracles taking part in the majority vote
-    constructor(address proxied, Oracle[] _oracles)
+    constructor(address proxied, Oracle[] memory _oracles)
         Proxy(proxied)
         public
     {
@@ -23,7 +23,7 @@ contract MajorityOracleProxy is Proxy, MajorityOracleData {
         require(_oracles.length > 2);
         for (uint i = 0; i < _oracles.length; i++)
             // Oracle address cannot be null
-            require(address(_oracles[i]) != 0);
+            require(address(_oracles[i]) != address(0));
         oracles = _oracles;
     }
 }

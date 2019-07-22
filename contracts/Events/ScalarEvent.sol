@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Events/Event.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -38,12 +38,12 @@ contract ScalarEventProxy is Proxy, EventData, ScalarEventData {
         public
     {
         // Validate input
-        require(address(_collateralToken) != 0 && address(_oracle) != 0);
+        require(address(_collateralToken) != address(0) && address(_oracle) != address(0));
         collateralToken = _collateralToken;
         oracle = _oracle;
         // Create an outcome token for each outcome
         for (uint8 i = 0; i < 2; i++) {
-            OutcomeToken outcomeToken = OutcomeToken(new OutcomeTokenProxy(outcomeTokenMasterCopy));
+            OutcomeToken outcomeToken = OutcomeToken(address(new OutcomeTokenProxy(outcomeTokenMasterCopy)));
             outcomeTokens.push(outcomeToken);
             emit OutcomeTokenCreation(outcomeToken, i);
         }

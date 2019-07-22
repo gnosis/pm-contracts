@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/SignedMessageOracle.sol";
 
 
@@ -35,7 +35,7 @@ contract SignedMessageOracleFactory {
         public
         returns (SignedMessageOracle signedMessageOracle)
     {
-        signedMessageOracle = SignedMessageOracle(new SignedMessageOracleProxy(signedMessageOracleMasterCopy, descriptionHash, v, r, s));
+        signedMessageOracle = SignedMessageOracle(address(new SignedMessageOracleProxy(address(signedMessageOracleMasterCopy), descriptionHash, v, r, s)));
         address oracle = ecrecover(descriptionHash, v, r, s);
         emit SignedMessageOracleCreation(msg.sender, signedMessageOracle, oracle);
     }

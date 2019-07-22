@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/CentralizedOracle.sol";
 
 
@@ -28,11 +28,11 @@ contract CentralizedOracleFactory {
     /// @dev Creates a new centralized oracle contract
     /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
-    function createCentralizedOracle(bytes ipfsHash)
+    function createCentralizedOracle(bytes memory ipfsHash)
         public
         returns (CentralizedOracle centralizedOracle)
     {
-        centralizedOracle = CentralizedOracle(new CentralizedOracleProxy(centralizedOracleMasterCopy, msg.sender, ipfsHash));
+        centralizedOracle = CentralizedOracle(address(new CentralizedOracleProxy(address(centralizedOracleMasterCopy), msg.sender, ipfsHash)));
         emit CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
     }
 }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/UltimateOracle.sol";
 
 
@@ -53,15 +53,15 @@ contract UltimateOracleFactory {
         public
         returns (UltimateOracle ultimateOracle)
     {
-        ultimateOracle = UltimateOracle(new UltimateOracleProxy(
-            ultimateOracleMasterCopy,
+        ultimateOracle = UltimateOracle(address(new UltimateOracleProxy(
+            address(ultimateOracleMasterCopy),
             oracle,
             collateralToken,
             spreadMultiplier,
             challengePeriod,
             challengeAmount,
             frontRunnerPeriod
-        ));
+        )));
         emit UltimateOracleCreation(
             msg.sender,
             ultimateOracle,

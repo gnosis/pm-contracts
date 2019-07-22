@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Markets/StandardMarket.sol";
 
 
@@ -32,7 +32,7 @@ contract StandardMarketFactory {
         public
         returns (StandardMarket market)
     {
-        market = StandardMarket(new StandardMarketProxy(standardMarketMasterCopy, msg.sender, eventContract, marketMaker, fee));
+        market = StandardMarket(address(new StandardMarketProxy(address(standardMarketMasterCopy), msg.sender, eventContract, marketMaker, fee)));
         emit StandardMarketCreation(msg.sender, market, eventContract, marketMaker, fee);
     }
 }

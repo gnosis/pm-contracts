@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Markets/StandardMarket.sol";
 
 contract StandardMarketWithPriceLoggerData {
@@ -98,7 +98,7 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     /// @param outcomeTokenAmounts Amounts of outcome tokens to trade
     /// @param collateralLimit The maximum cost or minimum profit in collateral tokens
     /// @return Cost/profit in collateral tokens
-    function trade(int[] outcomeTokenAmounts, int collateralLimit)
+    function trade(int[] memory outcomeTokenAmounts, int collateralLimit)
         public
         returns (int netCost)
     {

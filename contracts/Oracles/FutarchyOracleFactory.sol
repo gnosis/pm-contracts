@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/FutarchyOracle.sol";
 
 
@@ -39,7 +39,7 @@ contract FutarchyOracleFactory {
     constructor(FutarchyOracle _futarchyOracleMasterCopy, EventFactory _eventFactory, StandardMarketWithPriceLoggerFactory _marketFactory)
         public
     {
-        require(address(_eventFactory) != 0 && address(_marketFactory) != 0);
+        require(address(_eventFactory) != address(0) && address(_marketFactory) != address(0));
         futarchyOracleMasterCopy = _futarchyOracleMasterCopy;
         eventFactory = _eventFactory;
         marketFactory = _marketFactory;
@@ -70,8 +70,8 @@ contract FutarchyOracleFactory {
         public
         returns (FutarchyOracle futarchyOracle)
     {
-        futarchyOracle = FutarchyOracle(new FutarchyOracleProxy(
-            futarchyOracleMasterCopy,
+        futarchyOracle = FutarchyOracle(address(new FutarchyOracleProxy(
+            address(futarchyOracleMasterCopy),
             msg.sender,
             eventFactory,
             collateralToken,
@@ -84,7 +84,7 @@ contract FutarchyOracleFactory {
             fee,
             tradingPeriod,
             startDate
-        ));
+        )));
         emit FutarchyOracleCreation(
             msg.sender,
             futarchyOracle,

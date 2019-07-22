@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Markets/Market.sol";
 
 
@@ -10,6 +10,6 @@ contract MarketMaker {
      */
     function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public view returns (uint);
     function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount) public view returns (uint);
-    function calcNetCost(Market market, int[] outcomeTokenAmounts) public view returns (int);
+    function calcNetCost(Market market, int[] memory outcomeTokenAmounts) public view returns (int);
     function calcMarginalPrice(Market market, uint8 outcomeTokenIndex) public view returns (uint);
 }

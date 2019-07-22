@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -33,7 +33,7 @@ contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
 
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
-    constructor(address proxied, address _owner, bytes _ipfsHash)
+    constructor(address proxied, address _owner, bytes memory _ipfsHash)
         public
         Proxy(proxied)
     {

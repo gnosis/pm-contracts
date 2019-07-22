@@ -1,5 +1,5 @@
-pragma solidity ^0.4.24;
-import "openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
+pragma solidity ^0.5.0;
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
@@ -29,7 +29,7 @@ contract OutcomeTokenProxy is Proxy {
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is Proxied, StandardToken {
+contract OutcomeToken is Proxied, ERC20 {
     using SafeMath for *;
 
     /*
@@ -62,8 +62,7 @@ contract OutcomeToken is Proxied, StandardToken {
         public
         isEventContract
     {
-        balances[_for] = balances[_for].add(outcomeTokenCount);
-        totalSupply_ = totalSupply_.add(outcomeTokenCount);
+        _mint(_for, outcomeTokenCount);
         emit Issuance(_for, outcomeTokenCount);
     }
 
@@ -74,8 +73,7 @@ contract OutcomeToken is Proxied, StandardToken {
         public
         isEventContract
     {
-        balances[_for] = balances[_for].sub(outcomeTokenCount);
-        totalSupply_ = totalSupply_.sub(outcomeTokenCount);
+        _burn(_for, outcomeTokenCount);
         emit Revocation(_for, outcomeTokenCount);
     }
 }
