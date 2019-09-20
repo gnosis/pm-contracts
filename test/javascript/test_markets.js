@@ -3,7 +3,7 @@ const { wait } = require('./digix_tempo')(web3)
 
 const BigNumber = require('bignumber.js')
 const utils = require('./utils')
-const { getBlock, getParamFromTxEvent, assertRejects, Decimal, randrange, randnums } = utils
+const { getBlock, getParamFromTxEvent, assertRejects, randrange, randnums } = utils
 
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const EventFactory = artifacts.require('EventFactory')

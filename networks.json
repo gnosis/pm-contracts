@@ -173,32 +173,6 @@
       "transactionHash": "0x6b5bdd030cce53686c0a677d2ac69f3c82450a8045331c26ba6d8108365799a9"
     }
   },
-  "EtherToken": {
-    "1": {
-      "events": {},
-      "links": {},
-      "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "transactionHash": "0xb95343413e459a0f97461812111254163ae53467855c0d73e0f1e7c5b8442fa3"
-    },
-    "3": {
-      "events": {},
-      "links": {},
-      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
-      "transactionHash": "0x19ae7fb1bd96c6f623741f76573a3e97d8a863358dafb1d773a8f9ad98b424b4"
-    },
-    "4": {
-      "events": {},
-      "links": {},
-      "address": "0xc778417e063141139fce010982780140aa0cd5ab",
-      "transactionHash": "0x7bc8e85f99556aa23a41dd3c107e92ec76f057e4cea39f376ffb1b15d514b11f"
-    },
-    "42": {
-      "events": {},
-      "links": {},
-      "address": "0xd0a1e359811322d97991e03f863a0c30c2cf029c",
-      "transactionHash": "0x0e8d602b350e2a896134d79b48b8a59488a0a70933d46c5736c47b468877be35"
-    }
-  },
   "EventFactory": {
     "1": {
       "events": {},
@@ -401,26 +375,6 @@
       "links": {},
       "address": "0x0e696947a06550def604e82c26fd9e493e576337",
       "transactionHash": "0xf5626d3f45669f8f0472da20ac29b9ef246cd27140c0c68f42db86edd8483a7e"
-    }
-  },
-  "Math": {
-    "3": {
-      "events": {},
-      "links": {},
-      "address": "0x265e6694f83fbcfd037be0126fbafc0fcfd5b181",
-      "transactionHash": "0x0c334caea3e2c383c7a54d9fd38c06f65ae46d788c216b47ddecdc24019901d9"
-    },
-    "4": {
-      "events": {},
-      "links": {},
-      "address": "0xce036308718c3f704cb6cc492fa405c6d811d627",
-      "transactionHash": "0x479b0a6513e1849a8f8e3ad0a37018c360dbef7244ffa5d0b9044394e6fa0b1f"
-    },
-    "42": {
-      "events": {},
-      "links": {},
-      "address": "0x09d7ffa61ad04acb47b27043335018a92e539b2c",
-      "transactionHash": "0x23cad8e3fa64cd28d4e8e84cf6c2f1859804a3b86ba598d39c028ac794670c03"
     }
   },
   "OutcomeToken": {
