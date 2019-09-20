@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
-    "@gnosis.pm/truffle-nice-tools": "^1.3.0",
+    "@gnosis.pm/truffle-nice-tools": "^1.3.1",
     "babel-eslint": "^10.0.2",
     "cross-env": "^5.2.0",
     "decimal.js": "^10.2.0",
