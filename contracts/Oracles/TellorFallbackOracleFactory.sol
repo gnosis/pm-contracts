@@ -1,38 +1,38 @@
 pragma solidity ^0.5.0;
-import "../Oracles/CentralizedOracle.sol";
+import "../Oracles/TellorFallbackOracle.sol";
 
 
 /// @title Centralized oracle factory contract - Allows to create centralized oracle contracts
 /// @author Stefan George - <stefan@gnosis.pm>
-contract CentralizedOracleFactory {
+contract TellorFallbackOracleFactory {
 
     /*
      *  Events
      */
-    event CentralizedOracleCreation(address indexed creator, CentralizedOracle centralizedOracle, bytes ipfsHash);
+    event TellorFallbackOracleCreation(address indexed creator, TellorFallbackOracle tellorFallbackOracle, bytes ipfsHash);
 
     /*
      *  Storage
      */
-    CentralizedOracle public centralizedOracleMasterCopy;
+    TellorFallbackOracle public tellorFallbackOracleMasterCopy;
 
     /*
      *  Public functions
      */
-    constructor(CentralizedOracle _centralizedOracleMasterCopy)
+    constructor(TellorFallbackOracle _tellorFallbackOracleMasterCopy)
         public
     {
-        centralizedOracleMasterCopy = _centralizedOracleMasterCopy;
+        tellorFallbackOracleMasterCopy = _tellorFallbackOracleMasterCopy;
     }
 
     /// @dev Creates a new centralized oracle contract
     /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
-    function createCentralizedOracle(bytes memory ipfsHash)
+    function createTellorFallbackOracle(bytes memory ipfsHash)
         public
-        returns (CentralizedOracle centralizedOracle)
+        returns (TellorFallbackOracle tellorFallbackOracle)
     {
-        centralizedOracle = CentralizedOracle(address(new CentralizedOracleProxy(address(centralizedOracleMasterCopy), msg.sender, ipfsHash)));
-        emit CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
+        tellorFallbackOracle = TellorFallbackOracle(address(new TellorFallbackOracleProxy(address(tellorFallbackOracleMasterCopy), msg.sender, ipfsHash)));
+        emit TellorFallbackOracleCreation(msg.sender, tellorFallbackOracle, ipfsHash);
     }
 }

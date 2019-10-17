@@ -1,38 +1,38 @@
 pragma solidity ^0.5.0;
-import "../Oracles/CentralizedOracle.sol";
+import "../Oracles/TellorOracle.sol";
 
 
 /// @title Centralized oracle factory contract - Allows to create centralized oracle contracts
 /// @author Stefan George - <stefan@gnosis.pm>
-contract CentralizedOracleFactory {
+contract TellorOracleFactory {
 
     /*
      *  Events
      */
-    event CentralizedOracleCreation(address indexed creator, CentralizedOracle centralizedOracle, bytes ipfsHash);
+    event TellorOracleCreation(address indexed creator, TellorOracle tellorOracle, bytes ipfsHash);
 
     /*
      *  Storage
      */
-    CentralizedOracle public centralizedOracleMasterCopy;
+    TellorOracle public tellorOracleMasterCopy;
 
     /*
      *  Public functions
      */
-    constructor(CentralizedOracle _centralizedOracleMasterCopy)
+    constructor(TellorOracle _tellorOracleMasterCopy)
         public
     {
-        centralizedOracleMasterCopy = _centralizedOracleMasterCopy;
+        tellorOracleMasterCopy = _tellorOracleMasterCopy;
     }
 
     /// @dev Creates a new centralized oracle contract
     /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
-    function createCentralizedOracle(bytes memory ipfsHash)
+    function createTellorOracle(bytes memory ipfsHash)
         public
-        returns (CentralizedOracle centralizedOracle)
+        returns (TellorOracle tellorOracle)
     {
-        centralizedOracle = CentralizedOracle(address(new CentralizedOracleProxy(address(centralizedOracleMasterCopy), msg.sender, ipfsHash)));
-        emit CentralizedOracleCreation(msg.sender, centralizedOracle, ipfsHash);
+        tellorOracle = TellorOracle(address(new TellorOracleProxy(address(tellorOracleMasterCopy), msg.sender, ipfsHash)));
+        emit TellorOracleCreation(msg.sender, tellorOracle, ipfsHash);
     }
 }
