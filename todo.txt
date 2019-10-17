@@ -1,0 +1,15 @@
+Add functions into the Tellor Contracts
+
+4 contracts:
+- TellorFallbackOracle.sol
+- TellorFallbackOracleFactory.sol
+- TellorOracle.sol
+- TellorOracleFactory.sol
+
+
+Test Contracts
+Add Comments into contracts
+Deploy UserContract on Mainnet
+-Hardcode in Mainnet contract if none entered (optional if other network)
+Test Again
+Make pull request
