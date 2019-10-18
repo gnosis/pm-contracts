@@ -8,7 +8,13 @@ contract TellorInterface {
 
 
 
-contract TellorOracle is Oracle{
+contract TellorOracleProxy is Proxy{
+
+    constructor(address proxied)
+        public
+        Proxy(proxied);
+}
+contract TellorOracle is Oracle,TellorOracleProxy{
 
     /*
      *  Events

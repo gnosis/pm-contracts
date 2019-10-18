@@ -55,6 +55,17 @@ contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
 /// @title Centralized oracle contract - Allows the contract owner to set an outcome
 /// @author Stefan George - <stefan@gnosis.pm>
 contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
+	event OracleDisputed();
+    /*
+     *  Storage
+     */
+    address public tellorContract;
+    uint public requestId;
+    uint public endDate;
+    uint public disputePeriod;
+    uint public setTime;
+    uint public disputeCost;
+    bool public isDisputed;
 
     /*
      *  Public functions
@@ -79,6 +90,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     {
         // Result is not set yet
         require(!isSet);
+        setTime = now; 
         isSet = true;
         outcome = _outcome;
         emit OutcomeAssignment(_outcome);
@@ -91,7 +103,13 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         view
         returns (bool)
     {
-        return isSet;
+    	if (now > setTime + duration){
+    		return isSet;
+    	}
+    	else{
+    		return false
+    	}
+
     }
 
     /// @dev Returns outcome
@@ -104,29 +122,10 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         return outcome;
     }
 
-
-/////
-
-    /*
-     *  Events
-     */
-    event OutcomeAssignment(int outcome);
-
-    /*
-     *  Storage
-     */
-    address public tellorContract;
-    uint public requestId;
-    uint public endDate;
-    uint public disputePeriod;
-    bool public isSet;
-    int public outcome;
-
-
     /*
      *  Public functions
      */
-    function setTellorContract(address _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate)
+    function setTellorContract(address _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
         // Result is not set yet
@@ -138,16 +137,27 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         tellorContract = _tellorContract;
         requestId = _requestId;
         endDate = _endDate;
+        disputeCost = _disputeCost;
         disputePeriod = _disputePeriod;
+    }
+
+    function dispute() public payable{
+    	require(msg.value > disputeCost);
+    	require(!isDisputed);
+    	isDisputed = true;
+    	isSet = false;
+    	emit OracleDisputed();
+
     }
 
     /// @dev Sets event outcome
     /// @param _outcome Event outcome
-    function setOutcome()
+    function setTellorOutcome()
         public
     {
         // Result is not set yet
         require(!isSet);
+        require(isDisputed);
         require(_requestId != 0);
         bool _didGet;
         uint _value;
@@ -158,25 +168,8 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         	isSet = true;
         	emit OutcomeAssignment(_outcome);
         }
-    }
-
-    /// @dev Returns if winning outcome is set
-    /// @return Is outcome set?
-    function isOutcomeSet()
-        public
-        view
-        returns (bool)
-    {
-        return isSet;
-    }
-
-    /// @dev Returns outcome
-    /// @return Outcome
-    function getOutcome()
-        public
-        view
-        returns (int)
-    {
-        return outcome;
+        else{
+        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
+        }
     }
 }
