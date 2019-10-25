@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 
 
-contract TellorInterface {
-		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) returns (bool,uint,uint);
+interface TellorInterface {
+		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
 }
 
 
@@ -26,7 +26,7 @@ contract TellorOracle is Oracle,TellorOracleProxy{
      */
     address public tellorContract;
     uint public requestId;
-    uint public _endDate;
+    uint public endDate;
     bool public isSet;
     int public outcome;
 
@@ -45,24 +45,24 @@ contract TellorOracle is Oracle,TellorOracleProxy{
         require(_endDate > now);
         tellorContract = _tellorContract;
         requestId = _requestId;
+        endDate = _endDate;
     }
 
     /// @dev Sets event outcome
-    /// @param _outcome Event outcome
     function setOutcome()
         public
     {
         // Result is not set yet
         require(!isSet);
-        require(_requestId != 0);
+        require(requestId != 0);
         bool _didGet;
         uint _value;
         uint _time;
-        _didGet,_value,_time = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,_endDate);
+        (_didGet,_value,_time) = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,endDate);
         if(_didGet){
         	outcome = _value;
         	isSet = true;
-        	emit OutcomeAssignment(_outcome);
+        	emit OutcomeAssignment(outcome);
         }
     }
 

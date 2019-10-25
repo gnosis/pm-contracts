@@ -6,8 +6,8 @@ pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
-contract TellorInterface {
-		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) returns (bool,uint,uint);
+interface TellorInterface {
+		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
 }
 
 
@@ -103,11 +103,11 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         view
         returns (bool)
     {
-    	if (now > setTime + duration){
+    	if (now > setTime /*+ duration*/){
     		return isSet;
     	}
     	else{
-    		return false
+    		return false;
     	}
 
     }
@@ -151,22 +151,21 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     }
 
     /// @dev Sets event outcome
-    /// @param _outcome Event outcome
     function setTellorOutcome()
         public
     {
         // Result is not set yet
         require(!isSet);
         require(isDisputed);
-        require(_requestId != 0);
+        require(requestId != 0);
         bool _didGet;
         uint _value;
         uint _time;
-        _didGet,_value,_time = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,_endDate);
+        (_didGet,_value,_time) = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,endDate);
         if(_didGet){
         	outcome = _value;
         	isSet = true;
-        	emit OutcomeAssignment(_outcome);
+        	emit OutcomeAssignment(outcome);
         }
         else{
         	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
