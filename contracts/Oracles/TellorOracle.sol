@@ -1,9 +1,13 @@
 pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
+import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
 interface TellorInterface {
-		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
+	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
+    function requestDataWithEther(uint _requestId) payable external;
+    //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
+
 }
 
 
@@ -11,8 +15,9 @@ interface TellorInterface {
 contract TellorOracleProxy is Proxy{
 
     constructor(address proxied)
+        Proxy(proxied)
         public
-        Proxy(proxied);
+        {}
 }
 contract TellorOracle is Oracle,TellorOracleProxy{
 

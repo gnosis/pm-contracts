@@ -7,7 +7,9 @@ import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
-		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
+	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
+    function requestDataWithEther(uint _requestId) payable external;
+    //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
 }
 
 
@@ -37,7 +39,7 @@ contract CentralizedOracleData {
     }
 }
 
-contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
+contract TellorFallbackOracleProxy is Proxy, CentralizedOracleData {
 
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
@@ -59,7 +61,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     /*
      *  Storage
      */
-    address public tellorContract;
+    address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     uint public disputePeriod;
@@ -103,7 +105,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         view
         returns (bool)
     {
-    	if (now > setTime /*+ duration*/){
+    	if (now > setTime + disputePeriod /*+ duration*/){
     		return isSet;
     	}
     	else{
@@ -125,7 +127,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     /*
      *  Public functions
      */
-    function setTellorContract(address _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
+    function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
         // Result is not set yet
@@ -163,7 +165,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         uint _time;
         (_didGet,_value,_time) = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,endDate);
         if(_didGet){
-        	outcome = _value;
+        	outcome = int(_value);
         	isSet = true;
         	emit OutcomeAssignment(outcome);
         }

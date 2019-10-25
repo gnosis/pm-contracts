@@ -32,7 +32,9 @@ contract TellorFallbackOracleFactory {
         public
         returns (TellorFallbackOracle tellorFallbackOracle)
     {
-        tellorFallbackOracle = TellorFallbackOracle(address(new TellorFallbackOracleProxy(address(tellorFallbackOracleMasterCopy), msg.sender, ipfsHash)));
+        tellorFallbackOracle = TellorFallbackOracle(address(new TellorFallbackOracleProxy(
+            address(tellorFallbackOracleMasterCopy), msg.sender, ipfsHash)));
+
         emit TellorFallbackOracleCreation(msg.sender, tellorFallbackOracle, ipfsHash);
     }
 }
