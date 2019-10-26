@@ -29,7 +29,7 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     /*
      *  Storage
      */
-    address public tellorContract;
+    address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     bool public isSet;
@@ -39,15 +39,15 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     /*
      *  Public functions
      */
-    function setTellorContract(address _tellorContract, uint _requestId, uint _endDate)
+    function setTellorContract(address payable _tellorContract, uint _requestId, uint _endDate)
         public
     {
         // Result is not set yet
-        require(!isSet);
-        require(_tellorContract == address(0));
-        require(_requestId != 0);
-        require(_tellorContract != address(0));
-        require(_endDate > now);
+        require(!isSet, "The outcome is already set");
+        require(tellorContract == address(0), "tellorContract address has already been set");
+        require(_requestId != 0, "Use a valid _requestId, it should not be zero");
+        require(_tellorContract != address(0), "_tellorContract address should not be 0");
+        require(_endDate > now, "_endDate is not greater than now");
         tellorContract = _tellorContract;
         requestId = _requestId;
         endDate = _endDate;
@@ -58,8 +58,8 @@ contract TellorOracle is Oracle,TellorOracleProxy{
         public
     {
         // Result is not set yet
-        require(!isSet);
-        require(requestId != 0);
+        require(!isSet, "The outcome is already set");
+        require(requestId != 0, "Use a valid _requestId, it should not be zero");
         bool _didGet;
         uint _value;
         uint _time;

@@ -8,11 +8,12 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
-    function requestDataWithEther(uint _requestId) payable external;
+    function requestDataWithEther(uint _requestId) external payable;
     //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
 }
 
-
+/// @title Centralized oracle data - Allows to create centralized oracle contracts
+/// @author Stefan George - <stefan@gnosis.pm>
 contract CentralizedOracleData {
 
     /*
@@ -54,8 +55,7 @@ contract TellorFallbackOracleProxy is Proxy, CentralizedOracleData {
     }
 }
 
-/// @title Centralized oracle contract - Allows the contract owner to set an outcome
-/// @author Stefan George - <stefan@gnosis.pm>
+/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute provided by the centralized oracle
 contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
 	event OracleDisputed();
     /*
@@ -124,18 +124,21 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         return outcome;
     }
 
-    /*
-     *  Public functions
-     */
+    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _tellorContract is the Tellor user contract that should be used by the interface
+    /// @param _disputePeriod is the period when disputes are allowed
+    /// @param _requestId is the request ID for the type of data that is will be used by the contract
+    /// @param _endDate is the contract/maket end date  ???
+    /// @param _disputeCost is the cost in ETH to dispute a value
     function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
         // Result is not set yet
-        require(!isSet);
-        require(_tellorContract == address(0));
-        require(_requestId != 0);
-        require(_tellorContract != address(0));
-        require(_endDate > now);
+        require(!isSet, "The outcome is already set");
+        require(tellorContract == address(0), "tellorContract address has already been set");
+        require(_requestId != 0, "Use a valid _requestId, it should not be zero");
+        require(_tellorContract != address(0), "_tellorContract address should not be 0");
+        require(_endDate > now, "_endDate is not greater than now");
         tellorContract = _tellorContract;
         requestId = _requestId;
         endDate = _endDate;
@@ -143,23 +146,24 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         disputePeriod = _disputePeriod;
     }
 
+    /// @dev Allows users to initiate a dispute
     function dispute() public payable{
-    	require(msg.value > disputeCost);
-    	require(!isDisputed);
+    	require(msg.value > disputeCost, "The msg.value submitted is not greater than the dispute cost");
+    	require(!isDisputed, "The value has already been disputed");
     	isDisputed = true;
     	isSet = false;
     	emit OracleDisputed();
 
     }
 
-    /// @dev Sets event outcome
+    /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
     function setTellorOutcome()
         public
     {
         // Result is not set yet
-        require(!isSet);
-        require(isDisputed);
-        require(requestId != 0);
+        require(!isSet, "The outcome is already set");
+        require(isDisputed, "This is not under dispute");
+        require(requestId != 0, "Use a valid _requestId, it should not be zero");
         bool _didGet;
         uint _value;
         uint _time;
@@ -170,7 +174,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         	emit OutcomeAssignment(outcome);
         }
         else{
-        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
+        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value)();
         }
     }
 }
