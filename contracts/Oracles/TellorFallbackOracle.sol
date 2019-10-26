@@ -158,7 +158,8 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
 
     /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
     function setTellorOutcome()
-        public
+        public 
+        payable
     {
         // Result is not set yet
         require(!isSet, "The outcome is already set");
@@ -174,7 +175,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         	emit OutcomeAssignment(outcome);
         }
         else{
-        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value)();
+        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
         }
     }
 }
