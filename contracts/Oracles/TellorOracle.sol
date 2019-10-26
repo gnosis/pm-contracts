@@ -6,6 +6,7 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
     function requestDataWithEther(uint _requestId) payable external;
+    function() external payable ;
     //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
 
 }
@@ -13,11 +14,18 @@ interface TellorInterface {
 
 
 contract TellorOracleProxy is Proxy{
+    address public owner;
+    bytes public ipfsHash;
 
-    constructor(address proxied)
+    constructor(address proxied, address _owner, bytes memory _ipfsHash)
         Proxy(proxied)
         public
-        {}
+        {
+            // Description hash cannot be null
+            require(_ipfsHash.length == 46);
+            owner = _owner;
+            ipfsHash = _ipfsHash;
+        }
 }
 contract TellorOracle is Oracle,TellorOracleProxy{
 
@@ -29,11 +37,13 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     /*
      *  Storage
      */
+    
     address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     bool public isSet;
     int public outcome;
+
 
 
     /*
@@ -65,7 +75,7 @@ contract TellorOracle is Oracle,TellorOracleProxy{
         uint _time;
         (_didGet,_value,_time) = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,endDate);
         if(_didGet){
-        	outcome = _value;
+        	outcome = int(_value);
         	isSet = true;
         	emit OutcomeAssignment(outcome);
         }

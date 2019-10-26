@@ -9,6 +9,7 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
     function requestDataWithEther(uint _requestId) external payable;
+    function() external payable ;
     //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
 }
 
@@ -68,6 +69,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     uint public setTime;
     uint public disputeCost;
     bool public isDisputed;
+    //TellorInterface tellorInterface;
 
     /*
      *  Public functions
@@ -144,6 +146,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         endDate = _endDate;
         disputeCost = _disputeCost;
         disputePeriod = _disputePeriod;
+        //tellorInterface = TellorInterface(_tellorContract);
     }
 
     /// @dev Allows users to initiate a dispute
@@ -158,8 +161,8 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
 
     /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
     function setTellorOutcome()
-        public 
         payable
+        public 
     {
         // Result is not set yet
         require(!isSet, "The outcome is already set");
@@ -175,7 +178,10 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         	emit OutcomeAssignment(outcome);
         }
         else{
-        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
+            //address payable _tellor = address(uint160(address(tellorContract)));
+            //TellorInterface tellorInterface = TellorInterface(tellorContract);
+        	//TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
+            //tellorInterface.requestDataWithEther(requestId).transfer(msg.value);
         }
     }
 }
