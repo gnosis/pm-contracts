@@ -50,6 +50,10 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     /*
      *  Public functions
      */
+    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _tellorContract is the Tellor user contract that should be used by the interface
+    /// @param _requestId is the request ID for the type of data that is will be used by the contract
+    /// @param _endDate is the contract/maket end date
     function setTellorContract(address payable _tellorContract, uint _requestId, uint _endDate)
         public
     {

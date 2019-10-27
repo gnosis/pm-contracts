@@ -134,6 +134,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         return outcome;
     }
 
+///should this just be in the constructor? 
     /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _disputePeriod is the period when disputes are allowed
@@ -143,6 +144,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
+        require(msg.sender = owner); 
         // Result is not set yet
         require(!isSet, "The outcome is already set");
         require(tellorContract == address(0), "tellorContract address has already been set");
