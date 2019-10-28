@@ -7,8 +7,10 @@ import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
-	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
-    function addTipWithEther(uint256 _requestId) external payable;
+	  function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
+    function addTipWithEther(uint _requestId) external payable;
+    function() external payable ;
+
 }
 
 /// @title Centralized oracle data - Allows to create centralized oracle contracts
