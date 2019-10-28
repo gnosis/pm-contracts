@@ -1,13 +1,13 @@
 
 /****Uncomment the body below to run this with Truffle migrate for truffle testing*/
 //@tellor-io/TellorCore/tree/master/contracts
-var TellorTransfer = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/libraries/TellorTransfer.sol");
-var TellorDispute = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/libraries/TellorDispute.sol");
-var TellorStake = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/libraries/TellorStake.sol");
-var TellorLibrary = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/libraries/TellorLibrary.sol");
-var TellorGettersLibrary = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/libraries/TellorGettersLibrary.sol");
-var Tellor = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/Tellor.sol");
-var TellorMaster = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/TellorMaster.sol");
+var TellorTransfer = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/libraries/TellorTransfer.sol");
+var TellorDispute = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/libraries/TellorDispute.sol");
+var TellorStake = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/libraries/TellorStake.sol");
+var TellorLibrary = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/libraries/TellorLibrary.sol");
+var TellorGettersLibrary = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/libraries/TellorGettersLibrary.sol");
+var Tellor = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/Tellor.sol");
+var TellorMaster = artifacts.require("github.com/tellor-io/TellorCore/tree/master/contracts/TellorMaster.sol");
 /****Uncomment the body to run this with Truffle migrate for truffle testing*/
 
 /**

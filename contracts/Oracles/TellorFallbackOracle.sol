@@ -8,7 +8,7 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
-    function addTipWithEther(uint256 _requestId) public payable;
+    function addTipWithEther(uint256 _requestId) external payable;
 }
 
 /// @title Centralized oracle data - Allows to create centralized oracle contracts
@@ -134,7 +134,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
-        require(msg.sender = owner); 
+        require(msg.sender == owner);
         // Result is not set yet
         require(!isSet, "The outcome is already set");
         require(tellorContract == address(0), "tellorContract address has already been set");
@@ -178,11 +178,7 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         	emit OutcomeAssignment(outcome);
         }
         else{
-            //address payable _tellor = address(uint160(address(tellorContract)));
-            //TellorInterface tellorInterface = TellorInterface(tellorContract);
-        	//TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
-            //tellorInterface.requestDataWithEther(requestId).transfer(msg.value);
-            TellorInterface(tellorContract).addTipWithEther(requestId).value(msg.value);
+            //TellorInterface(tellorContract).addTipWithEther(requestId).value(msg.value);
         }
     }
 }

@@ -5,7 +5,7 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
-    function addTipWithEther(uint256 _requestId) public payable;
+    function addTipWithEther(uint256 _requestId) external payable;
 }
 
 
@@ -53,6 +53,7 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     function setTellorContract(address payable _tellorContract, uint _requestId, uint _endDate)
         public
     {
+        require(msg.sender == owner);
         // Result is not set yet
         require(!isSet, "The outcome is already set");
         require(tellorContract == address(0), "tellorContract address has already been set");

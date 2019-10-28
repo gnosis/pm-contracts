@@ -11,13 +11,13 @@ const TellorFallbackOracle = artifacts.require('TellorOracle')
 const TellorFallbackOracleFactory = artifacts.require('TellorOracleFactory')
 
 
-const TellorMaster = artifacts.require("./Tellor/TellorMaster.sol")
-const Tellor = artifacts.require(".Tellor/Tellor.sol")
+const TellorMaster = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/TellorMaster.sol")
+const Tellor = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/Tellor.sol")
 var tellorAbi = Tellor.abi;
 var tellorMasterAbi = TellorMaster.abi;
 
-const UserContract = artifacts.require("./Tellor/userFiles/UserContract.sol")
-const UsingTellor = artifacts.require(".Tellor/userFiles/UsingTellor.sol")
+const UserContract = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/userFiles/UserContract.sol")
+const UsingTellor = artifacts.require("@tellor-io/TellorCore/tree/master/contracts/userFiles/UsingTellor.sol")
 
 //using json instead...too many linked libarries....
 /*var fs = require('fs');
@@ -80,15 +80,15 @@ contract('Event', function (accounts) {
         )
 
         //start Mining so that a value can be added to tellor
-        console.log('START MINING RIG!!')
-        var logMineWatcher = await promisifyLogWatch(master.address, 'NewValue(uint256,uint256,uint256,uint256,bytes32)')
-        for(var i = 0;i < 5;i++){
-           logMineWatcher = await promisifyLogWatch(master.address, 'NewValue(uint256,uint256,uint256,uint256,bytes32)')
-           await web3.eth.sendTransaction({to: master.address,from:accounts[0],gas:7000000,data:tellor.methods.requestData(api,"BTC/USD",1000,0).encodeABI()})
-        }
+        // console.log('START MINING RIG!!')
+        // var logMineWatcher = await promisifyLogWatch(master.address, 'NewValue(uint256,uint256,uint256,uint256,bytes32)')
+        // for(var i = 0;i < 5;i++){
+        //    logMineWatcher = await promisifyLogWatch(master.address, 'NewValue(uint256,uint256,uint256,uint256,bytes32)')
+        //    await web3.eth.sendTransaction({to: master.address,from:accounts[0],gas:7000000,data:tellor.methods.requestData(api,"BTC/USD",1000,0).encodeABI()})
+        // }
 
-        res = web3.eth.abi.decodeParameters(['uint256','uint256'],logMineWatcher.data)
-        assert(res[0] > 0, "value should be positive")
+        // res = web3.eth.abi.decodeParameters(['uint256','uint256'],logMineWatcher.data)
+        // assert(res[0] > 0, "value should be positive")
 
     })
     it('should buy, set, and redeem outcomes for scalar event', async () => {
