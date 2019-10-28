@@ -8,18 +8,8 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
-    //function requestDataWithEther(uint _requestId) external payable;
-     function addTipWithEtherTipNotSpecified(uint256 _apiId) external payable;
-    //function requestDataWithEther(string calldata _request, string calldata _symbol, uint256 _granularity, uint256 _tip) external payable;
+    function addTipWithEther(uint256 _requestId) public payable;
 }
-//Brenda: add this to the user contract or using Tellor
-   // function addTipWithEtherTipNotSpecified(uint256 _apiId) external payable {
-   //      require(msg.value >= (tributePrice) / 1e18, "Value is too low");
-   //      uint _tip = (msg.value)/ (tributePrice) / 1e18;
-   //      require(_tellorm.balanceOf(address(this)) >= _tip, "Balance is lower than tip amount");
-   //      _tellor.addTip(_apiId, _tip);
-   //  }
-
 
 /// @title Centralized oracle data - Allows to create centralized oracle contracts
 /// @author Stefan George - <stefan@gnosis.pm>
