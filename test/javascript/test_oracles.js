@@ -18,7 +18,10 @@ const LMSRMarketMaker = artifacts.require('LMSRMarketMaker')
 const CategoricalEvent = artifacts.require('CategoricalEvent')
 const ScalarEvent = artifacts.require('ScalarEvent')
 const OutcomeToken = artifacts.require('OutcomeToken')
-
+const TellorOracle = artifacts.require('TellorOracle')
+const TellorOracleFactory = artifacts.require('TellorOracleFactory')
+const TellorFallbackOracle = artifacts.require('TellorOracleFallback')
+const TellorOracleFallbackFactory = artifacts.require('TellorOracleFallbackFactory')
 
 contract('Oracle', function (accounts) {
     let centralizedOracleFactory
@@ -26,6 +29,8 @@ contract('Oracle', function (accounts) {
     let majorityOracleFactory
     let ultimateOracleFactory
     let futarchyOracleFactory
+    let tellorOracleFactory
+    let tellorOracleFallbackFactory
     let lmsrMarketMaker
     let etherToken
     let ipfsHash, ipfsBytes
