@@ -6,11 +6,15 @@ pragma solidity ^0.5.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
-contract TellorInterface {
-		function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) returns (bool,uint,uint);
+interface TellorInterface {
+	  function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
+    function addTipWithEther(uint _requestId) external payable;
+    function() external payable ;
+
 }
 
-
+/// @title Centralized oracle data - Allows to create centralized oracle contracts
+/// @author Stefan George - <stefan@gnosis.pm>
 contract CentralizedOracleData {
 
     /*
@@ -37,7 +41,7 @@ contract CentralizedOracleData {
     }
 }
 
-contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
+contract TellorFallbackOracleProxy is Proxy, CentralizedOracleData {
 
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
@@ -52,20 +56,20 @@ contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
     }
 }
 
-/// @title Centralized oracle contract - Allows the contract owner to set an outcome
-/// @author Stefan George - <stefan@gnosis.pm>
+/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute provided by the centralized oracle
 contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
 	event OracleDisputed();
     /*
      *  Storage
      */
-    address public tellorContract;
+    address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     uint public disputePeriod;
     uint public setTime;
     uint public disputeCost;
     bool public isDisputed;
+    //TellorInterface tellorInterface;
 
     /*
      *  Public functions
@@ -103,11 +107,11 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         view
         returns (bool)
     {
-    	if (now > setTime + duration){
+    	if (now > setTime + disputePeriod /*+ duration*/){
     		return isSet;
     	}
     	else{
-    		return false
+    		return false;
     	}
 
     }
@@ -122,54 +126,61 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         return outcome;
     }
 
-    /*
-     *  Public functions
-     */
-    function setTellorContract(address _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
+///should this just be in the constructor? 
+    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _tellorContract is the Tellor user contract that should be used by the interface
+    /// @param _disputePeriod is the period when disputes are allowed
+    /// @param _requestId is the request ID for the type of data that is will be used by the contract
+    /// @param _endDate is the contract/maket end date  ???
+    /// @param _disputeCost is the cost in ETH to dispute a value
+    function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
     {
+        require(msg.sender == owner);
         // Result is not set yet
-        require(!isSet);
-        require(_tellorContract == address(0));
-        require(_requestId != 0);
-        require(_tellorContract != address(0));
-        require(_endDate > now);
+        require(!isSet, "The outcome is already set");
+        require(tellorContract == address(0), "tellorContract address has already been set");
+        require(_requestId != 0, "Use a valid _requestId, it should not be zero");
+        require(_tellorContract != address(0), "_tellorContract address should not be 0");
+        require(_endDate > now, "_endDate is not greater than now");
         tellorContract = _tellorContract;
         requestId = _requestId;
         endDate = _endDate;
         disputeCost = _disputeCost;
         disputePeriod = _disputePeriod;
+        //tellorInterface = TellorInterface(_tellorContract);
     }
 
+    /// @dev Allows users to initiate a dispute
     function dispute() public payable{
-    	require(msg.value > disputeCost);
-    	require(!isDisputed);
+    	require(msg.value > disputeCost, "The msg.value submitted is not greater than the dispute cost");
+    	require(!isDisputed, "The value has already been disputed");
     	isDisputed = true;
     	isSet = false;
     	emit OracleDisputed();
 
     }
 
-    /// @dev Sets event outcome
-    /// @param _outcome Event outcome
+    /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
     function setTellorOutcome()
-        public
+        payable
+        public 
     {
         // Result is not set yet
-        require(!isSet);
-        require(isDisputed);
-        require(_requestId != 0);
+        require(!isSet, "The outcome is already set");
+        require(isDisputed, "This is not under dispute");
+        require(requestId != 0, "Use a valid _requestId, it should not be zero");
         bool _didGet;
         uint _value;
         uint _time;
-        _didGet,_value,_time = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,_endDate);
+        (_didGet,_value,_time) = TellorInterface(tellorContract).getFirstVerifiedDataAfter(requestId,endDate);
         if(_didGet){
-        	outcome = _value;
+        	outcome = int(_value);
         	isSet = true;
-        	emit OutcomeAssignment(_outcome);
+        	emit OutcomeAssignment(outcome);
         }
         else{
-        	TellorInterface(tellorContract).requestDataWithEther(requestId).value(msg.value);
+            //TellorInterface(tellorContract).addTipWithEther(requestId).value(msg.value);
         }
     }
 }
