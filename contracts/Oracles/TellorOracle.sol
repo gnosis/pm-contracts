@@ -24,7 +24,7 @@ contract TellorOracleProxy is Proxy{
             ipfsHash = _ipfsHash;
         }
 }
-contract TellorOracle is Oracle,TellorOracleProxy{
+contract TellorOracle is Proxied, Oracle{
 
     /*
      *  Events
@@ -50,13 +50,9 @@ contract TellorOracle is Oracle,TellorOracleProxy{
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
     /// @param _endDate is the contract/maket end date
-    function setTellorContract(address payable _tellorContract, uint _requestId, uint _endDate)
+    constructor(address payable _tellorContract, uint _requestId, uint _endDate)
         public
     {
-        require(msg.sender == owner);
-        // Result is not set yet
-        require(!isSet, "The outcome is already set");
-        require(tellorContract == address(0), "tellorContract address has already been set");
         require(_requestId != 0, "Use a valid _requestId, it should not be zero");
         require(_tellorContract != address(0), "_tellorContract address should not be 0");
         require(_endDate > now, "_endDate is not greater than now");
