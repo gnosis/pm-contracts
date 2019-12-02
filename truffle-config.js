@@ -3,7 +3,8 @@ const config = {
         coverage: {
             host: "localhost",
             network_id: "*",
-            port: 8545
+            port: 8545,
+            gas:6721975
         },
         mainnet: {
             host: "localhost",

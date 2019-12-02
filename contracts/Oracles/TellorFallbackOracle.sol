@@ -71,6 +71,25 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
     bool public isDisputed;
     //TellorInterface tellorInterface;
 
+    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _tellorContract is the Tellor user contract that should be used by the interface
+    /// @param _disputePeriod is the period when disputes are allowed
+    /// @param _requestId is the request ID for the type of data that is will be used by the contract
+    /// @param _endDate is the contract/maket end date  ???
+    /// @param _disputeCost is the cost in ETH to dispute a value
+    constructor (address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
+        public
+    {
+        require(_requestId != 0, "Use a valid _requestId, it should not be zero");
+        require(_tellorContract != address(0), "_tellorContract address should not be 0");
+        require(_endDate > now, "_endDate is not greater than now");
+        tellorContract = _tellorContract;
+        requestId = _requestId;
+        endDate = _endDate;
+        disputeCost = _disputeCost;
+        disputePeriod = _disputePeriod;
+        //tellorInterface = TellorInterface(_tellorContract);
+    }
     /*
      *  Public functions
      */
@@ -126,30 +145,6 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         return outcome;
     }
 
-///should this just be in the constructor? 
-    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
-    /// @param _tellorContract is the Tellor user contract that should be used by the interface
-    /// @param _disputePeriod is the period when disputes are allowed
-    /// @param _requestId is the request ID for the type of data that is will be used by the contract
-    /// @param _endDate is the contract/maket end date  ???
-    /// @param _disputeCost is the cost in ETH to dispute a value
-    function setTellorContract(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
-        public
-    {
-        require(msg.sender == owner);
-        // Result is not set yet
-        require(!isSet, "The outcome is already set");
-        require(tellorContract == address(0), "tellorContract address has already been set");
-        require(_requestId != 0, "Use a valid _requestId, it should not be zero");
-        require(_tellorContract != address(0), "_tellorContract address should not be 0");
-        require(_endDate > now, "_endDate is not greater than now");
-        tellorContract = _tellorContract;
-        requestId = _requestId;
-        endDate = _endDate;
-        disputeCost = _disputeCost;
-        disputePeriod = _disputePeriod;
-        //tellorInterface = TellorInterface(_tellorContract);
-    }
 
     /// @dev Allows users to initiate a dispute
     function dispute() public payable{
