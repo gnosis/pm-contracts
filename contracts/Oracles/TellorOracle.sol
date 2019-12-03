@@ -5,7 +5,6 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns (bool,uint,uint);
-    function addTipWithEther(uint256 _requestId) external payable;
 }
 
 
@@ -47,7 +46,6 @@ contract TellorOracle is Proxied, Oracle,TellorOracleData{
     {
         // Result is not set yet
         require(!isSet, "The outcome is already set");
-        require(requestId != 0, "Use a valid _requestId, it should not be zero");
         bool _didGet;
         uint _value;
         uint _time;

@@ -22,14 +22,17 @@ const UsingTellor = require("usingtellor/build/contracts/UsingTellor.json")
 const Optimistic = require("usingtellor/build/contracts/Optimistic.json")
 
 const _date = new Date();
-const _endDate = ((_date - (_date % 86400000))/1000) + 86400;
 
 
+
+const buyer = 3
+const collateralTokenCount = 10
+let calls = 0
 
 contract('Event', function (accounts) {
     let eventFactory
     let etherToken
-    let oracle, event
+    let oracle, event, _endDate
     let master
     let tellor
     let userContract
@@ -41,8 +44,11 @@ contract('Event', function (accounts) {
     let tellorTransfer
     let tellorGettersLibrary
     let tellorLibrary 
+    let scalarEvent
 
     beforeEach(async () => {
+        _endDate = ((_date - (_date % 86400000))/1000) + 86400 + (86400 * 2 * calls);
+        calls = calls + 1
         let t = await new web3.eth.Contract(TellorTransfer.abi)
         tellorTransfer  =await t.deploy({data:TellorTransfer.bytecode}).send({from:accounts[0], gas:3000000})  
         t = await new web3.eth.Contract(TellorGettersLibrary.abi)
@@ -74,28 +80,27 @@ contract('Event', function (accounts) {
         t = await new web3.eth.Contract(TellorMaster.abi)
         master  =await t.deploy({data:masterBytes,arguments:[tellor._address]}).send({from:accounts[0], gas:4000000})
         userContract = await new web3.eth.Contract(UserContract.abi)
-        userContract = await userContract.deploy({data:UserContract.bytecode,arguments:[master._address]})
+        userContract = await userContract.deploy({data:UserContract.bytecode,arguments:[master._address]}).send({from:accounts[0], gas:4000000})
         usingTellor = await new web3.eth.Contract(UsingTellor.abi)
-        usingTellor = await usingTellor.deploy({data:UsingTellor.bytecode,arguments:[userContract._address]})
-        tellorOracle = await TellorOracle.new(tellor._address,1,_endDate)
-        tellorFallbackOracle = await TellorFallbackOracle.new(tellor._address,86400,1,_endDate,web3.utils.toWei('1','ether'))
+        usingTellor = await usingTellor.deploy({data:UsingTellor.bytecode,arguments:[userContract._address]}).send({from:accounts[0], gas:4000000})
+        tellorOracle = await TellorOracle.new(userContract._address,1,_endDate)
+        tellorFallbackOracle = await TellorFallbackOracle.new(userContract._address,86400,1,_endDate,web3.utils.toWei('1','ether'))
         tellorOracleFactory = await TellorOracleFactory.new(tellorOracle.address)
         tellorFallbackOracleFactory = await TellorFallbackOracleFactory.new(tellorFallbackOracle.address)
-        eventFactory = await EventFactory.deployed()
-        etherToken = await WETH9.deployed()
+        eventFactory = await EventFactory.new(CategoricalEvent.address, ScalarEvent.address, OutcomeToken.address)
+        etherToken = await WETH9.new()
+            await web3.eth.sendTransaction({to:master._address,from:accounts[0],gas:2000000,data:tellor.methods.requestData("1","1",10000,0).encodeABI()})      
+        
     })
     it('Test outcomes for Tellor Contract', async () => {
         oracle = await utils.getParamFromTxEvent(
-            await tellorOracleFactory.createTellorOracle(tellor._address,1,_endDate),
+            await tellorOracleFactory.createTellorOracle(userContract._address,1,_endDate),
             'tellorOracle', TellorOracle
         )
-        const scalarEvent = await utils.getParamFromTxEvent(
+        scalarEvent = await utils.getParamFromTxEvent(
             await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100),
             'scalarEvent', ScalarEvent
         )
-        // Buy all outcomes
-        const buyer = 3
-        const collateralTokenCount = 10
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
 
@@ -108,10 +113,21 @@ contract('Event', function (accounts) {
         const outcomeToken2 = await OutcomeToken.at(await scalarEvent.outcomeTokens(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
+                utils.advanceTime(86400*2)
+        for(var i =1;i<6;i++){
 
+            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:3000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
+        }
         //Set outcome in oracle contract
-        await oracle.setOutcome(0)
-        assert.equal(await oracle.getOutcome.call(), 0)
+        console.log("setting Outcome")
+        assert.equal(await oracle.isOutcomeSet.call(), false)
+        console.log(userContract._address)
+             // await web3.eth.sendTransaction({to:userContract._address,from:accounts[i],gas:3000000,data:tellor.methods.getCurrentValue.encodeABI()})      
+        
+        myvals = await userContract.methods.getCurrentValue(1)
+        console.log(myvals)
+        await oracle.setOutcome()
+        assert.equal(await oracle.getOutcome.call(), 500)
         assert.equal(await oracle.isOutcomeSet.call(), true)
 
         //Set outcome in event
@@ -129,16 +145,16 @@ contract('Event', function (accounts) {
     })
     it('Test outcomes for Tellor Fallback Contract', async () => {
           oracle = await utils.getParamFromTxEvent(
-            await tellorFallbackOracleFactory.createTellorFallbackOracle(tellor._address,86400,1,_endDate,web3.utils.toWei('1','ether')),
+            await tellorFallbackOracleFactory.createTellorFallbackOracle(userContract._address,86400,1,_endDate,web3.utils.toWei('1','ether')),
             'tellorFallbackOracle', TellorFallbackOracle
         )
-        const scalarEvent = await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100)
-        // Buy all outcomes
-        const buyer = 3
-        const collateralTokenCount = 10
+        scalarEvent = await utils.getParamFromTxEvent(
+            await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100),
+            'scalarEvent', ScalarEvent
+        )
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
-
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]) - collateralTokenCount, 0)
+        console.log("add",scalarEvent.address)
         await etherToken.approve(scalarEvent.address, collateralTokenCount, { from: accounts[buyer] })
         await scalarEvent.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
         assert.equal(await etherToken.balanceOf.call(scalarEvent.address), collateralTokenCount)
@@ -148,10 +164,14 @@ contract('Event', function (accounts) {
         const outcomeToken2 = await OutcomeToken.at(await scalarEvent.outcomeTokens(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
-
+        utils.advanceTime(86400*1)
+        for(var i =1;i<6;i++){
+            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:2000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
+        }
         //Set outcome in oracle contract
         await oracle.setOutcome(0)
         assert.equal(await oracle.getOutcome.call(), 0)
+        utils.advanceTime(86400*1.1)
         assert.equal(await oracle.isOutcomeSet.call(), true)
 
         //Set outcome in event
@@ -170,18 +190,15 @@ contract('Event', function (accounts) {
     it('Test outcomes for Tellor Fallback Contract w/Dispute', async () => {
 
         oracle = await utils.getParamFromTxEvent(
-            await tellorFallbackOracleFactory.createTellorFallbackOracle(tellor._address,86400,1,_endDate,web3.utils.toWei('1','ether')),
+            await tellorFallbackOracleFactory.createTellorFallbackOracle(userContract._address,86400,1,_endDate,web3.utils.toWei('1','ether')),
             'tellorFallbackOracle', TellorFallbackOracle
         )
-        const scalarEvent = await utils.getParamFromTxEvent(
+        scalarEvent = await utils.getParamFromTxEvent(
             await eventFactory.createScalarEvent(etherToken.address, oracle.address, -100, 100),
             'scalarEvent', ScalarEvent
         )
-        // Buy all outcomes
-        const buyer = 3
-        const collateralTokenCount = 10
         await etherToken.deposit({ value: collateralTokenCount, from: accounts[buyer] })
-        assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
+        assert.equal(await etherToken.balanceOf.call(accounts[buyer]) - collateralTokenCount,0)
 
         await etherToken.approve(scalarEvent.address, collateralTokenCount, { from: accounts[buyer] })
         await scalarEvent.buyAllOutcomes(collateralTokenCount, { from: accounts[buyer] })
@@ -196,16 +213,17 @@ contract('Event', function (accounts) {
         //Set outcome in oracle contract
         await oracle.setOutcome(0)
         assert.equal(await oracle.getOutcome.call(), 0)
-        assert.equal(await oracle.isOutcomeSet.call(), true)
+        assert.equal(await oracle.isOutcomeSet.call(), false)
 
-        await oracle.dispute()
-
-
-        await oracle.setTellorOutcome(0)
+        await oracle.dispute({value:web3.utils.toWei('1','ether')})
+        utils.advanceTime(86400*2)
+        for(var i =1;i<6;i++){
+            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:2000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
+        }
+        await oracle.setTellorOutcome()
+        utils.advanceTime(86400*1)
         assert.equal(await oracle.getOutcome.call(), 0)
         assert.equal(await oracle.isOutcomeSet.call(), true)
-
-
         //Set outcome in event
         await scalarEvent.setOutcome()
         assert.equal(await scalarEvent.outcome.call(), 0)

@@ -8,8 +8,6 @@ import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 interface TellorInterface {
 	  function getFirstVerifiedDataAfter(uint _requestId, uint _timestamp) external returns(bool,uint,uint);
-    function addTipWithEther(uint _requestId) external payable;
-    function() external payable ;
 
 }
 
@@ -36,7 +34,7 @@ contract TellorFallbackOracleData {
     /*
      *  Storage
      */
-    address public owner;
+    address payable public owner;
     bool public isSet;
     int public outcome;
 
@@ -58,7 +56,7 @@ contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
     /// @param _endDate is the contract/maket end date  ???
     /// @param _disputeCost is the cost in ETH to dispute a value
-    constructor(address proxied, address _owner,address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
+    constructor(address proxied, address payable _owner,address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
         Proxy(proxied)
     {
@@ -84,7 +82,7 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
      */
     /// @dev Replaces owner
     /// @param newOwner New owner
-    function replaceOwner(address newOwner)
+    function replaceOwner(address payable newOwner)
         public
         isOwner
     {
@@ -137,7 +135,7 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
 
     /// @dev Allows users to initiate a dispute
     function dispute() public payable{
-    	require(msg.value > disputeCost, "The msg.value submitted is not greater than the dispute cost");
+    	require(msg.value >= disputeCost, "The msg.value submitted is not greater than the dispute cost");
     	require(!isDisputed, "The value has already been disputed");
     	isDisputed = true;
     	isSet = false;
@@ -147,7 +145,6 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
 
     /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
     function setTellorOutcome()
-        payable
         public 
     {
         // Result is not set yet
@@ -163,8 +160,12 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
         	isSet = true;
         	emit OutcomeAssignment(outcome);
         }
-        else{
-            //TellorInterface(tellorContract).addTipWithEther(requestId).value(msg.value);
-        }
     }
+
+    function withdraw()
+        public{
+            if(isSet){
+                owner.transfer(address(this).balance);
+            }
+        }
 }
