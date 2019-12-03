@@ -9,7 +9,7 @@ contract TellorOracleFactory {
     /*
      *  Events
      */
-    event TellorOracleCreation(address indexed creator, TellorOracle tellorOracle, bytes ipfsHash);
+    event TellorOracleCreation(address indexed creator, TellorOracle tellorOracle);
 
     /*
      *  Storage
@@ -26,13 +26,12 @@ contract TellorOracleFactory {
     }
 
     /// @dev Creates a new centralized oracle contract
-    /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
-    function createTellorOracle(bytes memory ipfsHash)
+    function createTellorOracle(address payable _tellorContract, uint _requestId, uint _endDate)
         public
         returns (TellorOracle tellorOracle)
     {
-        tellorOracle = TellorOracle(address(new TellorOracleProxy(address(tellorOracleMasterCopy), msg.sender, ipfsHash)));
-        emit TellorOracleCreation(msg.sender, tellorOracle, ipfsHash);
+        tellorOracle = TellorOracle(address(new TellorOracleProxy(address(tellorOracleMasterCopy), _tellorContract,_requestId,_endDate)));
+        emit TellorOracleCreation(msg.sender, tellorOracle);
     }
 }

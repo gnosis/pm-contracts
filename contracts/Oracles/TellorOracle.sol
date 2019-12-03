@@ -9,50 +9,24 @@ interface TellorInterface {
 }
 
 
-
-contract TellorOracleProxy is Proxy{
-    address public owner;
-    bytes public ipfsHash;
-
-    constructor(address proxied, address _owner, bytes memory _ipfsHash)
-        Proxy(proxied)
-        public
-        {
-            // Description hash cannot be null
-            require(_ipfsHash.length == 46);
-            owner = _owner;
-            ipfsHash = _ipfsHash;
-        }
-}
-contract TellorOracle is Proxied, Oracle{
-
+contract TellorOracleData{
     /*
      *  Events
-     */
+    */
     event OutcomeAssignment(int outcome);
-
-    /*
-     *  Storage
-     */
-    
     address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     bool public isSet;
     int public outcome;
+}
+contract TellorOracleProxy is Proxy,TellorOracleData{
 
-
-
-    /*
-     *  Public functions
-     */
     /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
     /// @param _endDate is the contract/maket end date
-    constructor(address payable _tellorContract, uint _requestId, uint _endDate)
-        public
-    {
+    constructor(address proxied,address payable _tellorContract, uint _requestId, uint _endDate) Proxy(proxied) public {
         require(_requestId != 0, "Use a valid _requestId, it should not be zero");
         require(_tellorContract != address(0), "_tellorContract address should not be 0");
         require(_endDate > now, "_endDate is not greater than now");
@@ -60,6 +34,12 @@ contract TellorOracle is Proxied, Oracle{
         requestId = _requestId;
         endDate = _endDate;
     }
+}
+contract TellorOracle is Proxied, Oracle,TellorOracleData{
+
+    /*
+     *  Public functions
+     */
 
     /// @dev Sets event outcome
     function setOutcome()

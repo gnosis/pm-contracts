@@ -9,7 +9,7 @@ contract TellorFallbackOracleFactory {
     /*
      *  Events
      */
-    event TellorFallbackOracleCreation(address indexed creator, TellorFallbackOracle tellorFallbackOracle, bytes ipfsHash);
+    event TellorFallbackOracleCreation(address indexed creator, TellorFallbackOracle tellorFallbackOracle);
 
     /*
      *  Storage
@@ -26,15 +26,14 @@ contract TellorFallbackOracleFactory {
     }
 
     /// @dev Creates a new centralized oracle contract
-    /// @param ipfsHash Hash identifying off chain event description
     /// @return Oracle contract
-    function createTellorFallbackOracle(bytes memory ipfsHash)
+    function createTellorFallbackOracle(address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
         returns (TellorFallbackOracle tellorFallbackOracle)
     {
         tellorFallbackOracle = TellorFallbackOracle(address(new TellorFallbackOracleProxy(
-            address(tellorFallbackOracleMasterCopy), msg.sender, ipfsHash)));
+            address(tellorFallbackOracleMasterCopy),msg.sender, _tellorContract,_disputePeriod,_requestId,_endDate,_disputeCost)));
 
-        emit TellorFallbackOracleCreation(msg.sender, tellorFallbackOracle, ipfsHash);
+        emit TellorFallbackOracleCreation(msg.sender, tellorFallbackOracle);
     }
 }

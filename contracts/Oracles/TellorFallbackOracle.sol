@@ -15,19 +15,28 @@ interface TellorInterface {
 
 /// @title Centralized oracle data - Allows to create centralized oracle contracts
 /// @author Stefan George - <stefan@gnosis.pm>
-contract CentralizedOracleData {
+contract TellorFallbackOracleData {
 
     /*
      *  Events
      */
     event OwnerReplacement(address indexed newOwner);
     event OutcomeAssignment(int outcome);
-
+    event OracleDisputed();
+    /*
+     *  Storage
+     */
+    address payable public tellorContract;
+    uint public requestId;
+    uint public endDate;
+    uint public disputePeriod;
+    uint public setTime;
+    uint public disputeCost;
+    bool public isDisputed;
     /*
      *  Storage
      */
     address public owner;
-    bytes public ipfsHash;
     bool public isSet;
     int public outcome;
 
@@ -41,45 +50,20 @@ contract CentralizedOracleData {
     }
 }
 
-contract TellorFallbackOracleProxy is Proxy, CentralizedOracleData {
+contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
 
-    /// @dev Constructor sets owner address and IPFS hash
-    /// @param _ipfsHash Hash identifying off chain event description
-    constructor(address proxied, address _owner, bytes memory _ipfsHash)
-        public
-        Proxy(proxied)
-    {
-        // Description hash cannot be null
-        require(_ipfsHash.length == 46);
-        owner = _owner;
-        ipfsHash = _ipfsHash;
-    }
-}
-
-/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute provided by the centralized oracle
-contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
-	event OracleDisputed();
-    /*
-     *  Storage
-     */
-    address payable public tellorContract;
-    uint public requestId;
-    uint public endDate;
-    uint public disputePeriod;
-    uint public setTime;
-    uint public disputeCost;
-    bool public isDisputed;
-    //TellorInterface tellorInterface;
-
-    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+        /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _disputePeriod is the period when disputes are allowed
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
     /// @param _endDate is the contract/maket end date  ???
     /// @param _disputeCost is the cost in ETH to dispute a value
-    constructor (address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
+    constructor(address proxied, address _owner,address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
+        Proxy(proxied)
     {
+        // Description hash cannot be null
+
         require(_requestId != 0, "Use a valid _requestId, it should not be zero");
         require(_tellorContract != address(0), "_tellorContract address should not be 0");
         require(_endDate > now, "_endDate is not greater than now");
@@ -88,8 +72,13 @@ contract TellorFallbackOracle is Proxied, Oracle, CentralizedOracleData {
         endDate = _endDate;
         disputeCost = _disputeCost;
         disputePeriod = _disputePeriod;
-        //tellorInterface = TellorInterface(_tellorContract);
+        owner = _owner;
     }
+}
+
+/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute provided by the centralized oracle
+contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
+
     /*
      *  Public functions
      */
