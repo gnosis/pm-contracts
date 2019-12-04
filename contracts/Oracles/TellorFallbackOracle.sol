@@ -86,8 +86,6 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
         public
         isOwner
     {
-        // Result is not set yet
-        require(!isSet);
         owner = newOwner;
         emit OwnerReplacement(newOwner);
     }

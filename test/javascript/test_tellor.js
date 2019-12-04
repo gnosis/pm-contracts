@@ -47,7 +47,7 @@ contract('Event', function (accounts) {
     let scalarEvent
 
     beforeEach(async () => {
-        _endDate = ((_date - (_date % 86400000))/1000) + 86400 + (86400 * 2 * calls);
+        _endDate = ((_date - (_date % 86400000))/1000) + 86400 + (86400 * 4 * calls);
         calls = calls + 1
         let t = await new web3.eth.Contract(TellorTransfer.abi)
         tellorTransfer  =await t.deploy({data:TellorTransfer.bytecode}).send({from:accounts[0], gas:3000000})  
@@ -116,23 +116,23 @@ contract('Event', function (accounts) {
                 utils.advanceTime(86400*2)
         for(var i =1;i<6;i++){
 
-            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:3000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
+            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:3000000,data:tellor.methods.submitMiningSolution("1",1,100).encodeABI()})      
         }
         //Set outcome in oracle contract
         console.log("setting Outcome")
         assert.equal(await oracle.isOutcomeSet.call(), false)
         console.log(userContract._address)
              // await web3.eth.sendTransaction({to:userContract._address,from:accounts[i],gas:3000000,data:tellor.methods.getCurrentValue.encodeABI()})      
-        
-        myvals = await userContract.methods.getCurrentValue(1)
+        myvals = await userContract.methods.getCurrentValue(1).call()
         console.log(myvals)
+         utils.advanceTime(86400*2)
         await oracle.setOutcome()
-        assert.equal(await oracle.getOutcome.call(), 500)
+        assert.equal(await oracle.getOutcome.call(), 100)
         assert.equal(await oracle.isOutcomeSet.call(), true)
 
         //Set outcome in event
         await scalarEvent.setOutcome()
-        assert.equal(await scalarEvent.outcome.call(), 0)
+        assert.equal(await scalarEvent.outcome.call(), 100)
         assert.equal(await scalarEvent.isOutcomeSet.call(), true)
 
         //Redeem winnings for buyer account
@@ -164,14 +164,14 @@ contract('Event', function (accounts) {
         const outcomeToken2 = await OutcomeToken.at(await scalarEvent.outcomeTokens(1))
         assert.equal(await outcomeToken1.balanceOf.call(accounts[buyer]), collateralTokenCount)
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), collateralTokenCount)
-        utils.advanceTime(86400*1)
+        utils.advanceTime(86400*2)
         for(var i =1;i<6;i++){
             await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:2000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
         }
         //Set outcome in oracle contract
         await oracle.setOutcome(0)
         assert.equal(await oracle.getOutcome.call(), 0)
-        utils.advanceTime(86400*1.1)
+        utils.advanceTime(86400*2)
         assert.equal(await oracle.isOutcomeSet.call(), true)
 
         //Set outcome in event
@@ -218,15 +218,16 @@ contract('Event', function (accounts) {
         await oracle.dispute({value:web3.utils.toWei('1','ether')})
         utils.advanceTime(86400*2)
         for(var i =1;i<6;i++){
-            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:2000000,data:tellor.methods.submitMiningSolution("1",1,500).encodeABI()})      
+            await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:2000000,data:tellor.methods.submitMiningSolution("1",1,100).encodeABI()})      
         }
+                utils.advanceTime(86400*2)
         await oracle.setTellorOutcome()
-        utils.advanceTime(86400*1)
-        assert.equal(await oracle.getOutcome.call(), 0)
+
+        assert.equal(await oracle.getOutcome.call(), 100)
         assert.equal(await oracle.isOutcomeSet.call(), true)
         //Set outcome in event
         await scalarEvent.setOutcome()
-        assert.equal(await scalarEvent.outcome.call(), 0)
+        assert.equal(await scalarEvent.outcome.call(), 100)
         assert.equal(await scalarEvent.isOutcomeSet.call(), true)
 
         //Redeem winnings for buyer account
@@ -237,7 +238,11 @@ contract('Event', function (accounts) {
         assert.equal(await outcomeToken2.balanceOf.call(accounts[buyer]), 0)
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]), collateralTokenCount)
        //functions to test
-       await oracle.replaceOwner(accounts[1])
+       var bal1 = await web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether');
+        await oracle.withdraw()
+        var bal2 = await web3.utils.fromWei(await web3.eth.getBalance(accounts[0]), 'ether');
+        assert(bal2 > bal1, "withdraw should work")
+        await oracle.replaceOwner(accounts[1])
        assert.equal(await oracle.owner.call(), accounts[1],"set owner should work")
 })
 })
