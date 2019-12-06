@@ -32,7 +32,7 @@
     "bignumber.js": "^9.0.0",
     "canonical-weth": "^1.4.0",
     "openzeppelin-solidity": "^2.3.0",
-    "usingtellor": "0.0.1"
+    "usingtellor": "1.0.0"
   },
   "devDependencies": {
     "@digix/tempo": "^0.2.0",
