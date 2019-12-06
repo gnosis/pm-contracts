@@ -26,6 +26,8 @@ contract('Oracle', function (accounts) {
     let majorityOracleFactory
     let ultimateOracleFactory
     let futarchyOracleFactory
+    let tellorOracleFactory
+    let tellorOracleFallbackFactory
     let lmsrMarketMaker
     let etherToken
     let ipfsHash, ipfsBytes
