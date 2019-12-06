@@ -30,7 +30,7 @@ contract TellorOracleProxy is Proxy,TellorOracleData{
     /// @param _proxied address
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
-    /// @param _endDate is the contract/maket end date
+    /// @param _endDate is the contract/market end date or the date to use for getFirstVerifiedDataAfter
     constructor(address proxied,address payable _tellorContract, uint _requestId, uint _endDate) 
         public
         Proxy(proxied) 

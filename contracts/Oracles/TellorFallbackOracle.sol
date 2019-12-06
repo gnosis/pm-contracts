@@ -54,7 +54,7 @@ contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
     /// @param _tellorContract is the Tellor UserContract that should be used by the interface
     /// @param _disputePeriod is the period when disputes are allowed
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
-    /// @param _endDate is the contract/maket end date  ???
+    /// @param _endDate is the contract/market end date or the date to use for getFirstVerifiedDataAfter
     /// @param _disputeCost is the cost in ETH to dispute a value
     constructor(address proxied, address payable _owner,address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
