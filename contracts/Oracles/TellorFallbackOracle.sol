@@ -12,7 +12,7 @@ interface TellorInterface {
 }
 
 /// @title Centralized oracle data - Allows to create centralized oracle contracts
-/// @author Stefan George - <stefan@gnosis.pm>
+/// @author Brenda Loya - <bloya@tellor.io>
 contract TellorFallbackOracleData {
 
     /*
@@ -60,8 +60,6 @@ contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
         public
         Proxy(proxied)
     {
-        // Description hash cannot be null
-
         require(_requestId != 0, "Use a valid _requestId, it should not be zero");
         require(_tellorContract != address(0), "_tellorContract address should not be 0");
         require(_endDate > now, "_endDate is not greater than now");

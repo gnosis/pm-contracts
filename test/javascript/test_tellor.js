@@ -26,7 +26,7 @@ const buyer = 3
 const collateralTokenCount = 10
 let calls = 0
 
-contract('Event', function (accounts) {
+contract('Tellor', function (accounts) {
     let eventFactory
     let etherToken
     let oracle, event, _endDate
@@ -140,16 +140,8 @@ contract('Event', function (accounts) {
 
             await web3.eth.sendTransaction({to:master._address,from:accounts[i],gas:3000000,data:tellor.methods.submitMiningSolution("1",1,100).encodeABI()})      
         }
-
-        //Set outcome in oracle contract
-        console.log("setting Outcome")
         //Ensure outcome has not been set yet
         assert.equal(await oracle.isOutcomeSet.call(), false)
-
-        //Get CurrentValue for request 1 directly from Tellor
-        console.log(userContract._address)
-        myvals = await userContract.methods.getCurrentValue(1).call()
-        console.log(myvals)
         utils.advanceTime(86400*2)
 
         //Call setOutcome from the oracle after the contract expired and ensure it was set
@@ -189,7 +181,6 @@ contract('Event', function (accounts) {
         assert.equal(await etherToken.balanceOf.call(accounts[buyer]) - collateralTokenCount, 0)
         
         //Approve the scalarEvent contract to sell the outcomes
-        console.log("add",scalarEvent.address)
         await etherToken.approve(scalarEvent.address, collateralTokenCount, { from: accounts[buyer] })
         
         //Buy all outcomes

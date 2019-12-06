@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 import "../Oracles/TellorOracle.sol";
 
 
-/// @title Centralized oracle factory contract - Allows to create centralized oracle contracts
-/// @author Stefan George - <stefan@gnosis.pm>
+/// @title Tellor oracle factory contract - Allows to create tellor oracle contracts
+/// @author Brenda Loya- <stefan@gnosis.pm>
 contract TellorOracleFactory {
 
     /*

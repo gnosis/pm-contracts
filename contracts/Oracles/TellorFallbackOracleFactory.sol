@@ -3,7 +3,7 @@ import "../Oracles/TellorFallbackOracle.sol";
 
 
 /// @title Centralized oracle factory contract - Allows to create centralized oracle contracts
-/// @author Stefan George - <stefan@gnosis.pm>
+/// @author Nicholas Fett - <nfett@tellor.io>
 contract TellorFallbackOracleFactory {
 
     /*
