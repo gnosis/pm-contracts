@@ -11,21 +11,30 @@ interface TellorInterface {
 contract TellorOracleData{
     /*
      *  Events
-    */
+     */
     event OutcomeAssignment(int outcome);
+
+    /*
+     *  Storage
+     */
     address payable public tellorContract;
     uint public requestId;
     uint public endDate;
     bool public isSet;
     int public outcome;
 }
+
 contract TellorOracleProxy is Proxy,TellorOracleData{
 
     /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _proxied address
     /// @param _tellorContract is the Tellor user contract that should be used by the interface
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
-    /// @param _endDate is the contract/maket end date
-    constructor(address proxied,address payable _tellorContract, uint _requestId, uint _endDate) Proxy(proxied) public {
+    /// @param _endDate is the contract/market end date or the date to use for getFirstVerifiedDataAfter
+    constructor(address proxied,address payable _tellorContract, uint _requestId, uint _endDate) 
+        public
+        Proxy(proxied) 
+    {
         require(_requestId != 0, "Use a valid _requestId, it should not be zero");
         require(_tellorContract != address(0), "_tellorContract address should not be 0");
         require(_endDate > now, "_endDate is not greater than now");
@@ -34,12 +43,12 @@ contract TellorOracleProxy is Proxy,TellorOracleData{
         endDate = _endDate;
     }
 }
+
 contract TellorOracle is Proxied, Oracle,TellorOracleData{
 
     /*
      *  Public functions
      */
-
     /// @dev Sets event outcome
     function setOutcome()
         public

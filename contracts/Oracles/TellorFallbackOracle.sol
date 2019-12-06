@@ -21,6 +21,7 @@ contract TellorFallbackOracleData {
     event OwnerReplacement(address indexed newOwner);
     event OutcomeAssignment(int outcome);
     event OracleDisputed();
+
     /*
      *  Storage
      */
@@ -31,9 +32,6 @@ contract TellorFallbackOracleData {
     uint public setTime;
     uint public disputeCost;
     bool public isDisputed;
-    /*
-     *  Storage
-     */
     address payable public owner;
     bool public isSet;
     int public outcome;
@@ -50,11 +48,13 @@ contract TellorFallbackOracleData {
 
 contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
 
-        /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
-    /// @param _tellorContract is the Tellor user contract that should be used by the interface
+    /// @dev Sets the tellor contract, dispute period, type of data(requestId), end date and dispute cost
+    /// @param _proxied is the proxy address
+    /// @param _owner is the contract owner address
+    /// @param _tellorContract is the Tellor UserContract that should be used by the interface
     /// @param _disputePeriod is the period when disputes are allowed
     /// @param _requestId is the request ID for the type of data that is will be used by the contract
-    /// @param _endDate is the contract/maket end date  ???
+    /// @param _endDate is the contract/market end date or the date to use for getFirstVerifiedDataAfter
     /// @param _disputeCost is the cost in ETH to dispute a value
     constructor(address proxied, address payable _owner,address payable _tellorContract,uint _disputePeriod, uint _requestId, uint _endDate, uint _disputeCost)
         public
@@ -74,7 +74,7 @@ contract TellorFallbackOracleProxy is Proxy, TellorFallbackOracleData {
     }
 }
 
-/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute provided by the centralized oracle
+/// @title TellorFallbackOracle - Allows the contract owners to initiate and settle a dispute on a value provided by the centralized oracle
 contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
 
     /*
@@ -105,13 +105,13 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
     }
 
     /// @dev Returns if winning outcome is set
-    /// @return Is outcome set?
+    /// @return Is outcome set? (only true if the dispute period has passed)
     function isOutcomeSet()
         public
         view
         returns (bool)
     {
-    	if (now > setTime + disputePeriod /*+ duration*/){
+    	if (now > setTime + disputePeriod){
     		return isSet;
     	}
     	else{
@@ -132,7 +132,10 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
 
 
     /// @dev Allows users to initiate a dispute
-    function dispute() public payable{
+    function dispute() 
+        public 
+        payable
+    {
     	require(msg.value >= disputeCost, "The msg.value submitted is not greater than the dispute cost");
     	require(!isDisputed, "The value has already been disputed");
     	isDisputed = true;
@@ -141,7 +144,7 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
 
     }
 
-    /// @dev Sets event outcome based on the Tellor Oracle and if the data is not available it requests it
+    /// @dev Sets event outcome based on the Tellor Oracle only if there is a dispute open and if the data is not available, user has to go request it or wait for it.
     function setTellorOutcome()
         public 
     {
@@ -157,9 +160,10 @@ contract TellorFallbackOracle is Proxied, Oracle, TellorFallbackOracleData {
         	outcome = int(_value);
         	isSet = true;
         	emit OutcomeAssignment(outcome);
-        }
+        } 
     }
 
+    /// @dev Allows the owner to withdraw the dispute and data request fees
     function withdraw()
         public{
             if(isSet){
