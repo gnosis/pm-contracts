@@ -44,7 +44,7 @@
     "fs-extra": "^8.1.0",
     "lodash": "^4.17.15",
     "npm-prepublish": "^1.2.3",
-    "solc": "^0.5.6",
+    "solc": "^0.6.5",
     "solhint": "^2.1.2",
     "truffle": "^5.0.28"
   },
