@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/UltimateOracle.sol";
 
 
@@ -28,9 +29,7 @@ contract UltimateOracleFactory {
     /*
      *  Public functions
      */
-    constructor(UltimateOracle _ultimateOracleMasterCopy)
-        public
-    {
+    constructor(UltimateOracle _ultimateOracleMasterCopy) {
         ultimateOracleMasterCopy = _ultimateOracleMasterCopy;
     }
 
@@ -41,7 +40,7 @@ contract UltimateOracleFactory {
     /// @param challengePeriod Time to challenge oracle outcome
     /// @param challengeAmount Amount to challenge the outcome
     /// @param frontRunnerPeriod Time to overbid the front-runner
-    /// @return Oracle contract
+    /// @return ultimateOracle Oracle contract
     function createUltimateOracle(
         Oracle oracle,
         ERC20 collateralToken,

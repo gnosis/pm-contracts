@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -34,7 +35,6 @@ contract CentralizedOracleProxy is Proxy, CentralizedOracleData {
     /// @dev Constructor sets owner address and IPFS hash
     /// @param _ipfsHash Hash identifying off chain event description
     constructor(address proxied, address _owner, bytes memory _ipfsHash)
-        public
         Proxy(proxied)
     {
         // Description hash cannot be null
@@ -79,7 +79,7 @@ contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -89,7 +89,7 @@ contract CentralizedOracle is Proxied, Oracle, CentralizedOracleData {
     /// @dev Returns outcome
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

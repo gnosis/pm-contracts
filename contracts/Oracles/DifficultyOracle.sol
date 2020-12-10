@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 
 
@@ -22,9 +23,7 @@ contract DifficultyOracle is Oracle {
      */
     /// @dev Contract constructor validates and sets target block number
     /// @param _blockNumber Target block number
-    constructor(uint _blockNumber)
-        public
-    {
+    constructor(uint _blockNumber) {
         // Block has to be in the future
         require(_blockNumber > block.number);
         blockNumber = _blockNumber;
@@ -43,7 +42,7 @@ contract DifficultyOracle is Oracle {
     /// @dev Returns if difficulty is set
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -54,7 +53,7 @@ contract DifficultyOracle is Oracle {
     /// @dev Returns difficulty
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

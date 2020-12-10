@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/FutarchyOracle.sol";
 
 
@@ -37,7 +38,6 @@ contract FutarchyOracleFactory {
     /// @param _eventFactory Event factory contract
     /// @param _marketFactory Market factory contract
     constructor(FutarchyOracle _futarchyOracleMasterCopy, EventFactory _eventFactory, StandardMarketWithPriceLoggerFactory _marketFactory)
-        public
     {
         require(address(_eventFactory) != address(0) && address(_marketFactory) != address(0));
         futarchyOracleMasterCopy = _futarchyOracleMasterCopy;
@@ -55,7 +55,7 @@ contract FutarchyOracleFactory {
     /// @param fee Market fee
     /// @param tradingPeriod Trading period before decision can be determined
     /// @param startDate Start date for price logging
-    /// @return Oracle contract
+    /// @return futarchyOracle Oracle contract
     function createFutarchyOracle(
         ERC20 collateralToken,
         Oracle oracle,

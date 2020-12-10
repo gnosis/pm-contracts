@@ -1,6 +1,7 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "canonical-weth/contracts/WETH9.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/ERC20Detailed.sol";
+import "./drafts/ERC20Detailed.sol";
 
 contract Migrations {
     address public owner;
@@ -10,7 +11,7 @@ contract Migrations {
         if (msg.sender == owner) _;
     }
 
-    constructor() public {
+    constructor() {
         owner = msg.sender;
     }
 

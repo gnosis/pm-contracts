@@ -1,8 +1,9 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
+import "../drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
@@ -55,7 +56,6 @@ contract UltimateOracleProxy is Proxy, UltimateOracleData {
         uint _frontRunnerPeriod
     )
         Proxy(proxied)
-        public
     {
         // Validate inputs
         require(   address(_forwardedOracle) != address(0)
@@ -91,7 +91,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
                 && forwardedOutcomeSetTimestamp == 0
                 && forwardedOracle.isOutcomeSet());
         forwardedOutcome = forwardedOracle.getOutcome();
-        forwardedOutcomeSetTimestamp = now;
+        forwardedOutcomeSetTimestamp = block.timestamp;
         emit ForwardedOracleOutcomeAssignment(forwardedOutcome);
     }
 
@@ -108,7 +108,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         totalOutcomeAmounts[_outcome] = challengeAmount;
         totalAmount = challengeAmount;
         frontRunner = _outcome;
-        frontRunnerSetTimestamp = now;
+        frontRunnerSetTimestamp = block.timestamp;
         emit OutcomeChallenge(msg.sender, _outcome);
     }
 
@@ -137,13 +137,13 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         if (_outcome != frontRunner && totalOutcomeAmounts[_outcome] > totalOutcomeAmounts[frontRunner])
         {
             frontRunner = _outcome;
-            frontRunnerSetTimestamp = now;
+            frontRunnerSetTimestamp = block.timestamp;
         }
         emit OutcomeVote(msg.sender, _outcome, amount);
     }
 
     /// @dev Withdraws winnings for user
-    /// @return Winnings
+    /// @return amount Winnings
     function withdraw()
         public
         returns (uint amount)
@@ -164,7 +164,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         view
         returns (bool)
     {
-        return forwardedOutcomeSetTimestamp != 0 && now.sub(forwardedOutcomeSetTimestamp) > challengePeriod;
+        return forwardedOutcomeSetTimestamp != 0 && block.timestamp.sub(forwardedOutcomeSetTimestamp) > challengePeriod;
     }
 
     /// @dev Checks if time to overbid the front runner is over
@@ -174,7 +174,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
         view
         returns (bool)
     {
-        return frontRunnerSetTimestamp != 0 && now.sub(frontRunnerSetTimestamp) > frontRunnerPeriod;
+        return frontRunnerSetTimestamp != 0 && block.timestamp.sub(frontRunnerSetTimestamp) > frontRunnerPeriod;
     }
 
     /// @dev Checks if outcome was challenged
@@ -190,7 +190,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -201,7 +201,7 @@ contract UltimateOracle is Proxied, Oracle, UltimateOracleData {
     /// @dev Returns winning outcome
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -20,7 +21,6 @@ contract OutcomeTokenProxy is Proxy {
      */
     /// @dev Constructor sets events contract address
     constructor(address proxied)
-        public
         Proxy(proxied)
     {
         eventContract = msg.sender;
@@ -29,7 +29,7 @@ contract OutcomeTokenProxy is Proxy {
 
 /// @title Outcome token contract - Issuing and revoking outcome tokens
 /// @author Stefan George - <stefan@gnosis.pm>
-contract OutcomeToken is Proxied, ERC20 {
+abstract contract OutcomeToken is Proxied, ERC20 {
     using SafeMath for *;
 
     /*

@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -17,7 +18,6 @@ contract MajorityOracleProxy is Proxy, MajorityOracleData {
     /// @param _oracles List of oracles taking part in the majority vote
     constructor(address proxied, Oracle[] memory _oracles)
         Proxy(proxied)
-        public
     {
         // At least 2 oracles should be defined
         require(_oracles.length > 2);
@@ -36,8 +36,8 @@ contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
      *  Public functions
      */
     /// @dev Allows to registers oracles for a majority vote
-    /// @return Is outcome set?
-    /// @return Outcome
+    /// @return outcomeSet Is outcome set?
+    /// @return outcome Outcome
     function getStatusAndOutcome()
         public
         view
@@ -77,7 +77,7 @@ contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -88,7 +88,7 @@ contract MajorityOracle is Proxied, Oracle, MajorityOracleData {
     /// @dev Returns winning outcome
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

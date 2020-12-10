@@ -1,11 +1,12 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../Tokens/OutcomeToken.sol";
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 
-contract EventData {
+abstract contract EventData {
 
     /*
      *  Events
@@ -28,7 +29,7 @@ contract EventData {
 
 /// @title Event contract - Provide basic functionality required by different event types
 /// @author Stefan George - <stefan@gnosis.pm>
-contract Event is EventData {
+abstract contract Event is EventData {
 
     /*
      *  Public functions
@@ -82,7 +83,7 @@ contract Event is EventData {
     }
 
     /// @dev Returns outcome tokens array
-    /// @return Outcome tokens
+    /// @return OutcomeToken Outcome tokens
     function getOutcomeTokens()
         public
         view
@@ -92,7 +93,7 @@ contract Event is EventData {
     }
 
     /// @dev Returns the amount of outcome tokens held by owner
-    /// @return Outcome token distribution
+    /// @return outcomeTokenDistribution Outcome token distribution
     function getOutcomeTokenDistribution(address owner)
         public
         view
@@ -105,9 +106,9 @@ contract Event is EventData {
 
     /// @dev Calculates and returns event hash
     /// @return Event hash
-    function getEventHash() public view returns (bytes32);
+    function getEventHash() public view virtual returns (bytes32);
 
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
     /// @return Sender's winnings
-    function redeemWinnings() public returns (uint);
+    function redeemWinnings() public virtual returns (uint);
 }

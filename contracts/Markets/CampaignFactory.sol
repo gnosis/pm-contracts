@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Markets/Campaign.sol";
 
 
@@ -19,9 +20,7 @@ contract CampaignFactory {
     /*
      *  Public functions
      */
-    constructor(Campaign _campaignMasterCopy)
-        public
-    {
+    constructor(Campaign _campaignMasterCopy) {
         campaignMasterCopy = _campaignMasterCopy;
     }
 
@@ -32,7 +31,7 @@ contract CampaignFactory {
     /// @param fee Market fee
     /// @param funding Initial funding for market
     /// @param deadline Campaign deadline
-    /// @return Market contract
+    /// @return campaign Market contract
     function createCampaign(
         Event eventContract,
         StandardMarketFactory marketFactory,
