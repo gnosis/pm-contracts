@@ -1,6 +1,7 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
+import "../drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Fixed192x64Math.sol";
 import "../MarketMakers/MarketMaker.sol";
 
@@ -23,9 +24,9 @@ contract LMSRMarketMaker is MarketMaker {
     /// @dev Calculates the net cost for executing a given trade.
     /// @param market Market contract
     /// @param outcomeTokenAmounts Amounts of outcome tokens to buy from the market. If an amount is negative, represents an amount to sell to the market.
-    /// @return Net cost of trade. If positive, represents amount of collateral which would be paid to the market for the trade. If negative, represents amount of collateral which would be received from the market for the trade.
+    /// @return netCost Net cost of trade. If positive, represents amount of collateral which would be paid to the market for the trade. If negative, represents amount of collateral which would be received from the market for the trade.
     function calcNetCost(Market market, int[] memory outcomeTokenAmounts)
-        public
+        public override 
         view
         returns (int netCost)
     {
@@ -61,9 +62,9 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param market Market contract
     /// @param outcomeTokenIndex Index of outcome to buy
     /// @param outcomeTokenCount Number of outcome tokens to buy
-    /// @return Cost
+    /// @return cost Cost
     function calcCost(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
-        public
+        public override
         view
         returns (uint cost)
     {
@@ -97,9 +98,9 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param market Market contract
     /// @param outcomeTokenIndex Index of outcome to sell
     /// @param outcomeTokenCount Number of outcome tokens to sell
-    /// @return Profit
+    /// @return profit Profit
     function calcProfit(Market market, uint8 outcomeTokenIndex, uint outcomeTokenCount)
-        public
+        public override
         view
         returns (uint profit)
     {
@@ -124,9 +125,9 @@ contract LMSRMarketMaker is MarketMaker {
     /// @dev Returns marginal price of an outcome
     /// @param market Market contract
     /// @param outcomeTokenIndex Index of outcome to determine marginal price of
-    /// @return Marginal price of an outcome as a fixed point number
+    /// @return price Marginal price of an outcome as a fixed point number
     function calcMarginalPrice(Market market, uint8 outcomeTokenIndex)
-        public
+        public override
         view
         returns (uint price)
     {
@@ -149,7 +150,7 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param logN Logarithm of the number of outcomes
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
-    /// @return Cost level
+    /// @return costLevel Cost level
     function calcCostLevel(int logN, int[] memory netOutcomeTokensSold, uint funding, Fixed192x64Math.EstimationMode estimationMode)
         private
         pure
@@ -170,7 +171,9 @@ contract LMSRMarketMaker is MarketMaker {
     /// @param netOutcomeTokensSold Net outcome tokens sold by market
     /// @param funding Initial funding for market
     /// @param outcomeIndex Index of exponential term to extract (for use by marginal price function)
-    /// @return A result structure composed of the sum, the offset used, and the summand associated with the supplied index
+    /// @return sum A result structure composed of the sum, the offset used, and the summand associated with the supplied index
+    /// @return offset ditto
+    /// @return outcomeExpTerm ditto
     function sumExpOffset(int logN, int[] memory netOutcomeTokensSold, uint funding, uint8 outcomeIndex, Fixed192x64Math.EstimationMode estimationMode)
         private
         pure
@@ -209,7 +212,7 @@ contract LMSRMarketMaker is MarketMaker {
     ///      number of collateral tokens (which is the same as the number of outcome tokens the
     ///      market created) subtracted by the quantity of that token held by the market.
     /// @param market Market contract
-    /// @return Net outcome tokens sold by market
+    /// @return quantities Net outcome tokens sold by market
     function getNetOutcomeTokensSold(Market market)
         private
         view

@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Events/Event.sol";
 import "../MarketMakers/MarketMaker.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
@@ -36,16 +37,16 @@ contract MarketData {
 }
 
 /// @title Abstract market contract - Functions to be implemented by market contracts
-contract Market is MarketData {
+abstract contract Market is MarketData {
     /*
      *  Public functions
      */
-    function fund(uint _funding) public;
-    function close() public;
-    function withdrawFees() public returns (uint);
-    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost) public returns (uint);
-    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public returns (uint);
-    function trade(int[] memory outcomeTokenAmounts, int costLimit) public returns (int);
-    function calcMarketFee(uint outcomeTokenCost) public view returns (uint);
+    function fund(uint _funding) public virtual;
+    function close() public virtual;
+    function withdrawFees() public virtual returns (uint);
+    function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost) public virtual returns (uint);
+    function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public virtual returns (uint);
+    function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit) public virtual returns (uint);
+    function trade(int[] memory outcomeTokenAmounts, int costLimit) public virtual returns (int);
+    function calcMarketFee(uint outcomeTokenCost) public virtual view returns (uint);
 }

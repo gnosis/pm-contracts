@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Markets/StandardMarketWithPriceLogger.sol";
 
 
@@ -19,9 +20,7 @@ contract StandardMarketWithPriceLoggerFactory {
     /*
      *  Public functions
      */
-    constructor(StandardMarketWithPriceLogger _standardMarketWithPriceLoggerMasterCopy)
-        public
-    {
+    constructor(StandardMarketWithPriceLogger _standardMarketWithPriceLoggerMasterCopy) {
         standardMarketWithPriceLoggerMasterCopy = _standardMarketWithPriceLoggerMasterCopy;
     }
 
@@ -30,7 +29,7 @@ contract StandardMarketWithPriceLoggerFactory {
     /// @param marketMaker Market maker contract
     /// @param fee Market fee
     /// @param startDate Start date for price logging
-    /// @return Market contract
+    /// @return market Market contract
     function createMarket(Event eventContract, MarketMaker marketMaker, uint24 fee, uint startDate)
         public
         returns (StandardMarketWithPriceLogger market)

@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -39,7 +40,6 @@ contract SignedMessageOracleProxy is Proxy, SignedMessageOracleData {
     /// @param s Signature parameter
     constructor(address proxied, bytes32 _descriptionHash, uint8 v, bytes32 r, bytes32 s)
         Proxy(proxied)
-        public
     {
         signer = ecrecover(_descriptionHash, v, r, s);
         descriptionHash = _descriptionHash;
@@ -91,7 +91,7 @@ contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
     /// @dev Returns if winning outcome
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -101,7 +101,7 @@ contract SignedMessageOracle is Proxied, Oracle, SignedMessageOracleData {
     /// @dev Returns winning outcome
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Events/Event.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
@@ -11,7 +12,6 @@ contract CategoricalEventProxy is Proxy, EventData {
     /// @param outcomeCount Number of event outcomes
     constructor(address proxied, address outcomeTokenMasterCopy, ERC20 _collateralToken, Oracle _oracle, uint8 outcomeCount)
         Proxy(proxied)
-        public
     {
         // Validate input
         require(address(_collateralToken) != address(0) && address(_oracle) != address(0) && outcomeCount >= 2);
@@ -34,9 +34,9 @@ contract CategoricalEvent is Proxied, Event {
      *  Public functions
      */
     /// @dev Exchanges sender's winning outcome tokens for collateral tokens
-    /// @return Sender's winnings
+    /// @return winnings Sender's winnings
     function redeemWinnings()
-        public
+        public override
         returns (uint winnings)
     {
         // Winning outcome has to be set
@@ -53,7 +53,7 @@ contract CategoricalEvent is Proxied, Event {
     /// @dev Calculates and returns event hash
     /// @return Event hash
     function getEventHash()
-        public
+        public override
         view
         returns (bytes32)
     {

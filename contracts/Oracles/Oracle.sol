@@ -1,9 +1,10 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 /// @title Abstract oracle contract - Functions to be implemented by oracles
-contract Oracle {
+abstract contract Oracle {
 
-    function isOutcomeSet() public view returns (bool);
-    function getOutcome() public view returns (int);
+    function isOutcomeSet() public virtual view returns (bool);
+    function getOutcome() public virtual view returns (int);
 }

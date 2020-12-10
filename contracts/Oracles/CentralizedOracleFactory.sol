@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/CentralizedOracle.sol";
 
 
@@ -19,15 +20,13 @@ contract CentralizedOracleFactory {
     /*
      *  Public functions
      */
-    constructor(CentralizedOracle _centralizedOracleMasterCopy)
-        public
-    {
+    constructor(CentralizedOracle _centralizedOracleMasterCopy) {
         centralizedOracleMasterCopy = _centralizedOracleMasterCopy;
     }
 
     /// @dev Creates a new centralized oracle contract
     /// @param ipfsHash Hash identifying off chain event description
-    /// @return Oracle contract
+    /// @return centralizedOracle Oracle contract
     function createCentralizedOracle(bytes memory ipfsHash)
         public
         returns (CentralizedOracle centralizedOracle)

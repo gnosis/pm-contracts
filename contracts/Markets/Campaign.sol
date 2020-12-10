@@ -1,8 +1,9 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Events/Event.sol";
 import "../Markets/StandardMarketFactory.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "openzeppelin-solidity/contracts/drafts/SignedSafeMath.sol";
+import "../drafts/SignedSafeMath.sol";
 import "@gnosis.pm/util-contracts/contracts/Proxy.sol";
 
 contract CampaignData {
@@ -53,7 +54,7 @@ contract CampaignData {
     }
 
     modifier timedTransitions() {
-        if (stage == Stages.AuctionStarted && deadline < now)
+        if (stage == Stages.AuctionStarted && deadline < block.timestamp)
             stage = Stages.AuctionFailed;
         _;
     }
@@ -77,7 +78,6 @@ contract CampaignProxy is Proxy, CampaignData {
         uint _deadline
     )
         Proxy(proxied)
-        public
     {
         // Validate input
         require(   address(_eventContract) != address(0)
@@ -85,7 +85,7 @@ contract CampaignProxy is Proxy, CampaignData {
                 && address(_marketMaker) != address(0)
                 && _fee < FEE_RANGE
                 && _funding > 0
-                && now < _deadline);
+                && block.timestamp < _deadline);
         eventContract = _eventContract;
         marketFactory = _marketFactory;
         marketMaker = _marketMaker;
@@ -124,7 +124,7 @@ contract Campaign is Proxied, CampaignData {
     }
 
     /// @dev Withdraws refund amount
-    /// @return Refund amount
+    /// @return refundAmount Refund amount
     function refund()
         public
         timedTransitions
@@ -155,7 +155,6 @@ contract Campaign is Proxied, CampaignData {
     }
 
     /// @dev Allows to withdraw fees from market contract to campaign contract
-    /// @return Fee amount
     function closeMarket()
         public
         atStage(Stages.MarketCreated)
@@ -171,7 +170,7 @@ contract Campaign is Proxied, CampaignData {
     }
 
     /// @dev Allows to withdraw fees from campaign contract to contributor
-    /// @return Fee amount
+    /// @return fees Fee amount
     function withdrawFees()
         public
         atStage(Stages.MarketClosed)

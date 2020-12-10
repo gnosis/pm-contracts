@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/Oracle.sol";
 import "../Events/EventFactory.sol";
 import "../Markets/StandardMarketWithPriceLoggerFactory.sol";
@@ -70,7 +71,6 @@ contract FutarchyOracleProxy is Proxy, FutarchyOracleData {
         uint startDate
     )
         Proxy(proxied)
-        public
     {
         // trading period is at least a second
         require(_tradingPeriod > 0);
@@ -142,7 +142,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
         public
     {
         // Outcome is not set yet and trading period is over
-        require(!isSet && markets[0].startDate() + tradingPeriod < now);
+        require(!isSet && markets[0].startDate() + tradingPeriod < block.timestamp);
         // Find market with highest marginal price for long outcome tokens
         uint highestAvgPrice = markets[0].getAvgPrice();
         uint highestIndex = 0;
@@ -161,7 +161,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
     /// @dev Returns if winning outcome is set
     /// @return Is outcome set?
     function isOutcomeSet()
-        public
+        public override
         view
         returns (bool)
     {
@@ -171,7 +171,7 @@ contract FutarchyOracle is Proxied, Oracle, FutarchyOracleData {
     /// @dev Returns winning outcome
     /// @return Outcome
     function getOutcome()
-        public
+        public override
         view
         returns (int)
     {

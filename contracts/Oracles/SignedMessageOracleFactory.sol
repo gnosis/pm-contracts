@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Oracles/SignedMessageOracle.sol";
 
 
@@ -19,9 +20,7 @@ contract SignedMessageOracleFactory {
     /*
      *  Public functions
      */
-    constructor(SignedMessageOracle _signedMessageOracleMasterCopy)
-        public
-    {
+    constructor(SignedMessageOracle _signedMessageOracleMasterCopy) {
         signedMessageOracleMasterCopy = _signedMessageOracleMasterCopy;
     }
 
@@ -30,7 +29,7 @@ contract SignedMessageOracleFactory {
     /// @param v Signature parameter
     /// @param r Signature parameter
     /// @param s Signature parameter
-    /// @return Oracle contract
+    /// @return signedMessageOracle Oracle contract
     function createSignedMessageOracle(bytes32 descriptionHash, uint8 v, bytes32 r, bytes32 s)
         public
         returns (SignedMessageOracle signedMessageOracle)

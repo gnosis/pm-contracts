@@ -1,4 +1,5 @@
-pragma solidity ^0.5.0;
+// SPDX-License-Identifier: LGPL-3.0-only
+pragma solidity ^0.7.0;
 import "../Markets/StandardMarket.sol";
 
 contract StandardMarketWithPriceLoggerData {
@@ -28,16 +29,15 @@ contract StandardMarketWithPriceLoggerProxy is StandardMarketProxy, StandardMark
     /// @param _fee Market fee
     /// @param _startDate Start date for price logging
     constructor(address proxied, address _creator, Event _eventContract, MarketMaker _marketMaker, uint24 _fee, uint _startDate)
-        public
         StandardMarketProxy(proxied, _creator, _eventContract, _marketMaker, _fee)
     {
         require(eventContract.getOutcomeCount() == 2);
 
         if (_startDate == 0)
-            startDate = now;
+            startDate = block.timestamp;
         else {
             // The earliest start date is the market creation date
-            require(_startDate >= now);
+            require(_startDate >= block.timestamp);
             startDate = _startDate;
         }
 
@@ -55,9 +55,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     /// @param outcomeTokenIndex Index of the outcome token to buy
     /// @param outcomeTokenCount Amount of outcome tokens to buy
     /// @param maxCost The maximum cost in collateral tokens to pay for outcome tokens
-    /// @return Cost in collateral tokens
+    /// @return cost Cost in collateral tokens
     function buy(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint maxCost)
-        public
+        public override
         returns (uint cost)
     {
         logPriceBefore();
@@ -69,9 +69,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     /// @param outcomeTokenIndex Index of the outcome token to sell
     /// @param outcomeTokenCount Amount of outcome tokens to sell
     /// @param minProfit The minimum profit in collateral tokens to earn for outcome tokens
-    /// @return Profit in collateral tokens
+    /// @return profit Profit in collateral tokens
     function sell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
+        public override
         returns (uint profit)
     {
         logPriceBefore();
@@ -84,9 +84,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     /// @param outcomeTokenIndex Index of the outcome token to short sell
     /// @param outcomeTokenCount Amount of outcome tokens to short sell
     /// @param minProfit The minimum profit in collateral tokens to earn for short sold outcome tokens
-    /// @return Cost to short sell outcome in collateral tokens
+    /// @return cost Cost to short sell outcome in collateral tokens
     function shortSell(uint8 outcomeTokenIndex, uint outcomeTokenCount, uint minProfit)
-        public
+        public override
         returns (uint cost)
     {
         logPriceBefore();
@@ -97,9 +97,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     /// @dev Allows to trade outcome tokens with market maker
     /// @param outcomeTokenAmounts Amounts of outcome tokens to trade
     /// @param collateralLimit The maximum cost or minimum profit in collateral tokens
-    /// @return Cost/profit in collateral tokens
+    /// @return netCost Cost/profit in collateral tokens
     function trade(int[] memory outcomeTokenAmounts, int collateralLimit)
-        public
+        public override
         returns (int netCost)
     {
         logPriceBefore();
@@ -110,9 +110,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
 
     /// @dev Allows market creator to close the markets by transferring all remaining outcome tokens to the creator
     function close()
-        public
+        public override
     {
-        endDate = now;
+        endDate = block.timestamp;
         super.close();
     }
 
@@ -125,7 +125,7 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     {
         if(endDate > 0)
             return (priceIntegral + lastTradePrice * (endDate - lastTradeDate)) / (endDate - startDate);
-        return (priceIntegral + lastTradePrice * (now - lastTradeDate)) / (now - startDate);
+        return (priceIntegral + lastTradePrice * (block.timestamp - lastTradeDate)) / (block.timestamp - startDate);
     }
 
     /*
@@ -135,9 +135,9 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
     function logPriceBefore()
         private
     {
-        if (now >= startDate) {
+        if (block.timestamp >= startDate) {
             // Accumulate price integral only if logging has begun
-            priceIntegral += lastTradePrice * (now - lastTradeDate);
+            priceIntegral += lastTradePrice * (block.timestamp - lastTradeDate);
         }
     }
 
@@ -148,6 +148,6 @@ contract StandardMarketWithPriceLogger is StandardMarket, StandardMarketWithPric
         // Refresh lastTradePrice after every transactions as we don't know if
         // this will be the last transaction before logging period starts
         lastTradePrice = marketMaker.calcMarginalPrice(this, LONG);
-        lastTradeDate = now;
+        lastTradeDate = block.timestamp;
     }
 }
